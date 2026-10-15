@@ -115,7 +115,7 @@ button.sr-tile{cursor:pointer}
 .sr-tile .duo{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .sr-tile .quad{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
 .sr-tile .quad canvas{aspect-ratio:10/9}
-.sr-grid.trio{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.sr-grid.trio{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;max-width:600px}
 .sr-grid.trio .sr-tile{font-size:12.5px;padding:7px;min-width:0;grid-template-columns:minmax(0,1fr)}
 .sr-grid.trio .sr-tile b{font-size:14px;-webkit-hyphens:auto;hyphens:auto}
 @media (max-width:520px){.sr-grid.trio .sr-tile b{font-size:13px}}
@@ -138,6 +138,12 @@ button.sr-tile{cursor:pointer}
 .sr-note{color:#596455;font-size:14px}
 .sr-succ{display:grid;grid-template-columns:minmax(0,200px) 1fr;gap:14px;align-items:center;margin:12px 0}
 .sr-succ canvas{width:100%;border-radius:12px;background:#e7ecdf}
+.sr-award{display:flex;gap:12px;align-items:center;margin-top:12px;padding:10px 12px;border-radius:14px;background:#fff4dd;box-shadow:inset 0 0 0 2px #f4c27a}
+.sr-award canvas{width:72px;height:64px;border-radius:10px;background:#efe6cf;flex:none}
+.sr-award p{margin:0;display:grid;gap:2px}
+.sr-award b{font:800 16px/1.2 var(--display)}
+.sr-award span{color:#596455;font-size:13.5px}
+.sr-award i{color:#4c6c30}
 .sr-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
 .sr-actions button{font-size:16px;padding:11px 16px}
 @media (max-width:520px){.sr-succ{grid-template-columns:1fr}.sr-mission{font-size:12.5px;top:12px;max-width:calc(100% - 140px);border-radius:14px}.sr-frames{top:78px}.sr-fr{width:50px;height:50px}}
@@ -169,7 +175,7 @@ a{color:var(--accent)}
     <li><b>Land anywhere</b>You latch onto whatever you touch: limb, trunk or ground. Thin branch tips bend and weaken your launch, so leap from closer to the trunk.</li>
     <li><b>Photo</b>Hold the camera (top right), Space, or a controller's A button to look through the lens. It opens under your finger or mouse pointer and follows it as you slide (on a keyboard or controller, the arrows or right stick aim it). Let go to take the photo. Only what's inside the circle counts, and what your mission is looking for is chosen first. Nuts and cones within reach are collected.</li>
     <li><b>Menu</b>The acorn (top left), M or Start. Play any of four forests as one of its squirrels, take a mission, or browse your collection.</li>
-    <li><b>Missions</b>Photograph three different birds, collect three different nuts or cones, or photograph three different wildflowers. Each mission shows its three in outline on the right, and each one fills in when you find it; tap a frame to see it again (and hear the call, for birds).</li>
+    <li><b>Missions</b>Photograph three different birds, collect three different nuts or cones, or photograph three different wildflowers. Each mission shows its three in outline on the right, and each one fills in when you find it; tap a frame to see it again (and hear the call, for birds). Finish a mission and the squirrel you played joins your collection.</li>
     <li><b>Big leaps</b>Long flights turn your tail into a rainbow. Land a long leap on a branch and you get stars, fireflies and falling leaves.</li>
     <li><b>Full screen</b>Tap the button at the bottom of the play area, or press F. Esc exits.</li>
   </ul>
@@ -1280,7 +1286,8 @@ const ZN={
   flowers:['bluebell','woodanemone','primrose','celandine','twinflower','foxglove','woodsorrel','heather','redcampion','harebell','wintergreen']}};
 const ZONE_IDS=['east','boreal','sw','cal'];
 function zone(){return ZN[PLAY.zone||'east'];}
-function itemInfo(kind,id){if(kind==='b'){const b=BIRD_SP[id];return{kind,id,name:b.name,sci:b.sci,range:b.range,fact:b.fact,pl:b.pl};}
+function itemInfo(kind,id){if(kind==='s'){const q=SQUIRRELS[id];return{kind,id,name:q.name,sci:q.sci,range:q.range,fact:q.fact};}
+ if(kind==='b'){const b=BIRD_SP[id];return{kind,id,name:b.name,sci:b.sci,range:b.range,fact:b.fact,pl:b.pl};}
  if(kind==='n'){const n=NUTS[id];return{kind,id,name:n.name,sci:n.sci,range:n.range,fact:n.fact,tree:n.treeName};}
  const f=FLW[id];return{kind,id,name:f.name,sci:f.sci,range:f.range};}
 function plural(i){if(i.pl)return i.pl;const n=i.name;if(/(ch|sh)$/.test(n))return n+'es';if(/nut$/.test(n)||/cone$/.test(n)||/acorn$/.test(n))return n+'s';if(/grouse$/.test(n))return n;return n+'s';}
@@ -1458,7 +1465,7 @@ function drawGroundCritters(ctx,T,t){for(const n of T.nuts){if(!n.ground)continu
 function drawOneBird(ctx,b,t){const sp=BIRD_SP[b.sp],[x,y]=birdPos(b);const st=BirdArt.idle(sp,RM?0:t,b.seed);ctx.save();ctx.translate(x,y);if(b.kind!=='trunk'&&b.face<0)ctx.scale(-1,1);if(b.lean)ctx.rotate(b.lean*b.face*.5);BirdArt.drawBird(ctx,sp,0,0,BIRD_SCALE,st);ctx.restore();}
 
 /* ---- album (saved in this browser) ---- */
-const ALBUM={has:{},load(){try{this.has=JSON.parse(localStorage.getItem('squirrelRacer.album')||'{}')||{};}catch(e){this.has={};}},add(k){this.has[k]=1;try{localStorage.setItem('squirrelRacer.album',JSON.stringify(this.has));}catch(e){}}};
+const ALBUM={has:{},load(){try{this.has=JSON.parse(localStorage.getItem('squirrelRacer.album')||'{}')||{};}catch(e){this.has={};}},add(k){this.has[k]=this.has[k]||1;this.save();},bump(k){this.has[k]=(+this.has[k]||0)+1;this.save();return this.has[k];},save(){try{localStorage.setItem('squirrelRacer.album',JSON.stringify(this.has));}catch(e){}}};
 ALBUM.load();
 
 /* ---- missions ---- */
@@ -1537,7 +1544,7 @@ function takePhoto(){const c=document.getElementById('play'),w=c.clientWidth,h=c
  if(pick.kind==='n'){for(const T of W.trees.values()){const k=T.nuts.indexOf(pick.inst);if(k>=0)T.nuts.splice(k,1);}SFX.land();}
  if(pick.kind==='b')playCall(pick.id);
  if(isTarget(pick)){M.got.push(pick.id);fillFrames();celebrate(1,pick.x,pick.y,0,-1,false);const n=M.got.length;M.lastFound=pick.id;
-  if(n>=M.need){M.done=1;showCard(info,{msg:'That completes the mission!',match:1});setTimeout(()=>showSuccess(M),1400);}
+  if(n>=M.need){M.done=1;M.sqCount=ALBUM.bump('s:'+M.squirrel);showCard(info,{msg:'That completes the mission!',match:1});setTimeout(()=>showSuccess(M),1400);}
   else showCard(info,{msg:'Found one! '+n+' of '+M.need+'.',match:1,want:M});}
  else showCard(info,{msg:pick.kind==='n'?'Collected and added to your album.':'New in your album.',want:M&&!M.done?M:null});}
 
@@ -1589,6 +1596,7 @@ function fillFrames(noAnim){const M=PLAY.mission;if(!M)return;const btns=[...UI.
 function showSuccess(M){hideCard();celebrate(3,S.x,S.y,0,-1,false);
  let body='<h2>Mission complete!</h2>';
  body+=`<p>You ${M.type==='n'?'collected':'photographed'} ${andList(M.targets.map(id=>itemInfo(M.type,id).name))}.</p><div class="sr-grid trio">`+M.targets.map(id=>{const i=itemInfo(M.type,id);return`<div class="sr-tile done"><div data-pic="${M.type}:${id}"></div><b>${i.name}</b><i>${i.sci}</i><span>${i.range}</span></div>`;}).join('')+'</div>';
+ {const q=SQUIRRELS[M.squirrel],first=M.sqCount===1;body+=`<div class="sr-award"><div data-pic="sh:${M.squirrel}" data-w="90" data-h="80"></div><p>${first?`<b>The ${q.name.replace(/ \(.*\)/,'')} joins your collection!</b>`:`<b>Mission ${M.sqCount} as the ${q.name.replace(/ \(.*\)/,'')}</b>`}<span>${q.name} · <i>${q.sci}</i></span></p></div>`;}
  body+='<div class="sr-actions"><button type="button" data-go="resume">Keep exploring</button><button type="button" data-go="missions:'+M.zone+'">New mission</button><button type="button" data-go="main">Menu</button></div>';
  renderMenu(body);}
 function renderMenu(html){UI.menuIn.innerHTML=html;UI.menu.hidden=false;PLAY.paused=true;
@@ -1610,9 +1618,9 @@ function openMenu(view,arg){hideCard();let h='';
  if(view==='missions'){UI.missions=genMissions(arg);h=`<div class="sr-head"><button type="button" data-go="missionz" class="back">Back</button><h2>${ZN[arg].name}: pick a mission</h2></div><div class="sr-grid missions">`+UI.missions.map((m,k)=>{const q=SQUIRRELS[m.squirrel];const ids=m.targets;
    return`<button type="button" class="sr-tile mission" data-go="mission:${k}"><div class="quad"><div data-pic="sh:${m.squirrel}" data-w="100" data-h="90"></div>${ids.map(id=>`<div data-pic="${m.type}:${id}" data-w="100" data-h="90"></div>`).join('')}</div><b>${missionText(m)}</b><span class="sr-names">${missionNames(m)}</span><span>As the ${q.name.replace(/ \(.*\)/,'')}</span></button>`;}).join('')+'</div><p class="sr-note">New missions are dealt each time you open this screen.</p>';}
  if(view==='collection'){const tot=[];h=`<div class="sr-head"><button type="button" data-go="main" class="back">Back</button><h2>Collection</h2></div>`;
-  for(const z of ZONE_IDS){const Z=ZN[z];const sec=[['Birds','b',Z.birds],['Nuts and cones','n',Z.nuts],['Wildflowers','f',Z.flowers]];
+  for(const z of ZONE_IDS){const Z=ZN[z];const sec=[['Squirrels','s',Z.squirrels],['Birds','b',Z.birds],['Nuts and cones','n',Z.nuts],['Wildflowers','f',Z.flowers]];
    h+=`<h3 class="sr-zone">${Z.name}</h3>`;for(const[lab,k,ids]of sec){const got=ids.filter(id=>ALBUM.has[k+':'+id]).length;h+=`<h4>${lab} <span>${got} of ${ids.length}</span></h4><div class="sr-grid coll">`+ids.map(id=>{const i=itemInfo(k,id),have=ALBUM.has[k+':'+id];
-     return`<div class="sr-tile${have?' done':''}">${have?'<span class="tick" role="img" aria-label="Found"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>':''}${k==='n'?`<div class="duo"><div data-pic="t:${NUTS[id].tree}" data-w="90" data-h="80"></div><div data-pic="n:${id}" data-w="90" data-h="80"></div></div>`:`<div data-pic="${k}:${id}"></div>`}<b>${i.name}</b><i>${i.sci}</i>${k==='n'?`<span>${i.tree}</span>`:''}</div>`;}).join('')+'</div>';}}}
+     return`<div class="sr-tile${have?' done':''}">${have?'<span class="tick" role="img" aria-label="Found"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>':''}${k==='n'?`<div class="duo"><div data-pic="t:${NUTS[id].tree}" data-w="90" data-h="80"></div><div data-pic="n:${id}" data-w="90" data-h="80"></div></div>`:`<div data-pic="${k}:${id}"></div>`}<b>${i.name}</b><i>${i.sci}</i>${k==='n'?`<span>${i.tree}</span>`:''}${k==='s'?`<span>${have?(have>1?have+' missions completed':'1 mission completed'):'Complete a mission as this squirrel'}</span>`:''}</div>`;}).join('')+'</div>';}}}
  renderMenu(h);}
 function startGame(cfg){PLAY.zone=cfg.zone;PLAY.squirrel=cfg.squirrel;PLAY.mission=cfg.mission||null;PLAY.started=1;newWorld((Math.random()*1e6)|0);buildFrames();closeMenu();input.seen=false;}
 
