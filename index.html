@@ -52,7 +52,11 @@ section.panel{padding-block:20px;display:grid;gap:18px}
 .sr-round{position:absolute;z-index:4;width:48px;height:48px;border-radius:50%;border:0;display:grid;place-items:center;cursor:pointer;color:#fff8ea;background:rgba(20,26,20,.5);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);box-shadow:0 2px 10px rgba(0,0,0,.18)}
 .sr-round svg{width:24px;height:24px}
 .sr-round:hover{background:rgba(20,26,20,.7)}
-.sr-menu-btn{top:10px;left:10px;color:#f4c27a}
+.sr-menu-btn{top:10px;left:10px;width:60px;height:60px;background:rgba(182,92,23,.85);color:#fff}
+.sr-menu-btn svg{width:28px;height:28px}
+.sr-menu-btn:hover{background:rgba(182,92,23,1)}
+.sr-photo-btn{touch-action:none;-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+.sr-photo-btn.held{background:#f4c27a;color:#3a2410;transform:scale(1.06)}
 .sr-photo-btn{top:10px;right:10px;width:60px;height:60px;background:rgba(182,92,23,.85);color:#fff}
 .sr-photo-btn svg{width:28px;height:28px}
 .sr-photo-btn:hover{background:rgba(182,92,23,1)}
@@ -151,7 +155,7 @@ a{color:var(--accent)}
     <li><b>Move</b>Left thumb, W A S D, or a controller's left stick. In Nimble motion (B), steer anywhere within reach of a branch: the body glides in straight lines while the feet keep hold, so slipping between nearby branches, going under, or around a trunk just happens. In Surface motion (A), run along the branch and push into it to swing to the other side.</li>
     <li><b>Leap</b>Right thumb, the arrow keys, or a controller's right stick. Pull back away from where you want to go, then let go. Hold longer to wind up a bigger leap; on keys, the direction is the average of what you've held.</li>
     <li><b>Land anywhere</b>You latch onto whatever you touch: limb, trunk or ground. Thin branch tips bend and weaken your launch, so leap from closer to the trunk.</li>
-    <li><b>Photo</b>Tap the camera (top right), or press Space or a controller's A button. It photographs what's on screen, choosing what your mission is looking for first. Nuts and cones within reach are collected.</li>
+    <li><b>Photo</b>Hold the camera (top right), Space, or a controller's A button to look through the lens. Drag (or use the arrows or right stick) to aim the circle, then let go to take the photo. Only what's inside the circle counts, and what your mission is looking for is chosen first. Nuts and cones within reach are collected.</li>
     <li><b>Menu</b>The acorn (top left), M or Start. Play any of four forests as one of its squirrels, take a mission, or browse your collection.</li>
     <li><b>Missions</b>Photograph 3 of one bird, collect 3 of one nut or cone, or find 10 different wildflowers. Each find fills a frame on the right; tap a frame to see it again and hear the call.</li>
     <li><b>Big leaps</b>Long flights turn your tail into a rainbow. Land a long leap on a branch and you get stars, fireflies and falling leaves.</li>
@@ -837,7 +841,7 @@ function amb_crickets(){const ctx=AMB.ctx,t0=ctx.currentTime+.02,o=ctx.createOsc
  for(let i=0;i<4;i++){const t=t0+i*.055;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.12,t+.008);g.gain.linearRampToValueAtTime(0,t+.03);}
  o.connect(g);if(pan){pan.pan.value=Math.random()*1.6-.8;g.connect(pan).connect(AMB.L.crickets.synth);}else g.connect(AMB.L.crickets.synth);o.start(t0);o.stop(t0+.3);}
 function amb_burst(dur,f0,f1,type,peak){if(!AMB.started||!AMB.on)return;const ctx=AMB.ctx,t=ctx.currentTime,s=ctx.createBufferSource(),f=ctx.createBiquadFilter(),g=ctx.createGain();s.buffer=AMB.click2||(AMB.click2=amb_noise(ctx,1));f.type=type;f.frequency.setValueAtTime(f0,t);f.frequency.exponentialRampToValueAtTime(f1,t+dur);amb_env(g,t,.01,peak,dur);s.connect(f).connect(g).connect(AMB.fx);s.start(t);s.stop(t+dur+.1);}
-const SFX={shutter:()=>{amb_burst(.05,3000,2000,'highpass',.5);setTimeout(()=>amb_burst(.07,2400,1200,'bandpass',.45),70);},leap:p=>amb_burst(.35,500,1800,'bandpass',.25+.35*p),land:()=>amb_burst(.14,600,180,'lowpass',.5),
+const SFX={focus:()=>amb_burst(.03,3800,3400,'bandpass',.25),shutter:()=>{amb_burst(.05,3000,2000,'highpass',.5);setTimeout(()=>amb_burst(.07,2400,1200,'bandpass',.45),70);},leap:p=>amb_burst(.35,500,1800,'bandpass',.25+.35*p),land:()=>amb_burst(.14,600,180,'lowpass',.5),
  chime:tier=>{if(!AMB.started||!AMB.on||tier<1)return;const ctx=AMB.ctx,t=ctx.currentTime,notes=[1046.5,1318.5,1568,2093,2637].slice(0,tier+2);notes.forEach((f,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=f;amb_env(g,t+i*.07,.005,.07,.9);o.connect(g).connect(AMB.fx);o.start(t+i*.07);o.stop(t+i*.07+1);});}};
 function updateAudio(dt){if(!AMB.started)return;const ctx=AMB.ctx,now=ctx.currentTime,L=AMB.L;if(!L.wind)return;
  const y=S.flying?S.y:surfacePos().y,hgt=clamp(-y/480,0,1),gnd=1-clamp(-y/110,0,1),spd=clamp((S.flying?Math.hypot(S.vx,S.vy):S.speed)/260,0,1);
@@ -1451,18 +1455,52 @@ function missionText(m){if(m.type==='f')return'Photograph 10 different wildflowe
 
 /* ---- photo: pick what's on screen, prefer what you're looking for ---- */
 function onScreen(x,y,w,h){const z=cam.zoom*(1+FX.punch),sx=(x-cam.x)*z+w/2,sy=(y-cam.y)*z+h/2;return sx>-6&&sx<w+6&&sy>-6&&sy<h+6;}
-function takePhoto(){const c=document.getElementById('play'),w=c.clientWidth,h=c.clientHeight,M=PLAY.mission,taken=W.taken;flashUI();SFX.shutter();
- const sq=S.flying?{x:S.x,y:S.y}:surfacePos(),c0=[];
- for(const T of W.trees.values()){for(const b of T.birds){const[x,y]=birdPos(b);if(onScreen(x,y-8,w,h))c0.push({kind:'b',id:b.sp,inst:b,x,y:y-8});}
-  for(const n of T.nuts){const[x,y]=nutPos(n);if(onScreen(x,y+5,w,h))c0.push({kind:'n',id:n.sp,inst:n,x,y:y+5});}
-  for(const f of T.flowers){const y=f.y-f.h;if(onScreen(f.x,y,w,h))c0.push({kind:'f',id:f.sp,inst:f,x:f.x,y});}}
- const d=o=>Math.hypot(o.x-sq.x,o.y-sq.y),REACH=70;c0.sort((a,b)=>d(a)-d(b));
+/* ---- camera lens: hold to look through a circle, drag to aim, release to shoot ---- */
+const LENS={on:false,src:null,t0:0,cx:0,cy:0,bx:0,by:0,px:0,py:0,ax:0,ay:0,pick:null};
+const LENS_READY=.3;
+function lensR(w,h){return Math.max(80,Math.max(w,h)/8);}
+function lensStart(src,px,py){if(PLAY.paused||LENS.on)return;const c=document.getElementById('play'),w=c.clientWidth,h=c.clientHeight;hideCard();input.seen=true;if(AMB.on)startAudio();
+ Object.assign(LENS,{on:true,src,t0:performance.now()/1000,bx:w/2,by:h/2,cx:w/2,cy:h/2,px:px||0,py:py||0,ax:0,ay:0,pick:null});SFX.focus&&SFX.focus();}
+function lensAim(px,py){if(!LENS.on||LENS.src!=='touch')return;LENS.ax=(px-LENS.px)*1.6;LENS.ay=(py-LENS.py)*1.6;}
+function lensEnd(cancel){if(!LENS.on)return;LENS.on=false;if(cancel)return;
+ if(performance.now()/1000-LENS.t0<LENS_READY){DS.toast={txt:'Hold the camera to aim, then let go',t:2.4};return;}takePhoto();}
+function lensUpdate(w,h,dt){if(!LENS.on)return;const r=lensR(w,h);
+ const g=DS.gp;if(LENS.src==='pad'&&g.rcur){LENS.ax+=g.rcur.x*700*dt;LENS.ay+=g.rcur.y*700*dt;}
+ if(LENS.src==='key'&&KB.down.size){for(const c of KB.down){const v=KPULL[c];if(v){LENS.ax+=v[0]*500*dt;LENS.ay+=v[1]*500*dt;}}}
+ const tx=clamp(LENS.bx+LENS.ax,r+6,w-r-6),ty=clamp(LENS.by+LENS.ay,r+6,h-r-6);LENS.ax=tx-LENS.bx;LENS.ay=ty-LENS.by;
+ const k=1-Math.exp(-dt*18);LENS.cx+=(tx-LENS.cx)*k;LENS.cy+=(ty-LENS.cy)*k;LENS.pick=lensPick(w,h).pick;}
+function toScreen(x,y,w,h){const z=cam.zoom*(1+FX.punch);return[(x-cam.x)*z+w/2,(y-cam.y)*z+h/2];}
+// everything whose middle is inside the lens; what the mission wants comes first, then whatever is nearest the middle
+function lensPick(w,h){const M=PLAY.mission,taken=W.taken,r=lensR(w,h),z=cam.zoom*(1+FX.punch),c0=[];
+ const add=(kind,id,inst,x,y,sz)=>{const[sx,sy]=toScreen(x,y,w,h),dl=Math.hypot(sx-LENS.cx,sy-LENS.cy);if(dl<r+sz*z*.5)c0.push({kind,id,inst,x,y,sx,sy,dl,sz:sz*z});};
+ for(const T of W.trees.values()){for(const b of T.birds){const[x,y]=birdPos(b);add('b',b.sp,b,x,y-8,22);}
+  for(const n of T.nuts){const[x,y]=nutPos(n);add('n',n.sp,n,x,y+5,12);}
+  for(const f of T.flowers){add('f',f.sp,f,f.x,f.y-f.h,14);}}
+ const sq=S.flying?{x:S.x,y:S.y}:surfacePos(),reach=o=>o.kind!=='n'||Math.hypot(o.x-sq.x,o.y-sq.y)<70;
+ c0.sort((a,b)=>a.dl-b.dl);
  const fresh=c0.filter(o=>!taken.has(o.inst.id)),isTarget=o=>M&&!M.done&&o.kind===M.type&&(M.type==='f'?!M.got.includes(o.id):o.id===M.target);
- let pick=fresh.find(o=>isTarget(o)&&(o.kind!=='n'||d(o)<REACH))||fresh.find(o=>isTarget(o))||fresh.find(o=>o.kind!=='n'||d(o)<REACH)||fresh[0]||c0[0];
- if(!pick){showCard(null,{msg:'Nothing to photograph here yet. Birds perch on branches and trunks, nuts hang under the limbs, and wildflowers grow on the ground.'});return;}
+ const pick=fresh.find(o=>isTarget(o)&&reach(o))||fresh.find(o=>isTarget(o))||fresh.find(reach)||fresh[0]||c0[0]||null;
+ return{pick,isTarget,reach};}
+function drawLens(ctx,w,h,t){if(!LENS.on)return;const r=lensR(w,h),cx=LENS.cx,cy=LENS.cy,ready=clamp((performance.now()/1000-LENS.t0)/LENS_READY,0,1);
+ ctx.save();ctx.fillStyle='rgba(10,14,11,.72)';ctx.beginPath();ctx.rect(0,0,w,h);ctx.arc(cx,cy,r,0,TAU,true);ctx.fill();
+ // soft inner vignette and rim
+ const g=ctx.createRadialGradient(cx,cy,r*.72,cx,cy,r);g.addColorStop(0,'rgba(10,14,11,0)');g.addColorStop(1,'rgba(10,14,11,.35)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy,r,0,TAU);ctx.fill();
+ ctx.strokeStyle='rgba(255,248,234,.9)';ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(cx,cy,r,0,TAU);ctx.stroke();
+ ctx.strokeStyle='rgba(244,194,122,.95)';ctx.lineWidth=4;ctx.lineCap='round';ctx.beginPath();ctx.arc(cx,cy,r+6,-Math.PI/2,-Math.PI/2+TAU*ready);ctx.stroke();
+ ctx.strokeStyle='rgba(255,248,234,.7)';ctx.lineWidth=2;for(let i=0;i<4;i++){const a=i*Math.PI/2;ctx.beginPath();ctx.moveTo(cx+Math.cos(a)*(r-12),cy+Math.sin(a)*(r-12));ctx.lineTo(cx+Math.cos(a)*(r-4),cy+Math.sin(a)*(r-4));ctx.stroke();}
+ ctx.beginPath();ctx.moveTo(cx-7,cy);ctx.lineTo(cx+7,cy);ctx.moveTo(cx,cy-7);ctx.lineTo(cx,cy+7);ctx.stroke();
+ // focus brackets on what the shot will capture
+ const P=LENS.pick;if(P&&ready>=1){const hs=Math.max(16,P.sz*.75),x=P.sx,y=P.sy,l=hs*.45,pulse=1+.06*Math.sin(t*8);ctx.save();ctx.translate(x,y);ctx.scale(pulse,pulse);ctx.strokeStyle='#f4c27a';ctx.lineWidth=2.5;
+  for(const[sx,sy]of[[-1,-1],[1,-1],[1,1],[-1,1]]){ctx.beginPath();ctx.moveTo(sx*hs,sy*(hs-l));ctx.lineTo(sx*hs,sy*hs);ctx.lineTo(sx*(hs-l),sy*hs);ctx.stroke();}ctx.restore();}
+ ctx.fillStyle='rgba(255,248,234,.92)';ctx.font='600 13px "Atkinson Hyperlegible",sans-serif';ctx.textAlign='center';
+ {const nar=w<520,msg=ready<1?'Focusing…':(LENS.src==='touch'?'Drag to aim · let go'+(nar?'':' to take the photo'):LENS.src==='pad'?'Right stick to aim · let go'+(nar?'':' to take the photo'):'Arrow keys to aim · let go'+(nar?'':' to take the photo'));const tw=ctx.measureText(msg).width/2+10;const ty=cy+r+28<h-60?cy+r+28:cy-r-16;ctx.fillText(msg,clamp(cx,tw,w-tw),ty);}
+ ctx.restore();}
+function takePhoto(){const c=document.getElementById('play'),w=c.clientWidth,h=c.clientHeight,M=PLAY.mission,taken=W.taken;flashUI();SFX.shutter();
+ const{pick,isTarget,reach}=lensPick(w,h);
+ if(!pick){showCard(null,{msg:'Nothing in the lens that time. Aim the circle at a bird, a nut or cone, or a wildflower.'});return;}
  const info=itemInfo(pick.kind,pick.id);
  if(taken.has(pick.inst.id)){showCard(info,{msg:'Already in your album from this forest.'});return;}
- if(pick.kind==='n'&&d(pick)>=REACH){showCard(info,{msg:'Climb within reach to collect it.',want:M&&!M.done&&!isTarget(pick)?M:null});return;}
+ if(!reach(pick)){showCard(info,{msg:'Climb within reach to collect it.',want:M&&!M.done&&!isTarget(pick)?M:null});return;}
  taken.add(pick.inst.id);ALBUM.add(pick.kind+':'+pick.id);
  if(pick.kind==='n'){for(const T of W.trees.values()){const k=T.nuts.indexOf(pick.inst);if(k>=0)T.nuts.splice(k,1);}SFX.land();}
  if(pick.kind==='b')playCall(pick.id);
@@ -1472,7 +1510,7 @@ function takePhoto(){const c=document.getElementById('play'),w=c.clientWidth,h=c
  else showCard(info,{msg:pick.kind==='n'?'Collected and added to your album.':'New in your album.',want:M&&!M.done?M:null});}
 
 /* ---- UI: menu, photo button, frames, cards ---- */
-const ICON={acorn:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M4 9c0-2.5 3.6-4 8-4s8 1.5 8 4v1H4z" fill="currentColor"/><path d="M6 11h12c0 5-2.5 9.5-6 11-3.5-1.5-6-6-6-11z" fill="currentColor" opacity=".75"/></svg>',
+const ICON={acorn:'<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5.3c0-1.5.6-2.6 2-3.3"/><path d="M3.6 10.6c0-3.1 3.8-5.3 8.4-5.3s8.4 2.2 8.4 5.3z"/><path d="M6.6 10.6c0 5.4 2.3 9.1 5.4 10.8 3.1-1.7 5.4-5.4 5.4-10.8"/></svg>',
  camera:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 8h3l1.6-2.4h6.8L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><circle cx="12" cy="13" r="3.6" fill="none" stroke="currentColor" stroke-width="2"/></svg>'};
 const UI={};
 function buildUI(){const st=document.getElementById('stage');
@@ -1483,7 +1521,14 @@ function buildUI(){const st=document.getElementById('stage');
  <div class="sr-menu" id="sr-menu" hidden><div class="sr-menu-in" id="sr-menu-in"></div></div>`);
  UI.menu=document.getElementById('sr-menu');UI.menuIn=document.getElementById('sr-menu-in');UI.card=document.getElementById('sr-card');UI.frames=document.getElementById('sr-frames');UI.mission=document.getElementById('sr-mission');
  document.getElementById('sr-menu-btn').addEventListener('click',e=>{e.stopPropagation();openMenu('main');});
- document.getElementById('sr-photo-btn').addEventListener('click',e=>{e.stopPropagation();if(!PLAY.paused)takePhoto();});
+ {const pb=document.getElementById('sr-photo-btn');
+  pb.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();if(PLAY.paused)return;try{pb.setPointerCapture(e.pointerId);}catch(_){}pb._pid=e.pointerId;pb.classList.add('held');lensStart('touch',e.clientX,e.clientY);});
+  pb.addEventListener('pointermove',e=>{if(e.pointerId===pb._pid)lensAim(e.clientX,e.clientY);});
+  const end=cancel=>e=>{if(e.pointerId!==pb._pid)return;pb._pid=null;pb.classList.remove('held');if(LENS.src==='touch')lensEnd(cancel);};
+  pb.addEventListener('pointerup',end(false));pb.addEventListener('pointercancel',end(true));
+  pb.addEventListener('contextmenu',e=>e.preventDefault());
+  pb.addEventListener('keydown',e=>{if((e.code==='Space'||e.code==='Enter')&&!e.repeat){e.preventDefault();e.stopPropagation();lensStart('key');}});
+  pb.addEventListener('keyup',e=>{if((e.code==='Space'||e.code==='Enter')&&LENS.src==='key'){e.preventDefault();e.stopPropagation();lensEnd();}});}
  UI.card.addEventListener('click',()=>hideCard());
  for(const el of[UI.menu,UI.card,UI.frames])el.addEventListener('pointerdown',e=>e.stopPropagation());}
 function flashUI(){const f=document.getElementById('sr-flash');f.classList.remove('go');void f.offsetWidth;f.classList.add('go');}
@@ -1677,6 +1722,7 @@ function drawPlay(t,dt){
  grassBand(ctx,vx0,vx1,t,{seed:53,step:7,yMin:25,yMax:34,hMin:6,hMax:15,bw:3.2,wind:1.1,boost:.5,cols:GRASS_FRINGE},trunks);
  drawFX(ctx);ctx.restore();
  drawFG(ctx,w,h,t,dt);
+ if(!PLAY.paused)lensUpdate(w,h,dt);else if(LENS.on)lensEnd(true);drawLens(ctx,w,h,t);
  drawSticks(ctx,w,h);
  // HUD
  if(!input.seen){ctx.fillStyle='rgba(20,26,20,.6)';const tw=Math.min(w-140,330);ctx.fillRect(w/2-tw/2,PLAY.scheme==='dual'?(PLAY.mission?(w<520?92:62):62):h-58,tw,42);ctx.fillStyle='#f3f1e8';ctx.font='600 13px "Atkinson Hyperlegible",sans-serif';ctx.textAlign='center';ctx.fillText(PLAY.scheme==='dual'?(w<520?'Left: move · Right: pull to leap':'Left: move · Right: pull back to leap'):'Drag to run · grab squirrel & pull back to jump',w/2,PLAY.scheme==='dual'?(PLAY.mission?(w<520?118:88):88):h-32);ctx.textAlign='start';}
@@ -1688,25 +1734,26 @@ const KB={down:new Set(),pull:null,t:0,ax:0,ay:0};
 const KMOVE={KeyW:[0,-1],KeyS:[0,1],KeyA:[-1,0],KeyD:[1,0]},KPULL={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0]};
 function kbVec(map){let x=0,y=0;for(const k of KB.down){const v=map[k];if(v){x+=v[0];y+=v[1];}}const m=Math.hypot(x,y);return m?{x:x/m,y:y/m}:null;}
 const kbPower=()=>(.5+.5*clamp(KB.t/.8,0,1))*1.2;
-function pollKeys(dt){const p=kbVec(KPULL);if(p){KB.ax+=p.x*dt;KB.ay+=p.y*dt;KB.t+=dt;const m=Math.hypot(KB.ax,KB.ay)||1;KB.pull={x:KB.ax/m,y:KB.ay/m};}
+function pollKeys(dt){if(LENS.on){KB.pull=null;KB.t=0;KB.ax=KB.ay=0;return;}const p=kbVec(KPULL);if(p){KB.ax+=p.x*dt;KB.ay+=p.y*dt;KB.t+=dt;const m=Math.hypot(KB.ax,KB.ay)||1;KB.pull={x:KB.ax/m,y:KB.ay/m};}
  else if(KB.pull){const q=KB.pull;KB.pull=null;if(KB.t>.06)jumpWith(aimFrom(-q.x,-q.y,kbPower()));KB.t=0;KB.ax=KB.ay=0;}}
 window.addEventListener('keydown',e=>{if(tab!=='play'||e.target.closest&&e.target.closest('input,textarea'))return;const c=e.code;
  if(PLAY.paused){KB.down.clear();return;}
- if((c==='Space'||c==='Enter')&&!e.repeat&&!(e.target.closest&&e.target.closest('button'))){e.preventDefault();input.seen=true;takePhoto();return;}
+ if(c==='Space'||c==='Enter'){if(e.target.closest&&e.target.closest('button'))return;e.preventDefault();if(!e.repeat)lensStart('key');return;}
+ if(LENS.on&&LENS.src==='key'&&KPULL[c]){e.preventDefault();KB.down.add(c);return;}
  if(c==='KeyM'&&!e.repeat){e.preventDefault();openMenu('main');return;}
  if(KMOVE[c]||KPULL[c]){e.preventDefault();input.seen=true;if(AMB.on)startAudio();KB.down.add(c);}});
-window.addEventListener('keyup',e=>{KB.down.delete(e.code);});
-window.addEventListener('blur',()=>{KB.down.clear();KB.pull=null;KB.t=0;KB.ax=KB.ay=0;});
+window.addEventListener('keyup',e=>{KB.down.delete(e.code);if((e.code==='Space'||e.code==='Enter')&&LENS.on&&LENS.src==='key')lensEnd();});
+window.addEventListener('blur',()=>{lensEnd(true);KB.down.clear();KB.pull=null;KB.t=0;KB.ax=KB.ay=0;});
 
 /* ================= DUAL STICK + GAMEPAD ================= */
 const DS={L:null,R:null,gp:{active:false,lx:0,ly:0,rs:null,rcur:null,aPrev:false,name:'',blocked:false},toast:null};
 const STICK_R=50,TOLERANCE=Math.cos(70*Math.PI/180);
 function aimFrom(ux,uy,pw){const ff=flexAt(S.path,S.s);const v=pw*VMAX*(.55+.45*ff);return{vx:ux*v,vy:uy*v,pw,L:100};}
-function dualAim(){if(S.flying)return null;const R=DS.R;if(R&&PLAY.scheme==='dual'){const dx=R.x-R.sx,dy=R.y-R.sy,L=Math.hypot(dx,dy);if(L>=30&&performance.now()-R.t0>110)return aimFrom(-dx/L,-dy/L,(.5+.5*clamp((L-30)/80,0,1)));}
+function dualAim(){if(S.flying||LENS.on)return null;const R=DS.R;if(R&&PLAY.scheme==='dual'){const dx=R.x-R.sx,dy=R.y-R.sy,L=Math.hypot(dx,dy);if(L>=30&&performance.now()-R.t0>110)return aimFrom(-dx/L,-dy/L,(.5+.5*clamp((L-30)/80,0,1)));}
  if(KB.pull&&KB.t>.1)return aimFrom(-KB.pull.x,-KB.pull.y,kbPower());
  const g=DS.gp;if(g.active&&g.rcur&&g.rcur.m>.45)return aimFrom(-g.rcur.x/g.rcur.m,-g.rcur.y/g.rcur.m,(.5+.5*clamp((g.rcur.m-.45)/.55,0,1)));return null;}
 function curAim(w,h){if(S.flying)return null;if(input.down&&input.mode==='aim'){const a=aimVel(w,h);return a.L>18?a:null;}return dualAim();}
-function jumpWith(a){if(S.flying||!a)return;S.dorsal=false;S.dorsalDraw=null;SFX.leap(a.pw||.5);const p=surfacePos();S.bx=S.by=0;S.x=p.x;S.y=p.y;S.vx=a.vx;S.vy=a.vy;S.flying=true;S.air=0;S.from=S.path;S.lx=p.x;S.ly=p.y;FX.trail.length=0;S.sagV-=60*(1-flexAt(S.path,S.s));}
+function jumpWith(a){if(S.flying||!a||LENS.on)return;S.dorsal=false;S.dorsalDraw=null;SFX.leap(a.pw||.5);const p=surfacePos();S.bx=S.by=0;S.x=p.x;S.y=p.y;S.vx=a.vx;S.vy=a.vy;S.flying=true;S.air=0;S.from=S.path;S.lx=p.x;S.ly=p.y;FX.trail.length=0;S.sagV-=60*(1-flexAt(S.path,S.s));}
 function stickVec(){let x=0,y=0;if(DS.L){x=DS.L.vx;y=DS.L.vy;}const kv=kbVec(KMOVE);if(kv&&!DS.L){x=kv.x;y=kv.y;}const g=DS.gp;if(g.active&&Math.hypot(g.lx,g.ly)>Math.hypot(x,y)){x=g.lx;y=g.ly;}return{x,y,m:Math.min(1,Math.hypot(x,y))};}
 function sideFor(Q,s2,old,uy){if(Q.noFlip)return -1;if(Q.kind==='trunk')return old.x<pathAt(Q,s2).x?-1:1;return uy>.5?1:-1;}
 // Move along the surface only if the stick points roughly along it (within 70°); otherwise stand still.
@@ -1749,19 +1796,19 @@ function pollPad(){const g=DS.gp;let pads;try{pads=navigator.getGamepads?navigat
  g.active=true;const dz=v=>Math.abs(v)<.18?0:v,b=i=>!!(p.buttons[i]&&p.buttons[i].pressed);
  let lx=dz(p.axes[0]||0),ly=dz(p.axes[1]||0);if(b(14))lx=-1;if(b(15))lx=1;if(b(12))ly=-1;if(b(13))ly=1;g.lx=lx;g.ly=ly;
  const rx=dz(p.axes[2]||0),ry=dz(p.axes[3]||0),rm=Math.hypot(rx,ry);
- if(rm>.3){g.rcur={x:rx,y:ry,m:Math.min(1,rm)};if(!g.rs||rm>=g.rs.m)g.rs={x:rx,y:ry,m:Math.min(1,rm)};}
+ if(LENS.on){g.rcur=rm>.3?{x:rx,y:ry,m:Math.min(1,rm)}:null;g.rs=null;}else if(rm>.3){g.rcur={x:rx,y:ry,m:Math.min(1,rm)};if(!g.rs||rm>=g.rs.m)g.rs={x:rx,y:ry,m:Math.min(1,rm)};}
  else{g.rcur=null;if(g.rs){const R=g.rs;g.rs=null;if(R.m>.45)jumpWith(aimFrom(-R.x/R.m,-R.y/R.m,(.5+.5*clamp((R.m-.45)/.55,0,1))));}}
  }
 const PADB={};
 function padUI(){let p=null;try{for(const q of(navigator.getGamepads?navigator.getGamepads():[])||[])if(q&&q.connected){p=q;break;}}catch(e){return;}if(!p)return;
- const hit=i=>{const on=!!(p.buttons[i]&&p.buttons[i].pressed),was=PADB[i];PADB[i]=on;return on&&!was;};
+ const held=i=>!!(p.buttons[i]&&p.buttons[i].pressed),hit=i=>{const on=held(i),was=PADB[i];PADB[i]=on;return on&&!was;};
  const menu=UI.menu&&!UI.menu.hidden;
  if(hit(9)){if(menu){if(PLAY.started)closeMenu();}else openMenu('main');}
  const a=hit(0),b=hit(1),up=hit(12)|hit(14),dn=hit(13)|hit(15);
  if(menu){const els=[...UI.menuIn.querySelectorAll('button')];if(!els.length)return;let k=els.indexOf(document.activeElement);
   if(up||dn){k=k<0?0:(k+(dn?1:-1)+els.length)%els.length;els[k].focus();els[k].scrollIntoView({block:'nearest'});}
   if(a&&k>=0)els[k].click();if(b){const bk=UI.menuIn.querySelector('.back');if(bk)bk.click();else if(PLAY.started)closeMenu();}return;}
- if(a||b){input.seen=true;takePhoto();}}
+ if(a||b)lensStart('pad');if(LENS.on&&LENS.src==='pad'&&!held(0)&&!held(1))lensEnd();}
 function setPadStatus(){const el=document.getElementById('pad-status');if(!el)return;const g=DS.gp;el.textContent=g.blocked?'This viewer blocks controllers. They work once the game runs on its own page.':g.active?'Connected: '+g.name:'No controller yet. Pair one, then press any button.';}
 window.addEventListener('gamepadconnected',()=>{pollPad();setPadStatus();});
 window.addEventListener('gamepaddisconnected',()=>{pollPad();setPadStatus();});
