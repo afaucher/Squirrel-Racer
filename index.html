@@ -66,9 +66,7 @@ section.panel{padding-block:20px;display:grid;gap:18px}
 .stage:fullscreen .sr-photo-btn,.stage.immersive .sr-photo-btn{top:calc(10px + env(safe-area-inset-top,0px))}
 .sr-mission{position:absolute;z-index:3;top:14px;left:50%;transform:translateX(-50%);max-width:calc(100% - 160px);padding:7px 14px;border-radius:999px;background:rgba(20,26,20,.5);color:#fff8ea;font:700 14px/1.25 var(--body);text-align:center;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);pointer-events:none}
 .sr-frames{position:absolute;z-index:3;right:10px;top:82px;display:grid;gap:8px}
-.sr-frames.many{grid-template-columns:repeat(2,44px);gap:6px}
 .sr-fr{width:60px;height:60px;padding:4px;border-radius:14px;border:1.5px solid rgba(255,255,255,.4);background:rgba(20,30,22,.35);cursor:pointer;transition:background .4s,border-color .4s}
-.sr-frames.many .sr-fr{width:44px;height:44px;border-radius:11px;padding:3px}
 .sr-fr canvas{width:100%;height:100%;display:block}
 .sr-fr.filled{background:rgba(255,248,232,.92);border-color:#f4c27a}
 .sr-fr.pop{animation:srpop .7s cubic-bezier(.2,1.6,.4,1)}
@@ -115,6 +113,20 @@ button.sr-tile{cursor:pointer}
 .sr-tile i{color:#4c6c30;font-size:13px}
 .sr-tile span{color:#596455;font-size:13px}
 .sr-tile .duo{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.sr-tile .quad{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.sr-tile .quad canvas{aspect-ratio:10/9}
+.sr-grid.trio{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.sr-grid.trio .sr-tile{font-size:12.5px;padding:7px;min-width:0;grid-template-columns:minmax(0,1fr)}
+.sr-grid.trio .sr-tile b{font-size:14px;-webkit-hyphens:auto;hyphens:auto}
+@media (max-width:520px){.sr-grid.trio .sr-tile b{font-size:13px}}
+.sr-tile canvas{max-width:100%}
+.sr-tile .sr-names{color:#1b221c;font-size:13.5px}
+.sr-pair figure.want.many{display:block}
+.sr-left{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px;margin-top:6px}
+.sr-left div{display:grid;gap:1px;font-size:12.5px;line-height:1.25}
+.sr-left canvas{width:100%;height:auto;aspect-ratio:4/3;border-radius:8px;background:#dfe5e8}
+.sr-left b{font:700 13px/1.2 var(--display)}
+.sr-left i{color:#4c6c30}
 .sr-tile .duo canvas{aspect-ratio:9/8}
 .sr-grid.coll .sr-tile:not(.done) canvas{filter:grayscale(.85) opacity(.55)}
 .sr-tile.done{background:#fff9ec;box-shadow:inset 0 0 0 2px #f4c27a}
@@ -128,7 +140,7 @@ button.sr-tile{cursor:pointer}
 .sr-succ canvas{width:100%;border-radius:12px;background:#e7ecdf}
 .sr-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
 .sr-actions button{font-size:16px;padding:11px 16px}
-@media (max-width:520px){.sr-succ{grid-template-columns:1fr}.sr-mission{font-size:12.5px;top:12px;max-width:calc(100% - 140px);border-radius:14px}.sr-frames{top:78px}.sr-fr{width:50px;height:50px}.sr-frames.many{grid-template-columns:repeat(2,38px)}.sr-frames.many .sr-fr{width:38px;height:38px}}
+@media (max-width:520px){.sr-succ{grid-template-columns:1fr}.sr-mission{font-size:12.5px;top:12px;max-width:calc(100% - 140px);border-radius:14px}.sr-frames{top:78px}.sr-fr{width:50px;height:50px}}
 #play{width:100%;height:min(72vh,640px);border-radius:12px;display:block;touch-action:none;user-select:none;-webkit-user-select:none;background:#c9dbe4;cursor:grab}
 .bar{display:flex;flex-wrap:wrap;gap:14px 22px;align-items:end}
 .foot{margin:0;color:var(--muted);font-size:14px;max-width:72ch}
@@ -157,7 +169,7 @@ a{color:var(--accent)}
     <li><b>Land anywhere</b>You latch onto whatever you touch: limb, trunk or ground. Thin branch tips bend and weaken your launch, so leap from closer to the trunk.</li>
     <li><b>Photo</b>Hold the camera (top right), Space, or a controller's A button to look through the lens. It opens under your finger or mouse pointer and follows it as you slide (on a keyboard or controller, the arrows or right stick aim it). Let go to take the photo. Only what's inside the circle counts, and what your mission is looking for is chosen first. Nuts and cones within reach are collected.</li>
     <li><b>Menu</b>The acorn (top left), M or Start. Play any of four forests as one of its squirrels, take a mission, or browse your collection.</li>
-    <li><b>Missions</b>Photograph 3 of one bird, collect 3 of one nut or cone, or find 10 different wildflowers. Each find fills a frame on the right; tap a frame to see it again and hear the call.</li>
+    <li><b>Missions</b>Photograph three different birds, collect three different nuts or cones, or photograph three different wildflowers. Each mission shows its three in outline on the right, and each one fills in when you find it; tap a frame to see it again (and hear the call, for birds).</li>
     <li><b>Big leaps</b>Long flights turn your tail into a rainbow. Land a long leap on a branch and you get stars, fireflies and falling leaves.</li>
     <li><b>Full screen</b>Tap the button at the bottom of the play area, or press F. Esc exits.</li>
   </ul>
@@ -1421,11 +1433,11 @@ function worldBirdCall(){if(!W)return false;let best=[];for(const T of W.trees.v
  const b=best[(Math.random()*best.length)|0],d=Math.hypot(b.x-cam.x,b.y-cam.y);playCall(b.sp,{world:1,pan:(b.x-cam.x)/600,vol:clamp(1.2-d/700,.15,1)});return true;}
 
 /* ---- populate trees with birds, nuts and flowers ---- */
-function pickTreeKey(hsh){const Z=zone(),M=PLAY.mission;let tot=0;const ws=Z.trees.map(([k,w])=>{const boost=(M&&M.type==='n'&&NUTS[M.target].tree===k)?3:1;tot+=w*boost;return[k,w*boost];});let r=(hsh%1000)/1000*tot;for(const[k,w]of ws){if((r-=w)<0)return k;}return ws[0][0];}
+function pickTreeKey(hsh){const Z=zone(),M=PLAY.mission;let tot=0;const ws=Z.trees.map(([k,w])=>{const boost=(M&&M.type==='n'&&!M.done&&M.targets.some(id=>!M.got.includes(id)&&NUTS[id].tree===k))?3:1;tot+=w*boost;return[k,w*boost];});let r=(hsh%1000)/1000*tot;for(const[k,w]of ws){if((r-=w)<0)return k;}return ws[0][0];}
 function populateTree(T,i,hsh){const Z=zone(),M=PLAY.mission,r=rng(hsh^0x5bd1e995),taken=W.taken;T.birds=[];T.nuts=[];T.flowers=[];
  const limbs=T.limbs.filter(l=>!l.behind&&l.path.len>60);
  // birds
- const nb=(r()<.6?1:0)+(r()<.25?1:0);const tgt=M&&M.type==='b'?M.target:null;const want=[];if(tgt&&r()<.5)want.push(tgt);while(want.length<nb)want.push(Z.birds[(r()*Z.birds.length)|0]);
+ const nb=(r()<.6?1:0)+(r()<.25?1:0);const left=M&&M.type==='b'&&!M.done?M.targets.filter(id=>!M.got.includes(id)):[],tgt=left.length?left[(r()*left.length)|0]:null;const want=[];if(tgt&&r()<.5)want.push(tgt);while(want.length<nb)want.push(Z.birds[(r()*Z.birds.length)|0]);
  want.forEach((bid,k)=>{const sp=BIRD_SP[bid],id=i+':b'+k;let b=null;
   if(sp.pose==='cling'||sp.pose==='headdown'){const P=T.trunk,s=P.len*(.18+r()*.4),q=pathAt(P,s),w=wAt(P,s)/2;b={kind:'trunk',P,s,x:q.x+(sp.pose==='cling'?-w:w),y:q.y};}
   else if(sp.pose==='ground'){b={kind:'ground',x:T.x+(r()<.5?-1:1)*(40+r()*110),y:4};}
@@ -1450,8 +1462,17 @@ const ALBUM={has:{},load(){try{this.has=JSON.parse(localStorage.getItem('squirre
 ALBUM.load();
 
 /* ---- missions ---- */
-function genMissions(zid){const Z=ZN[zid],r=Math.random,pick=a=>a[(r()*a.length)|0];const types=['b','n','f'];return types.map(type=>({zone:zid,squirrel:pick(Z.squirrels),type,target:type==='b'?pick(Z.birds):type==='n'?pick(Z.nuts):null,need:type==='f'?10:3}));}
-function missionText(m){if(m.type==='f')return'Photograph 10 different wildflowers';const i=itemInfo(m.type,m.target);return(m.type==='b'?'Photograph 3 ':'Collect 3 ')+plural(i);}
+// every mission asks for three different species
+function pick3(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[b[i],b[j]]=[b[j],b[i]];}return b.slice(0,3);}
+function genMissions(zid){const Z=ZN[zid],pick=a=>a[(Math.random()*a.length)|0];return['b','n','f'].map(type=>({zone:zid,squirrel:pick(Z.squirrels),type,targets:pick3(type==='b'?Z.birds:type==='n'?Z.nuts:Z.flowers),need:3}));}
+const isCone=id=>/cone$/i.test(NUTS[id].name);
+function nutNoun(ids){const c=ids.filter(isCone).length;return c===ids.length?'cones':c?'nuts and cones':'nuts';}
+function missionText(m){return m.type==='b'?'Photograph these 3 birds':m.type==='f'?'Photograph these 3 wildflowers':'Collect these 3 '+nutNoun(m.targets);}
+function andList(a){return a.length<2?a.join(''):a.slice(0,-1).join(', ')+' and '+a[a.length-1];}
+function missionNames(m){return andList(m.targets.map(id=>itemInfo(m.type,id).name));}
+function wanted(M,kind,id){return!!M&&!M.done&&M.type===kind&&!M.got.includes(id)&&M.targets.includes(id);}
+function slotId(M,k){return M.targets[k];}
+function slotFilled(M,k){return M.got.includes(M.targets[k]);}
 
 /* ---- photo: pick what's on screen, prefer what you're looking for ---- */
 function onScreen(x,y,w,h){const z=cam.zoom*(1+FX.punch),sx=(x-cam.x)*z+w/2,sy=(y-cam.y)*z+h/2;return sx>-6&&sx<w+6&&sy>-6&&sy<h+6;}
@@ -1484,7 +1505,7 @@ function lensPick(w,h){const M=PLAY.mission,taken=W.taken,r=lensR(w,h),z=cam.zoo
   for(const f of T.flowers){add('f',f.sp,f,f.x,f.y-f.h,14);}}
  const sq=S.flying?{x:S.x,y:S.y}:surfacePos(),reach=o=>o.kind!=='n'||Math.hypot(o.x-sq.x,o.y-sq.y)<70;
  c0.sort((a,b)=>a.dl-b.dl);
- const fresh=c0.filter(o=>!taken.has(o.inst.id)),isTarget=o=>M&&!M.done&&o.kind===M.type&&(M.type==='f'?!M.got.includes(o.id):o.id===M.target);
+ const fresh=c0.filter(o=>!taken.has(o.inst.id)),isTarget=o=>wanted(M,o.kind,o.id);
  const pick=fresh.find(o=>isTarget(o)&&reach(o))||fresh.find(o=>isTarget(o))||fresh.find(reach)||fresh[0]||c0[0]||null;
  return{pick,isTarget,reach};}
 // a camera lens, not a gunsight: the view irises open, the edge is soft, and the glass catches a little light
@@ -1515,9 +1536,9 @@ function takePhoto(){const c=document.getElementById('play'),w=c.clientWidth,h=c
  taken.add(pick.inst.id);ALBUM.add(pick.kind+':'+pick.id);
  if(pick.kind==='n'){for(const T of W.trees.values()){const k=T.nuts.indexOf(pick.inst);if(k>=0)T.nuts.splice(k,1);}SFX.land();}
  if(pick.kind==='b')playCall(pick.id);
- if(isTarget(pick)){M.got.push(pick.id);fillFrames();celebrate(1,pick.x,pick.y,0,-1,false);const n=M.got.length;
+ if(isTarget(pick)){M.got.push(pick.id);fillFrames();celebrate(1,pick.x,pick.y,0,-1,false);const n=M.got.length;M.lastFound=pick.id;
   if(n>=M.need){M.done=1;showCard(info,{msg:'That completes the mission!',match:1});setTimeout(()=>showSuccess(M),1400);}
-  else showCard(info,{msg:(M.type==='f'?'A new wildflower! ':"That's one! ")+n+' of '+M.need+'.',match:1});}
+  else showCard(info,{msg:'Found one! '+n+' of '+M.need+'.',match:1,want:M});}
  else showCard(info,{msg:pick.kind==='n'?'Collected and added to your album.':'New in your album.',want:M&&!M.done?M:null});}
 
 /* ---- UI: menu, photo button, frames, cards ---- */
@@ -1529,7 +1550,7 @@ function buildUI(){const st=document.getElementById('stage');
  <button class="sr-round sr-photo-btn" id="sr-photo-btn" type="button" aria-label="Take a photo">${ICON.camera}</button>
  <div class="sr-mission" id="sr-mission" hidden></div><div class="sr-frames" id="sr-frames"></div>
  <div class="sr-flash" id="sr-flash"></div><div class="sr-card" id="sr-card" hidden></div>
- <div class="sr-menu" id="sr-menu" hidden><div class="sr-menu-in" id="sr-menu-in"></div></div>`);
+ <div class="sr-menu" id="sr-menu" hidden><div class="sr-menu-in" id="sr-menu-in" lang="en"></div></div>`);
  UI.menu=document.getElementById('sr-menu');UI.menuIn=document.getElementById('sr-menu-in');UI.card=document.getElementById('sr-card');UI.frames=document.getElementById('sr-frames');UI.mission=document.getElementById('sr-mission');
  document.getElementById('sr-menu-btn').addEventListener('click',e=>{e.stopPropagation();openMenu('main');});
  {const pb=document.getElementById('sr-photo-btn');
@@ -1551,22 +1572,23 @@ let cardT=0;
 function showCard(info,o){o=o||{};clearTimeout(cardT);const C=UI.card;C.innerHTML='';C.className='sr-card'+(o.match?' match':'');
  const row=document.createElement('div');row.className='sr-pair';
  if(info){const f=document.createElement('figure');f.appendChild(pic(info.kind,info.id,'',180,135));f.insertAdjacentHTML('beforeend',figHTML(info,o.label||(o.want?'You found':'')));row.appendChild(f);}
- if(o.want){const wi=o.want.type==='f'?null:itemInfo(o.want.type,o.want.target);const f=document.createElement('figure');f.className='want';
-  if(wi){f.appendChild(pic(wi.kind,wi.id,'',180,135));f.insertAdjacentHTML('beforeend',figHTML({...wi,fact:''},'Looking for'));}else f.innerHTML='<figcaption><span class="sr-k">Looking for</span><b>Wildflowers</b><span>'+(10-o.want.got.length)+' more kinds to find</span></figcaption>';row.appendChild(f);}
+ if(o.want){const W0=o.want,f=document.createElement('figure');f.className='want';
+  {const left=W0.targets.filter(id=>!W0.got.includes(id));f.className='want many';f.innerHTML='<figcaption><span class="sr-k">Still looking for</span></figcaption>';const ul=document.createElement('div');ul.className='sr-left';
+   for(const id of left){const i=itemInfo(W0.type,id),d=document.createElement('div');d.appendChild(pic(W0.type,id,'',120,90));d.insertAdjacentHTML('beforeend','<b>'+i.name+'</b><i>'+i.sci+'</i>');ul.appendChild(d);}f.appendChild(ul);}
+  row.appendChild(f);}
  C.appendChild(row);if(o.msg)C.insertAdjacentHTML('beforeend','<p class="sr-msg">'+o.msg+'</p>');C.hidden=false;cardT=setTimeout(hideCard,o.want?7000:4500);}
 function hideCard(){UI.card.hidden=true;}
-function buildFrames(){const M=PLAY.mission;UI.frames.innerHTML='';UI.frames.className='sr-frames'+(M&&M.type==='f'?' many':'');UI.mission.hidden=!M;if(!M)return;UI.mission.textContent=missionText(M);
+function buildFrames(){const M=PLAY.mission;UI.frames.innerHTML='';UI.frames.className='sr-frames';UI.mission.hidden=!M;if(!M)return;UI.mission.textContent=missionText(M);
  for(let k=0;k<M.need;k++){const b=document.createElement('button');b.type='button';b.className='sr-fr';b.dataset.k=k;b.setAttribute('aria-label','Mission slot '+(k+1));const c=document.createElement('canvas');b.appendChild(c);UI.frames.appendChild(b);
-  b.addEventListener('click',e=>{e.stopPropagation();const id=M.type==='f'?M.got[k]:M.target;if(!id){showCard(null,{msg:'Wildflowers grow on the forest floor. Each new kind fills a frame.'});return;}const info=itemInfo(M.type,id);if(M.type==='b')playCall(id);showCard(info,{label:M.got.length>k?'Found':'Looking for'});});}
+  b.addEventListener('click',e=>{e.stopPropagation();const id=slotId(M,k);const info=itemInfo(M.type,id);if(M.type==='b')playCall(id);showCard(info,{label:slotFilled(M,k)?'Found':'Looking for'});});}
  fillFrames(true);}
-function fillFrames(noAnim){const M=PLAY.mission;if(!M)return;const btns=[...UI.frames.children];btns.forEach((b,k)=>{const c=b.firstChild,filled=k<M.got.length,id=M.type==='f'?M.got[k]:M.target;
+function fillFrames(noAnim){const M=PLAY.mission;if(!M)return;const btns=[...UI.frames.children];btns.forEach((b,k)=>{const c=b.firstChild,filled=slotFilled(M,k),id=slotId(M,k);
   const src=id?(filled?pictureOf(M.type,id,120,120):outlineOf(M.type,id,120,120)):outlineOf('f','bloodroot',120,120);c.width=src.width;c.height=src.height;const g=c.getContext('2d');g.clearRect(0,0,c.width,c.height);g.globalAlpha=filled||id?1:.45;g.drawImage(src,0,0);
   const was=b.classList.contains('filled');b.classList.toggle('filled',filled);if(filled&&!was&&!noAnim){b.classList.remove('pop');void b.offsetWidth;b.classList.add('pop');}});
  UI.mission.textContent=missionText(M)+' · '+Math.min(M.got.length,M.need)+'/'+M.need;}
-function showSuccess(M){const info=M.type==='f'?null:itemInfo(M.type,M.target);hideCard();celebrate(3,S.x,S.y,0,-1,false);
+function showSuccess(M){hideCard();celebrate(3,S.x,S.y,0,-1,false);
  let body='<h2>Mission complete!</h2>';
- if(info)body+=`<div class="sr-succ"><div data-pic="${M.type}:${M.target}"></div>${figHTML(info)}</div><p>You ${M.type==='n'?'collected':'photographed'} 3 ${plural(info)}.</p>`;
- else body+='<p>You photographed 10 different wildflowers.</p><div class="sr-grid">'+M.got.map(id=>`<div class="sr-tile done"><div data-pic="f:${id}"></div><b>${FLW[id].name}</b><i>${FLW[id].sci}</i></div>`).join('')+'</div>';
+ body+=`<p>You ${M.type==='n'?'collected':'photographed'} ${andList(M.targets.map(id=>itemInfo(M.type,id).name))}.</p><div class="sr-grid trio">`+M.targets.map(id=>{const i=itemInfo(M.type,id);return`<div class="sr-tile done"><div data-pic="${M.type}:${id}"></div><b>${i.name}</b><i>${i.sci}</i><span>${i.range}</span></div>`;}).join('')+'</div>';
  body+='<div class="sr-actions"><button type="button" data-go="resume">Keep exploring</button><button type="button" data-go="missions:'+M.zone+'">New mission</button><button type="button" data-go="main">Menu</button></div>';
  renderMenu(body);}
 function renderMenu(html){UI.menuIn.innerHTML=html;UI.menu.hidden=false;PLAY.paused=true;
@@ -1585,8 +1607,8 @@ function openMenu(view,arg){hideCard();let h='';
  if(view==='playz'||view==='missionz'){h=`<div class="sr-head"><button type="button" data-go="main" class="back">Back</button><h2>${view==='playz'?'Choose a forest':'Missions: choose a forest'}</h2></div><div class="sr-grid zones">`+ZONE_IDS.map(z=>{const Z=ZN[z];const tr=Z.trees[0][0];
    return`<button type="button" class="sr-tile" data-go="${view==='playz'?'plays':'missions'}:${z}"><div data-pic="t:${tr}" data-w="150" data-h="112"></div><b>${Z.name}</b><i>${Z.where}</i></button>`;}).join('')+'</div>';}
  if(view==='plays'){const Z=ZN[arg];h=`<div class="sr-head"><button type="button" data-go="playz" class="back">Back</button><h2>${Z.name}: choose your squirrel</h2></div><div class="sr-grid">`+Z.squirrels.map(s=>{const q=SQUIRRELS[s];return`<button type="button" class="sr-tile" data-go="play:${arg}:${s}"><div data-pic="sh:${s}"></div><b>${q.name}</b><i>${q.sci}</i><span>${q.range}</span></button>`;}).join('')+'</div>';}
- if(view==='missions'){UI.missions=genMissions(arg);h=`<div class="sr-head"><button type="button" data-go="missionz" class="back">Back</button><h2>${ZN[arg].name}: pick a mission</h2></div><div class="sr-grid missions">`+UI.missions.map((m,k)=>{const q=SQUIRRELS[m.squirrel];const tp=m.type==='f'?'f:'+ZN[arg].flowers[(Math.random()*ZN[arg].flowers.length)|0]:m.type+':'+m.target;
-   return`<button type="button" class="sr-tile mission" data-go="mission:${k}"><div class="duo"><div data-pic="sh:${m.squirrel}" data-w="110" data-h="90"></div><div data-pic="${tp}" data-w="110" data-h="90"></div></div><b>${missionText(m)}</b><span>As the ${q.name.replace(/ \(.*\)/,'')}</span></button>`;}).join('')+'</div><p class="sr-note">New missions are dealt each time you open this screen.</p>';}
+ if(view==='missions'){UI.missions=genMissions(arg);h=`<div class="sr-head"><button type="button" data-go="missionz" class="back">Back</button><h2>${ZN[arg].name}: pick a mission</h2></div><div class="sr-grid missions">`+UI.missions.map((m,k)=>{const q=SQUIRRELS[m.squirrel];const ids=m.targets;
+   return`<button type="button" class="sr-tile mission" data-go="mission:${k}"><div class="quad"><div data-pic="sh:${m.squirrel}" data-w="100" data-h="90"></div>${ids.map(id=>`<div data-pic="${m.type}:${id}" data-w="100" data-h="90"></div>`).join('')}</div><b>${missionText(m)}</b><span class="sr-names">${missionNames(m)}</span><span>As the ${q.name.replace(/ \(.*\)/,'')}</span></button>`;}).join('')+'</div><p class="sr-note">New missions are dealt each time you open this screen.</p>';}
  if(view==='collection'){const tot=[];h=`<div class="sr-head"><button type="button" data-go="main" class="back">Back</button><h2>Collection</h2></div>`;
   for(const z of ZONE_IDS){const Z=ZN[z];const sec=[['Birds','b',Z.birds],['Nuts and cones','n',Z.nuts],['Wildflowers','f',Z.flowers]];
    h+=`<h3 class="sr-zone">${Z.name}</h3>`;for(const[lab,k,ids]of sec){const got=ids.filter(id=>ALBUM.has[k+':'+id]).length;h+=`<h4>${lab} <span>${got} of ${ids.length}</span></h4><div class="sr-grid coll">`+ids.map(id=>{const i=itemInfo(k,id),have=ALBUM.has[k+':'+id];
