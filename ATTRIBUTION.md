@@ -9,8 +9,13 @@ All artwork, animation and sound in the game is original and generated in code. 
 The common names, scientific names, native ranges and facts on every card come from these general references, cross-checked against the per-species pages below.
 
 - [All About Birds](https://www.allaboutbirds.org), Cornell Lab of Ornithology: North American bird ranges, field marks and calls.
-- [RSPB](https://www.rspb.org.uk): British and European birds.
-- [Wikipedia](https://en.wikipedia.org): species summaries and ranges, under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/). We cite these pages; we don't copy their text.
+- [RSPB A–Z of UK birds](https://www.rspb.org.uk/birds-and-wildlife/a-z): British and European birds.
+- [Trees for Life: the Caledonian Forest](https://treesforlife.org.uk/into-the-forest/the-caledonian-forest/) and its [trees, plants and animals](https://treesforlife.org.uk/into-the-forest/trees-plants-animals/): the Scottish pinewood.
+- [Fire Effects Information System](https://research.fs.usda.gov/feis), USDA Forest Service: North American tree and wildflower ranges.
+- Burns & Honkala (coordinators), *Silvics of North America*, USDA Agriculture Handbook 654 (1990). [Volume 1, Conifers](https://research.fs.usda.gov/treesearch/1547).
+- [Wikipedia](https://en.wikipedia.org): species summaries and ranges, under [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+
+These are cited as fact references only; no text or images are copied from them. Every link below was checked in October 2026.
 
 ### Squirrels
 
@@ -117,7 +122,7 @@ The common names, scientific names, native ranges and facts on every card come f
 | Common blanketflower | *Gaillardia aristata* | [Wikipedia](https://en.wikipedia.org/wiki/Gaillardia_aristata) |
 | Beardlip penstemon | *Penstemon barbatus* | [Wikipedia](https://en.wikipedia.org/wiki/Penstemon_barbatus) |
 | Bluebell | *Hyacinthoides non-scripta* | [Wikipedia](https://en.wikipedia.org/wiki/Hyacinthoides_non-scripta) |
-| Wood anemone | *Anemone nemorosa* | [Wikipedia](https://en.wikipedia.org/wiki/Anemone_nemorosa) |
+| Wood anemone | *Anemonoides nemorosa* (formerly *Anemone nemorosa*) | [Wikipedia](https://en.wikipedia.org/wiki/Anemonoides_nemorosa) |
 | Primrose | *Primula vulgaris* | [Wikipedia](https://en.wikipedia.org/wiki/Primula_vulgaris) |
 | Lesser celandine | *Ficaria verna* | [Wikipedia](https://en.wikipedia.org/wiki/Ficaria_verna) |
 | Foxglove | *Digitalis purpurea* | [Wikipedia](https://en.wikipedia.org/wiki/Digitalis_purpurea) |
@@ -137,9 +142,10 @@ The ambience and every bird call are synthesized in the browser. The game also l
 
 For real recordings of each bird's call (`audio/birds/<id>.mp3`), good sources are:
 
-- US National Park Service sound libraries, such as those for Yellowstone and Rocky Mountain National Park: public domain, credit the NPS.
-- US Fish & Wildlife Service and USGS recordings: works of the US federal government, public domain.
-- [xeno-canto](https://xeno-canto.org): each recording carries its own Creative Commons licence, most often BY-NC-SA. Credit the recordist and follow that licence.
+- National Park Service sound libraries for [Yellowstone](https://www.nps.gov/yell/learn/photosmultimedia/soundlibrary.htm) and [Rocky Mountain National Park](https://www.nps.gov/romo/learn/photosmultimedia/soundlibrary.htm). Public domain; credit "National Park Service".
+- [USGS](https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits) recordings. USGS-made works are public domain; credit "U.S. Geological Survey". Items from others marked as copyrighted are excluded.
+- US Fish & Wildlife Service recordings on Wikimedia Commons, tagged [PD-USGov-FWS](https://commons.wikimedia.org/wiki/Template:PD-USGov-FWS). Check each file's source details.
+- [xeno-canto](https://xeno-canto.org). Each recording carries its own Creative Commons licence, chosen by the recordist and often non-commercial (NC) or share-alike (SA); check it on the recording's page. Credit as "Recordist, XC123456, www.xeno-canto.org/123456". Avoid no-derivatives (ND) recordings if you need to trim them.
 
 Add a line here for each recording you include.
 
