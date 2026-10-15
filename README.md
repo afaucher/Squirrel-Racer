@@ -45,7 +45,7 @@ Holding the photo button opens a round lens (a quarter of the screen across) and
 | Southwest Ponderosa Pine | Abert's, Kaibab | Ponderosa pine, Gambel oak, Douglas-fir, quaking aspen, Colorado pinyon | Steller's jay, pygmy nuthatch, mountain chickadee, acorn woodpecker, western bluebird, red-faced warbler |
 | Caledonian Pinewood | Eurasian red (and its dark form) | Scots pine, silver birch, hazel, pedunculate oak, European beech, rowan | Eurasian jay, crested tit, great spotted woodpecker, coal tit, European robin, common chaffinch |
 
-Each forest also has 11 native wildflowers and 4 nuts or cones. Birds are synthesized from the rhythm and pitch of their real calls; drop a recording at `audio/birds/<id>.mp3` to use it instead (see `audio/README.md`).
+Each forest also has 11 native wildflowers and 4 nuts or cones. To add a forest, see [docs/ADDING-A-FOREST.md](docs/ADDING-A-FOREST.md): how the species are researched, how each one is described as data, and how to check the result. Birds are synthesized from the rhythm and pitch of their real calls; drop a recording at `audio/birds/<id>.mp3` to use it instead (see `audio/README.md`).
 
 ## Motion models (A/B toggle in the page)
 
