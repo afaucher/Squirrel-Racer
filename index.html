@@ -155,7 +155,7 @@ a{color:var(--accent)}
     <li><b>Move</b>Left thumb, W A S D, or a controller's left stick. In Nimble motion (B), steer anywhere within reach of a branch: the body glides in straight lines while the feet keep hold, so slipping between nearby branches, going under, or around a trunk just happens. In Surface motion (A), run along the branch and push into it to swing to the other side.</li>
     <li><b>Leap</b>Right thumb, the arrow keys, or a controller's right stick. Pull back away from where you want to go, then let go. Hold longer to wind up a bigger leap; on keys, the direction is the average of what you've held.</li>
     <li><b>Land anywhere</b>You latch onto whatever you touch: limb, trunk or ground. Thin branch tips bend and weaken your launch, so leap from closer to the trunk.</li>
-    <li><b>Photo</b>Hold the camera (top right), Space, or a controller's A button to look through the lens. It opens under your mouse pointer and follows it; on touch, drag from the button (or use the arrows or right stick) to aim. Let go to take the photo. Only what's inside the circle counts, and what your mission is looking for is chosen first. Nuts and cones within reach are collected.</li>
+    <li><b>Photo</b>Hold the camera (top right), Space, or a controller's A button to look through the lens. It opens under your finger or mouse pointer and follows it as you slide (on a keyboard or controller, the arrows or right stick aim it). Let go to take the photo. Only what's inside the circle counts, and what your mission is looking for is chosen first. Nuts and cones within reach are collected.</li>
     <li><b>Menu</b>The acorn (top left), M or Start. Play any of four forests as one of its squirrels, take a mission, or browse your collection.</li>
     <li><b>Missions</b>Photograph 3 of one bird, collect 3 of one nut or cone, or find 10 different wildflowers. Each find fills a frame on the right; tap a frame to see it again and hear the call.</li>
     <li><b>Big leaps</b>Long flights turn your tail into a rainbow. Land a long leap on a branch and you get stars, fireflies and falling leaves.</li>
@@ -1456,21 +1456,23 @@ function missionText(m){if(m.type==='f')return'Photograph 10 different wildflowe
 /* ---- photo: pick what's on screen, prefer what you're looking for ---- */
 function onScreen(x,y,w,h){const z=cam.zoom*(1+FX.punch),sx=(x-cam.x)*z+w/2,sy=(y-cam.y)*z+h/2;return sx>-6&&sx<w+6&&sy>-6&&sy<h+6;}
 /* ---- camera lens: hold to look through a circle, drag to aim, release to shoot ---- */
-const LENS={on:false,src:null,follow:false,t0:0,cx:0,cy:0,bx:0,by:0,px:0,py:0,ax:0,ay:0,pick:null};
+const LENS={on:false,src:null,follow:false,f:{x:0,y:0},t0:0,cx:0,cy:0,bx:0,by:0,px:0,py:0,ax:0,ay:0,pick:null};
 const LENS_READY=.3;
 // where the mouse last was over the play area, so the lens can open right under it
 const MOUSE={x:0,y:0,t:-1e9};
 function lensR(w,h){return Math.max(80,Math.max(w,h)/8);}
 function lensStart(src,px,py){if(PLAY.paused||LENS.on)return;const c=document.getElementById('play'),w=c.clientWidth,h=c.clientHeight;hideCard();input.seen=true;if(AMB.on)startAudio();
- const follow=src==='mouse'||(src==='key'&&MOUSE.t>0);const r=lensR(w,h);const sx=follow?clamp(MOUSE.x,r+6,w-r-6):w/2,sy=follow?clamp(MOUSE.y,r+6,h-r-6):h/2;
+ const cr=c.getBoundingClientRect();if(src==='touch'){LENS.f.x=(px||0)-cr.left;LENS.f.y=(py||0)-cr.top;}
+ const follow=src==='mouse'||src==='touch'||(src==='key'&&MOUSE.t>0),F=src==='touch'?LENS.f:MOUSE;const r=lensR(w,h);const sx=follow?clamp(F.x,r+6,w-r-6):w/2,sy=follow?clamp(F.y,r+6,h-r-6):h/2;
  Object.assign(LENS,{on:true,src,follow,t0:performance.now()/1000,bx:sx,by:sy,cx:sx,cy:sy,px:px||0,py:py||0,ax:0,ay:0,pick:null});SFX.focus&&SFX.focus();}
-function lensAim(px,py){if(!LENS.on||LENS.src!=='touch')return;LENS.ax=(px-LENS.px)*1.6;LENS.ay=(py-LENS.py)*1.6;}
+// on touch the lens sits under the finger and follows it
+function lensAim(px,py){if(!LENS.on||LENS.src!=='touch')return;const cr=document.getElementById('play').getBoundingClientRect();LENS.f.x=px-cr.left;LENS.f.y=py-cr.top;}
 function lensEnd(cancel){if(!LENS.on)return;LENS.on=false;if(cancel)return;
  if(performance.now()/1000-LENS.t0<LENS_READY){DS.toast={txt:'Hold the camera, then let go',t:2.4};return;}takePhoto();}
 function lensUpdate(w,h,dt){if(!LENS.on)return;const r=lensR(w,h);
  const g=DS.gp;if(LENS.src==='pad'&&g.rcur){LENS.ax+=g.rcur.x*700*dt;LENS.ay+=g.rcur.y*700*dt;}
  if(LENS.src==='key'&&!LENS.follow&&KB.down.size){for(const c of KB.down){const v=KPULL[c];if(v){LENS.ax+=v[0]*500*dt;LENS.ay+=v[1]*500*dt;}}}
- if(LENS.follow){LENS.ax=MOUSE.x-LENS.bx;LENS.ay=MOUSE.y-LENS.by;}
+ if(LENS.follow){const F=LENS.src==='touch'?LENS.f:MOUSE;LENS.ax=F.x-LENS.bx;LENS.ay=F.y-LENS.by;}
  const tx=clamp(LENS.bx+LENS.ax,r+6,w-r-6),ty=clamp(LENS.by+LENS.ay,r+6,h-r-6);if(!LENS.follow){LENS.ax=tx-LENS.bx;LENS.ay=ty-LENS.by;}
  const k=1-Math.exp(-dt*(LENS.follow?30:18));LENS.cx+=(tx-LENS.cx)*k;LENS.cy+=(ty-LENS.cy)*k;LENS.pick=lensPick(w,h).pick;}
 function toScreen(x,y,w,h){const z=cam.zoom*(1+FX.punch);return[(x-cam.x)*z+w/2,(y-cam.y)*z+h/2];}
@@ -1501,7 +1503,7 @@ function drawLens(ctx,w,h,t){if(!LENS.on)return;const R=lensR(w,h),cx=LENS.cx,cy
  // what's in focus gets a faint warm glow
  const P=LENS.pick;if(P&&u>=1){const gr=Math.max(18,P.sz*1.1),gl=ctx.createRadialGradient(P.sx,P.sy,0,P.sx,P.sy,gr);gl.addColorStop(0,'rgba(255,220,150,.22)');gl.addColorStop(1,'rgba(255,220,150,0)');ctx.fillStyle=gl;ctx.beginPath();ctx.arc(P.sx,P.sy,gr,0,TAU);ctx.fill();}
  ctx.globalCompositeOperation='source-over';
- if(u>=1){const nar=w<520,msg=LENS.follow?'Let go to take the photo':(LENS.src==='touch'?'Drag to aim, let go to shoot':LENS.src==='pad'?'Right stick to aim, let go to shoot':'Arrows to aim, let go to shoot');
+ if(u>=1){const nar=w<520,msg=LENS.follow?(LENS.src==='touch'?'Slide to aim, let go to take the photo':'Let go to take the photo'):(LENS.src==='pad'?'Right stick to aim, let go to shoot':'Arrows to aim, let go to shoot');
   ctx.font='600 '+(nar?12:13)+'px "Atkinson Hyperlegible",sans-serif';ctx.textAlign='center';const tw=ctx.measureText(msg).width/2+10;const ty=cy+R+30<h-60?cy+R+30:cy-R-18;ctx.fillStyle='rgba(255,248,234,.75)';ctx.fillText(msg,clamp(cx,tw,w-tw),ty);}
  ctx.restore();}
 function takePhoto(){const c=document.getElementById('play'),w=c.clientWidth,h=c.clientHeight,M=PLAY.mission,taken=W.taken;flashUI();SFX.shutter();
