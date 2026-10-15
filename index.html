@@ -120,6 +120,7 @@ button.sr-tile{cursor:pointer}
 .sr-grid.trio .sr-tile b{font-size:14px;-webkit-hyphens:auto;hyphens:auto}
 @media (max-width:520px){.sr-grid.trio .sr-tile b{font-size:13px}}
 .sr-tile canvas{max-width:100%}
+.sr-tile .sr-where{color:#b65c17;font:500 11.5px/1.35 var(--mono);letter-spacing:.04em;text-transform:uppercase;margin-bottom:2px}
 .sr-tile .sr-names{color:#1b221c;font-size:13.5px}
 .sr-pair figure.want.many{display:block}
 .sr-left{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:8px;margin-top:6px}
@@ -195,7 +196,7 @@ a{color:var(--accent)}
     <li><b>Leap</b>Right thumb, the arrow keys, or a controller's right stick. Pull back away from where you want to go, then let go. Hold longer to wind up a bigger leap; on keys, the direction is the average of what you've held.</li>
     <li><b>Land anywhere</b>You latch onto whatever you touch: limb, trunk or ground. Thin branch tips bend and weaken your launch, so leap from closer to the trunk.</li>
     <li><b>Photo</b>Hold the camera (top right), Space, or a controller's A button to look through the lens. It opens under your finger or mouse pointer and follows it as you slide (on a keyboard or controller, the arrows or right stick aim it). Let go to take the photo. Only what's inside the circle counts, and what your mission is looking for is chosen first. Nuts and cones within reach are collected.</li>
-    <li><b>Menu</b>The acorn (top left), M or Start. Play any of four forests as one of its squirrels, take a mission, or browse your collection.</li>
+    <li><b>Menu</b>The acorn (top left), M or Start. Play any of four forests as one of its squirrels, take a mission (each is dealt its own forest and squirrel), or browse your collection.</li>
     <li><b>Missions</b>Photograph three different birds, collect three different nuts or cones, or photograph three different wildflowers. Each mission shows its three in outline on the right, and each one fills in when you find it; tap a frame to see it again (and hear the call, for birds). Finish a mission and the squirrel you played joins your collection.</li>
     <li><b>Big leaps</b>Long flights turn your tail into a rainbow. Land a long leap on a branch and you get stars, fireflies and falling leaves.</li>
     <li><b>Full screen</b>Tap the button at the bottom of the play area, or press F. Esc exits.</li>
@@ -1492,7 +1493,8 @@ ALBUM.load();
 /* ---- missions ---- */
 // every mission asks for three different species
 function pick3(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[b[i],b[j]]=[b[j],b[i]];}return b.slice(0,3);}
-function genMissions(zid){const Z=ZN[zid],pick=a=>a[(Math.random()*a.length)|0];return['b','n','f'].map(type=>({zone:zid,squirrel:pick(Z.squirrels),type,targets:pick3(type==='b'?Z.birds:type==='n'?Z.nuts:Z.flowers),need:3}));}
+// each mission rolls a forest, then a squirrel from that forest, then what to find there
+function genMissions(){const pick=a=>a[(Math.random()*a.length)|0],types=pick3(['b','n','f']);return types.map(type=>{const zid=pick(ZONE_IDS),Z=ZN[zid];return{zone:zid,squirrel:pick(Z.squirrels),type,targets:pick3(type==='b'?Z.birds:type==='n'?Z.nuts:Z.flowers),need:3};});}
 const isCone=id=>/cone$/i.test(NUTS[id].name);
 function nutNoun(ids){const c=ids.filter(isCone).length;return c===ids.length?'cones':c?'nuts and cones':'nuts';}
 function missionText(m){return m.type==='b'?'Photograph these 3 birds':m.type==='f'?'Photograph these 3 wildflowers':'Collect these 3 '+nutNoun(m.targets);}
@@ -1618,7 +1620,7 @@ function showSuccess(M){hideCard();celebrate(3,S.x,S.y,0,-1,false);
  let body='<h2>Mission complete!</h2>';
  body+=`<p>You ${M.type==='n'?'collected':'photographed'} ${andList(M.targets.map(id=>itemInfo(M.type,id).name))}.</p><div class="sr-grid trio">`+M.targets.map(id=>{const i=itemInfo(M.type,id);return`<div class="sr-tile done"><div data-pic="${M.type}:${id}"></div><b>${i.name}</b><i>${i.sci}</i><span>${i.range}</span></div>`;}).join('')+'</div>';
  {const q=SQUIRRELS[M.squirrel],first=M.sqCount===1;body+=`<div class="sr-award"><div data-pic="sh:${M.squirrel}" data-w="90" data-h="80"></div><p>${first?`<b>The ${q.name.replace(/ \(.*\)/,'')} joins your collection!</b>`:`<b>Mission ${M.sqCount} as the ${q.name.replace(/ \(.*\)/,'')}</b>`}<span>${q.name} · <i>${q.sci}</i></span></p></div>`;}
- body+='<div class="sr-actions"><button type="button" data-go="resume">Keep exploring</button><button type="button" data-go="missions:'+M.zone+'">New mission</button><button type="button" data-go="main">Menu</button></div>';
+ body+='<div class="sr-actions"><button type="button" data-go="resume">Keep exploring</button><button type="button" data-go="missions">New mission</button><button type="button" data-go="main">Menu</button></div>';
  renderMenu(body);}
 function renderMenu(html){UI.menuIn.innerHTML=html;UI.menu.hidden=false;PLAY.paused=true;
  for(const el of UI.menuIn.querySelectorAll('[data-pic]')){const[k,id]=el.dataset.pic.split(':');const W=+el.dataset.w||150,H=+el.dataset.h||112;el.appendChild(pic(k,id,'',W,H));}
@@ -1650,12 +1652,12 @@ function infoView(k,id){const i=itemInfo(k,id),have=ALBUM.has[k+':'+id],zones=ZO
 function openMenu(view,arg){hideCard();let h='';
  if(view==='main'){h=`<div class="sr-title">${ICON.acorn}<div><h2>Squirrel Racer</h2><p>Explore real forests as a real squirrel.</p></div></div><div class="sr-main">
   ${W&&PLAY.started?'<button type="button" data-go="resume" class="primary">Resume</button>':''}<button type="button" data-go="playz">Play<span>Explore freely. Pick a forest and a squirrel.</span></button>
-  <button type="button" data-go="missionz">Missions<span>Find birds, nuts, cones and wildflowers.</span></button><button type="button" data-go="collection">Collection<span>Everything you've found, with names and ranges.</span></button></div>`;}
+  <button type="button" data-go="missions">Missions<span>Find birds, nuts, cones and wildflowers.</span></button><button type="button" data-go="collection">Collection<span>Everything you've found, with names and ranges.</span></button></div>`;}
  if(view==='playz'||view==='missionz'){h=`<div class="sr-head"><button type="button" data-go="main" class="back">Back</button><h2>${view==='playz'?'Choose a forest':'Missions: choose a forest'}</h2></div><div class="sr-grid zones">`+ZONE_IDS.map(z=>{const Z=ZN[z];const tr=Z.trees[0][0];
    return`<button type="button" class="sr-tile" data-go="${view==='playz'?'plays':'missions'}:${z}"><div data-pic="t:${tr}" data-w="150" data-h="112"></div><b>${Z.name}</b><i>${Z.where}</i></button>`;}).join('')+'</div>';}
  if(view==='plays'){const Z=ZN[arg];h=`<div class="sr-head"><button type="button" data-go="playz" class="back">Back</button><h2>${Z.name}: choose your squirrel</h2></div><div class="sr-grid">`+Z.squirrels.map(s=>{const q=SQUIRRELS[s];return`<button type="button" class="sr-tile" data-go="play:${arg}:${s}"><div data-pic="sh:${s}"></div><b>${q.name}</b><i>${q.sci}</i><span>${q.range}</span></button>`;}).join('')+'</div>';}
- if(view==='missions'){UI.missions=genMissions(arg);h=`<div class="sr-head"><button type="button" data-go="missionz" class="back">Back</button><h2>${ZN[arg].name}: pick a mission</h2></div><div class="sr-grid missions">`+UI.missions.map((m,k)=>{const q=SQUIRRELS[m.squirrel];const ids=m.targets;
-   return`<button type="button" class="sr-tile mission" data-go="mission:${k}"><div class="quad"><div data-pic="sh:${m.squirrel}" data-w="100" data-h="90"></div>${ids.map(id=>`<div data-pic="${m.type}:${id}" data-w="100" data-h="90"></div>`).join('')}</div><b>${missionText(m)}</b><span class="sr-names">${missionNames(m)}</span><span>As the ${q.name.replace(/ \(.*\)/,'')}</span></button>`;}).join('')+'</div><p class="sr-note">New missions are dealt each time you open this screen.</p>';}
+ if(view==='missions'){UI.missions=genMissions();h=`<div class="sr-head"><button type="button" data-go="main" class="back">Back</button><h2>Pick a mission</h2></div><div class="sr-grid missions">`+UI.missions.map((m,k)=>{const q=SQUIRRELS[m.squirrel];const ids=m.targets;
+   return`<button type="button" class="sr-tile mission" data-go="mission:${k}"><div class="quad"><div data-pic="sh:${m.squirrel}" data-w="100" data-h="90"></div>${ids.map(id=>`<div data-pic="${m.type}:${id}" data-w="100" data-h="90"></div>`).join('')}</div><span class="sr-where">${ZN[m.zone].name}<br>as the ${q.name}</span><b>${missionText(m)}</b><span class="sr-names">${missionNames(m)}</span></button>`;}).join('')+'</div><p class="sr-note">New missions are dealt each time you open this screen.</p>';}
  if(view==='info'){const[k,id]=arg.split(':');h=infoView(k,id);}
  if(view==='collection'){const tot=[];h=`<div class="sr-head"><button type="button" data-go="main" class="back">Back</button><h2>Collection</h2></div>`;
   for(const z of ZONE_IDS){const Z=ZN[z];const sec=[['Squirrels','s',Z.squirrels],['Birds','b',Z.birds],['Nuts and cones','n',Z.nuts],['Wildflowers','f',Z.flowers]];
