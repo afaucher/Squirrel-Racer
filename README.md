@@ -28,7 +28,7 @@ then visit http://localhost:8000.
 
 ## Motion models (A/B toggle in the page)
 
-- **B · Nimble (default).** The body moves freely in straight lines anywhere within reach of a branch, trunk or the ground. Each foot reaches for the nearest surface, so slipping between nearby branches, going underneath, or around a trunk just happens. Mid-roll the squirrel switches to a back view (or a belly view when it passes behind a thick branch) with its legs gripping both edges of the branch.
+- **B · Nimble (default).** A two-ended body: the shoulders lead and the hips trail, so the spine follows the path it actually takes. Each end grips its own surface and you can move while either end is within reach, so the squirrel climbs across gaps (front paws reach the next branch while the hind paws still hold the last) instead of jumping. Roll comes from what both ends are holding, so it twists through a back view (or a belly view behind thick branches) rather than flipping. The spine's swing rate is capped, reversing plays a short turn, and standing still settles the body back onto the branch.
 - **A · Surface.** The squirrel runs along one surface at a time. Push into the branch to swing to its other side; overlapping branches from neighbouring trees can be crossed by pushing toward them.
 
 ## What's in it

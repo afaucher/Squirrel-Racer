@@ -659,36 +659,48 @@ function surfInfo(P,x,y,cull){let s,d,hw,qx,qy,ang;
 function nearestSurf(x,y){let best=null;for(const P of W.paths){const i=surfInfo(P,x,y,true);if(i&&(!best||i.gap<best.gap))best=i;}return best;}
 // hysteresis: keep holding the current surface until another is clearly closer (stops corner ping-pong)
 function heldSurf(x,y){const ns=nearestSurf(x,y);const cur=S.prim&&S.prim.P;if(!ns||!cur||ns.P===cur||W.paths.indexOf(cur)<0)return ns;const ci=surfInfo(cur,x,y,false);return(ci&&ci.gap<NIM.R&&ci.gap-ns.gap<6)?ci:ns;}
+// ---- two-ended body: shoulders lead, hips trail like a trailer, so the spine follows the path it actually takes.
+// Each end holds its own surface; you can move while EITHER end is within reach, so the body bridges gaps.
+const LH=10; // centre to shoulders / hips, world units
+function girdles(cx,cy,ta){const ux=Math.cos(ta),uy=Math.sin(ta);return[[cx+ux*LH,cy+uy*LH],[cx-ux*LH,cy-uy*LH]];}
+function holdOf(g){const ns=nearestSurf(g[0],g[1]);if(!ns)return null;if(ns.P.kind==='ground')return{ns,gap:-g[1],q:[g[0],0]};return{ns,gap:ns.gap,q:[ns.qx,ns.qy]};}
+// roll target: +1 = feet down onto the surface, -1 = hanging under it, ~0 = twisting between surfaces (back view)
+function rollFrom(cx,cy,ta){const nx=-Math.sin(ta),ny=Math.cos(ta);let sw=0,acc=0;
+ for(const g of girdles(cx,cy,ta)){const H=holdOf(g);if(!H)continue;const dx=H.q[0]-g[0],dy=H.q[1]-g[1],d=Math.hypot(dx,dy);if(d<1.5)continue;
+  const w=1/Math.pow(1+Math.max(0,H.gap)/6,2);acc+=w*(dx*nx+dy*ny)/d;sw+=w;}
+ return sw?acc/sw:(S.rollU||1);}
 function nimbleMove(dt){const v=stickVec(),m=v.m<.2?0:Math.min(1,v.m),ox=S.x,oy=S.y;let ux=0,uy=0;if(m){ux=v.x/v.m;uy=v.y/v.m;}
- let nx=ox+ux*m*RUN*dt,ny=oy+uy*m*RUN*dt;if(ny>-NIM.stand)ny=-NIM.stand;
- let ns=nearestSurf(nx,ny);
- // stay within reach: slide along the edge of the reach zone
- if(ns&&ns.gap>NIM.R){if(ns.P.kind==='ground')ny=Math.max(ny,-NIM.R);else{const dx=nx-ns.qx,dy=ny-ns.qy,d=Math.hypot(dx,dy)||1,lim=ns.hw+NIM.R;nx=ns.qx+dx/d*lim;ny=ns.qy+dy/d*lim;}ns=nearestSurf(nx,ny);}
- if(!ns)return;
- // follow the contour when steering along a surface; move freely when steering across
- {const tx=Math.cos(ns.ang),ty=Math.sin(ns.ang),along=m?Math.abs(ux*tx+uy*ty):1;const dx=nx-ns.qx,dy=ny-ns.qy,d=Math.hypot(dx,dy);
-  if(d>2&&ns.P.kind!=='ground'){const want=ns.hw+NIM.stand,k=(m?along*along:.6)*(1-Math.exp(-dt*8));nx+=(ns.qx+dx/d*want-nx)*k;ny+=(ns.qy+dy/d*want-ny)*k;}
-  if(ny>-NIM.stand)ny=-NIM.stand;}
- const mv=Math.hypot(nx-ox,ny-oy);S.x=nx;S.y=ny;S.speed=mv/Math.max(dt,1e-4);
- ns=heldSurf(nx,ny);if(!ns)return;S.prim=ns;S.path=ns.P;S.s=ns.s;if(ns.gap<NIM.stand+8)S.held=ns.P;
- // body orientation follows the surface tangent (continuous: pick ang or ang+PI nearest the current one)
- const prev=S.ta==null?ns.ang:S.ta,fx0=S.nfx||1;const sc=[];
- for(const cand of[ns.ang,ns.ang+Math.PI]){const df0=Math.atan2(Math.sin(cand-prev),Math.cos(cand-prev));let v=-Math.abs(df0);if(ns.P.kind!=='ground'){const rU=((ns.qx-nx)*-Math.sin(cand)+(ns.qy-ny)*Math.cos(cand))/(ns.hw+NIM.stand);if(Math.abs(rU)>.3&&Math.sign(rU)!==Math.sign(S.fyA||1))v-=.9;}if(mv>.3)v+=1.6*fx0*(Math.cos(cand)*(nx-ox)+Math.sin(cand)*(ny-oy))/mv;sc.push([v,prev+df0,Math.abs(df0)]);}
- // the candidate nearest the current angle wins ties; the other must be clearly better
- sc.sort((a,b)=>a[2]-b[2]);const bestTa=(sc[1][0]>sc[0][0]+.35)?sc[1][1]:sc[0][1];
- S.ta=prev+(bestTa-prev)*(1-Math.exp(-dt*12));
- const c=Math.cos(S.ta),sn=Math.sin(S.ta),vt=(nx-ox)*c+(ny-oy)*sn;if(mv>.3&&Math.abs(vt)>mv*.25){const want=vt>0?1:-1;if(want!==S.nfx){S.fxT=(S.fxT||0)+dt;if(S.fxT>.12){S.nfx=want;S.fxT=0;}}else S.fxT=0;}
- // feet face the surface: if the surface is "above" the body in its own frame, it hangs upside down
- const tsx=ns.qx-nx,tsy=ns.qy-ny;if(ns.P.kind==='ground')S.nfy=1;else if(Math.hypot(tsx,tsy)>3)S.nfy=(-sn*tsx+c*tsy)>=0?1:-1;
- S.nfx=S.nfx||1;S.nfy=S.nfy||1;
- // roll: +1 = surface below the body, -1 = hanging under it; continuous with position so it can never flicker
- if(ns.P.kind==='ground')S.rollU=1;else{const nnx=-Math.sin(S.ta),nny=Math.cos(S.ta);S.rollU=clamp(((ns.qx-nx)*nnx+(ns.qy-ny)*nny)/(ns.hw+NIM.stand),-1.5,1.5);}
- S.dir=S.nfx;S.side=S.rollU>=0?-1:1;}
+ if(S.hip==null){S.hip=[ox-Math.cos(S.ta||0)*LH,oy-Math.sin(S.ta||0)*LH];}
+ S.turnT=Math.max(0,(S.turnT||0)-dt/.22);
+ let nx=ox+ux*m*RUN*dt,ny=oy+uy*m*RUN*dt;
+ // follow the contour when steering along the surface under the body; move freely when steering across
+ {const ns=nearestSurf(nx,ny);if(ns&&ns.P.kind!=='ground'){const tx=Math.cos(ns.ang),ty=Math.sin(ns.ang),along=m?Math.abs(ux*tx+uy*ty):1;const dx=nx-ns.qx,dy=ny-ns.qy,d=Math.hypot(dx,dy);
+  if(d>2){const want=ns.hw+NIM.stand,k=(m?along*along:.6)*(1-Math.exp(-dt*8));nx+=(ns.qx+dx/d*want-nx)*k;ny+=(ns.qy+dy/d*want-ny)*k;}}}
+ // trailer: hips follow the centre at a fixed distance; heading = hips -> centre
+ const trail=(cx,cy)=>{let hx=S.hip[0],hy=S.hip[1],dx=cx-hx,dy=cy-hy,d=Math.hypot(dx,dy);if(d<1e-3){dx=Math.cos(S.ta||0);dy=Math.sin(S.ta||0);d=1;}return[cx-dx/d*LH,cy-dy/d*LH,Math.atan2(dy,dx)];};
+ let[hx,hy,ta]=trail(nx,ny);
+ // reach: at least one end of the body must be within reach of a surface; otherwise pull that end back into reach
+ for(let it=0;it<2;it++){const G=girdles(nx,ny,ta),H=G.map(holdOf);let bi=-1,bg=1e9;H.forEach((h,k)=>{if(h&&h.gap<bg){bg=h.gap;bi=k;}});
+  if(bi<0){nx=ox;ny=oy;break;}if(bg<=NIM.R)break;const g=G[bi],q=H[bi].q,dx=g[0]-q[0],dy=g[1]-q[1],d=Math.hypot(dx,dy)||1,over=bg-NIM.R;nx-=dx/d*over;ny-=dy/d*over;[hx,hy,ta]=trail(nx,ny);}
+ // keep the whole body above the ground
+ {const G=girdles(nx,ny,ta);const low=Math.max(ny+NIM.stand,G[0][1]+5,G[1][1]+5);if(low>0){ny-=low;[hx,hy,ta]=trail(nx,ny);}}
+ // the spine can only swing so fast (about 90 degrees in a quarter second), so bends read as a smooth curl, never a snap
+ if(S.ta!=null&&!S.turnT){const df=Math.atan2(Math.sin(ta-S.ta),Math.cos(ta-S.ta)),lim=6.5*dt;if(Math.abs(df)>lim){ta=S.ta+Math.sign(df)*lim;hx=nx-Math.cos(ta)*LH;hy=ny-Math.sin(ta)*LH;}}
+ const mvx=nx-ox,mvy=ny-oy,mv=Math.hypot(mvx,mvy);
+ // turning around: moving backwards for a moment turns the squirrel (animated), it doesn't slide or snap
+ const hu=[Math.cos(S.ta||0),Math.sin(S.ta||0)];
+ if(mv>.3&&(mvx*hu[0]+mvy*hu[1])<-.35*mv&&!S.turnT){S.backT=(S.backT||0)+dt;if(S.backT>.1){S.backT=0;S.ta=(S.ta||0)+Math.PI;S.fyA=-(S.fyA||1);S.rollSg=-(S.rollSg||1);S.rollU=-(S.rollU||1);S.hip=[nx-Math.cos(S.ta)*LH,ny-Math.sin(S.ta)*LH];S.turnT=1;[hx,hy,ta]=[S.hip[0],S.hip[1],S.ta];}}
+ else if(mv>.3)S.backT=0;
+ // standing still: settle the spine back onto the surface under the body
+ if(mv<.3){const ns=nearestSurf(nx,ny);if(ns&&ns.gap<NIM.stand+6){let tg=ns.ang;if(Math.cos(tg-ta)<0)tg+=Math.PI;const df=Math.atan2(Math.sin(tg-ta),Math.cos(tg-ta));ta+=clamp(df,-3*dt,3*dt);hx=nx-Math.cos(ta)*LH;hy=ny-Math.sin(ta)*LH;}}
+ S.x=nx;S.y=ny;S.hip=[hx,hy];S.ta=ta;S.nfx=1;S.dir=1;S.speed=mv/Math.max(dt,1e-4);
+ const ns=heldSurf(nx,ny);if(ns){S.prim=ns;S.path=ns.P;S.s=ns.s;if(ns.gap<NIM.stand+8)S.held=ns.P;}
+ S.rollU=rollFrom(nx,ny,ta);S.nfy=S.rollU>=0?1:-1;S.side=S.rollU>=0?-1:1;}
 function landNimble(ns){SFX.land();S.flying=false;S.landT=.35;S.speed=0;S.idle=0;if(S.y>-NIM.stand)S.y=-NIM.stand;
- S.path=ns.P;S.s=ns.s;S.prim=ns;S.held=ns.P;const a=ns.ang;S.ta=a;S.nfx=(S.vx*Math.cos(a)+S.vy*Math.sin(a))<0?-1:1;S.nfy=ns.P.kind==='ground'?1:((-Math.sin(a)*(ns.qx-S.x)+Math.cos(a)*(ns.qy-S.y))>=0?1:-1);S.fxA=S.nfx;S.fyA=S.nfy;S.dir=S.nfx;
+ S.path=ns.P;S.s=ns.s;S.prim=ns;S.held=ns.P;let a=ns.ang;if(S.vx*Math.cos(a)+S.vy*Math.sin(a)<0)a+=Math.PI;S.ta=a;S.nfx=1;S.dir=1;S.hip=[S.x-Math.cos(a)*LH,S.y-Math.sin(a)*LH];S.turnT=0;S.rollU=rollFrom(S.x,S.y,a);S.fyA=S.rollU>=0?1:-1;S.nfy=S.fyA;S.rollSg=S.fyA;S.fxA=1;
  if(ns.P.kind==='limb'){S.sag=0;S.sagV=90*(1-flexAt(ns.P,ns.s))+20;}
  const nx=S.x-ns.qx,ny=S.y-ns.qy,nl=Math.hypot(nx,ny)||1,px=ns.qx+nx/nl*ns.hw,py=ns.qy+ny/nl*ns.hw;
- if(ns.P.kind==='ground'){if(S.vy>260)celebrate(0,S.x,0,0,-1);}else{const score=Math.abs(S.x-(S.lx||S.x))+Math.max(0,(S.ly||S.y)-S.y)*.7;const tier=score>420?3:score>270?2:score>160?1:0;if(tier)celebrate(tier,px,py,nx/nl,ny/nl,S.nfy<0,ns.P.sp&&ns.P.sp.leaf);}}
+ if(ns.P.kind==='ground'){if(S.vy>260)celebrate(0,S.x,0,0,-1);}else{const score=Math.abs(S.x-(S.lx||S.x))+Math.max(0,(S.ly||S.y)-S.y)*.7;const tier=score>420?3:score>270?2:score>160?1:0;if(tier)celebrate(tier,px,py,nx/nl,ny/nl,S.fyA*Math.cos(S.ta)<-.3,ns.P.sp&&ns.P.sp.leaf);}}
 // Leg IK: each foot reaches for the nearest surface; feet step along it while moving
 function makeIK(bx,by,ta,fx,fy,ph,moving){const c=Math.cos(ta),s=Math.sin(ta),sx=fx*SQS,sy=fy*SQS;
  const toW=l=>[bx+c*sx*l[0]-s*sy*(l[1]+19),by+s*sx*l[0]+c*sy*(l[1]+19)];
@@ -699,10 +711,10 @@ function makeIK(bx,by,ta,fx,fy,ph,moving){const c=Math.cos(ta),s=Math.sin(ta),sx
    const o=sk[k][0],ow=toW(o),ns=nearestSurf(ow[0],ow[1]);if(!ns)continue;let T;
    if(ns.P.kind==='ground')T=[ow[0],0];else{const sg=sagAt(ns.P,ns.s),dx=ow[0]-ns.qx,dy=ow[1]-ns.qy-sg,d=Math.hypot(dx,dy)||1;T=[ns.qx+dx/d*ns.hw,ns.qy+sg+dy/d*ns.hw];}
    if(moving){const st=Math.sin(ph*TAU+off)*6*fx;T=[T[0]+Math.cos(ns.ang)*st,T[1]+Math.sin(ns.ang)*st];}
-   let Tl=toL(T);const hind=k[0]==='h';if(hind)Tl=[Tl[0]-6,Tl[1]-3];if(Math.hypot(Tl[0]-o[0],Tl[1]-o[1])>(a+b)*2.4)continue;
+   let Tl=toL(T);const hind=k[0]==='h';if(hind)Tl=[Tl[0]-6,Tl[1]-3];if(Math.hypot(Tl[0]-o[0],Tl[1]-o[1])>(a+b)*1.85)continue;
    const[j,e]=ik2(o,Tl,a,b,pref);sk[k]=hind?[o,j,e,[e[0]+6,e[1]+3]]:[o,j,e];}};}
 function setMotion(m){if(PLAY.motion===m)return;
- if(!S.flying){if(m==='nimble'){const p=surfacePos();S.x=p.x+p.nx*NIM.stand;S.y=Math.min(p.y+p.ny*NIM.stand,-NIM.stand);S.ta=p.ang;S.nfx=S.dir;S.nfy=S.side===-1?1:-1;S.fxA=S.nfx;S.fyA=S.nfy;S.held=S.path;}
+ if(!S.flying){if(m==='nimble'){const p=surfacePos();S.x=p.x+p.nx*NIM.stand;S.y=Math.min(p.y+p.ny*NIM.stand,-NIM.stand);S.ta=p.ang+(S.dir<0?Math.PI:0);S.nfx=1;S.nfy=(S.side===-1?1:-1)*(S.dir<0?-1:1);S.fxA=1;S.fyA=S.nfy;S.rollSg=S.fyA;S.hip=null;S.held=S.path;}
   else{const ns=nearestSurf(S.x,S.y);if(ns){S.path=ns.P;S.s=ns.s;S.side=ns.P.noFlip?-1:(ns.P.kind==='ground'?-1:pathProject(ns.P,S.x,S.y).side);S.dir=S.nfx||1;}}}
  PLAY.motion=m;}
 function squirrelDepth(){if(S.flying)return 9;if(PLAY.motion==='nimble'&&S.prim&&S.prim.P.kind!=='ground'&&S.prim.hw>6.5&&Math.abs(S.rollU)<.8)return(S.prim.P.depth||0)-.5;const P=PLAY.motion==='nimble'?(S.held||S.path):S.path;return(P.depth||0)+.5;}
@@ -827,7 +839,7 @@ function updatePlay(dt,w,h){
  let tx=px+cam.lx*(w/6)/cam.zoom,ty=py+cam.ly*(h/6)/cam.zoom-12;
  const maxY=((PLAY.scheme==='dual'?170:60)-h/2)/cam.zoom;ty=Math.min(ty,maxY);const k=1-Math.exp(-dt*(S.flying?5:4));const ox=cam.x,oy=cam.y;cam.x+=(tx-cam.x)*k;cam.y+=(ty-cam.y)*k;cam.vx=lerp(cam.vx,(cam.x-ox)/Math.max(dt,1e-3)/300,.2);cam.vy=lerp(cam.vy||0,(cam.y-oy)/Math.max(dt,1e-3)/300,.2);
 }
-function resetSquirrel(){S.path=W.ground;S.s=cam.x+OFF;S.side=-1;S.flying=false;S.speed=0;S.sag=0;S.sagV=0;S.x=cam.x;S.y=-NIM.stand;S.held=W.ground;S.ta=0;S.nfy=1;S.fyA=1;}
+function resetSquirrel(){S.path=W.ground;S.s=cam.x+OFF;S.side=-1;S.flying=false;S.speed=0;S.sag=0;S.sagV=0;S.x=cam.x;S.y=-NIM.stand;S.held=W.ground;S.ta=0;S.nfy=1;S.fyA=1;S.hip=null;S.turnT=0;S.rollSg=1;}
 function drawLayer(ctx,w,h,list,k,spacing,yoff,offset){if(!list.length)return;ctx.save();ctx.translate(w/2,h/2);ctx.scale(cam.zoom*k,cam.zoom*k);ctx.translate(-cam.x,-cam.y+yoff);const vw=w/(cam.zoom*k);const i0=Math.floor((cam.x-vw/2-300)/spacing),i1=Math.ceil((cam.x+vw/2+300)/spacing);for(let i=i0;i<=i1;i++){const c=list[(hash(i,offset)%list.length)];const x=i*spacing+(hash(i,offset+1)%80)-40;const sc=.85+(hash(i,offset+2)%30)/100;ctx.drawImage(c,x-260*sc,-470*sc,520*sc,480*sc);}ctx.restore();}
 function drawPlay(t,dt){
  const c=document.getElementById('play'),{ctx,w,h}=setup(c);
@@ -864,20 +876,21 @@ function drawPlay(t,dt){
  const C=COATS[PLAY.coat],rig=S.rig;ctx.save();
  let ikFn=null;
  if(S.flying){mode='leap';ph=clamp(S.air/.8,0,1);ctx.translate(S.x,S.y);if(S.vx<0)ctx.scale(-1,1);ctx.rotate(Math.atan2(S.vy,Math.abs(S.vx))*.7);ctx.scale(SQS,SQS);if(PLAY.motion==='nimble')ctx.translate(0,19);}
- else if(PLAY.motion==='nimble'){const ta=S.ta||0;S.fxA=S.nfx;{let r=clamp((S.rollU==null?1:S.rollU)*1.35,-1,1);const sg=Math.sign(r||1),tnow=performance.now()/1000;if(S.rollSg&&sg!==S.rollSg){if(tnow-(S.rollT||0)<.35&&Math.abs(r)<.75)r=S.rollSg*.3;else{S.rollSg=sg;S.rollT=tnow;}}else if(!S.rollSg)S.rollSg=sg;const tgt=Math.sign(r||1)*Math.pow(Math.abs(r),.6);S.fyA=lerp(S.fyA==null?tgt:S.fyA,tgt,Math.min(1,dt*18));} const fyDraw=Math.sign(S.fyA||1);
+ else if(PLAY.motion==='nimble'){const ta=S.ta||0;S.fxA=S.nfx;{let r=clamp((S.rollU==null?1:S.rollU)*1.35,-1,1);const sg=Math.sign(r||1),tnow=performance.now()/1000;if(S.rollSg&&sg!==S.rollSg){if(tnow-(S.rollT||0)<.35&&Math.abs(r)<.75)r=S.rollSg*.3;else{S.rollSg=sg;S.rollT=tnow;}}else if(!S.rollSg)S.rollSg=sg;const tgt=Math.sign(r||1)*Math.pow(Math.abs(r),.6);S.fyA=S.fyA==null?tgt:S.fyA+clamp(tgt-S.fyA,-4.5*dt,4.5*dt);} const fyDraw=Math.sign(S.fyA||1);
   // mid-roll: switch to the back (or belly, when passing behind a thick branch) view, with hysteresis
-  const af=Math.abs(S.fyA);if(S.dorsal){if(af>.7)S.dorsal=false;}else if(af<.55&&S.prim&&S.prim.P.kind!=='ground')S.dorsal=true;
+  const af=Math.abs(S.fyA);if(S.dorsal){if(af>.7||S.turnT>0)S.dorsal=false;}else if(af<.55&&!S.turnT&&S.prim&&S.prim.P.kind!=='ground')S.dorsal=true;
+  const tm=S.turnT>0?-Math.cos(Math.PI*(1-S.turnT)):1,turnSx=Math.sign(tm||1)*Math.max(.22,Math.abs(tm));
   const bx=S.x+(S.bx||0),by=S.y+(S.by||0)+sagAt(S.path,S.s);ctx.translate(bx,by);ctx.rotate(ta);
   if(S.dorsal){ctx.scale(S.nfx*SQS,SQS);const ns=S.prim,c=Math.cos(ta),sn=Math.sin(ta),sx=S.nfx*SQS;
    const toW=l=>[bx+c*sx*l[0]-sn*SQS*l[1],by+sn*sx*l[0]+c*SQS*l[1]],toL=w=>{const dx=w[0]-bx,dy=w[1]-by;return[(c*dx+sn*dy)/sx,(-sn*dx+c*dy)/SQS];};
    const grip=(lx,stepK)=>{const ow0=toW([lx,0]),pr=pathProject(ns.P,ow0[0],ow0[1]-sagAt(ns.P,ns.s)),q=pathAt(ns.P,pr.s);q.y+=sagAt(ns.P,pr.s);const ow=ow0,nn=[-Math.sin(q.ang),Math.cos(q.ang)],st=S.speed>15?Math.sin(S.phase*TAU)*5*stepK:0;
     const A=toL([q.x+nn[0]*q.w*.47+Math.cos(q.ang)*st,q.y+nn[1]*q.w*.47+Math.sin(q.ang)*st]),B=toL([q.x-nn[0]*q.w*.47-Math.cos(q.ang)*st,q.y-nn[1]*q.w*.47-Math.sin(q.ang)*st]);return A[1]>B[1]?[A,B]:[B,A];};
    const[fl,fr]=grip(12,1),[hl,hr]=grip(-11,-1);S.dorsalDraw={paws:{fl,fr,hl,hr},belly:squirrelDepth()<(ns.P.depth||0)};}
-  else{S.dorsalDraw=null;ctx.scale(S.fxA*SQS,fyDraw*SQS);ctx.translate(0,19);}
+  else{S.dorsalDraw=null;ctx.scale(turnSx*SQS,fyDraw*SQS);ctx.translate(0,19);}
   const moving=S.speed>15;let useIK=true;
-  if(aiming||Math.abs(S.fyA)<.75)mode='crouch';else if(S.landT>0){mode='land';ph=1-S.landT/.35;}else if(moving)mode='bound';
-  else if(S.fyA>0&&Math.abs(Math.sin(ta))<.55&&S.prim&&S.prim.gap<NIM.stand+5){mode=(S.idle%9)>5?'alert':'sit';useIK=false;}else{mode='bound';ph=.75;}
-  if(useIK)ikFn=makeIK(bx,by,ta,S.nfx,fyDraw,ph,moving);}
+  if(aiming||Math.abs(S.fyA)<.75||S.turnT>.15)mode='crouch';else if(S.landT>0){mode='land';ph=1-S.landT/.35;}else if(moving)mode='bound';
+  else if(S.fyA*Math.cos(ta)>.6&&S.prim&&S.prim.gap<NIM.stand+5){mode=(S.idle%9)>5?'alert':'sit';useIK=false;}else{mode='bound';ph=.75;}
+  if(useIK)ikFn=makeIK(bx,by,ta,turnSx,fyDraw,ph,moving);}
  else{const p=surfacePos();ctx.translate(p.x+(S.bx||0),p.y+(S.by||0));let flipScale=S.side===-1?1:-1;if(S.flipT>0){const f=Math.cos(Math.PI*(1-S.flipT));flipScale=(S.side===-1?1:-1)*-f;ctx.translate(-p.nx*p.w*(1-Math.abs(f))*.5,-p.ny*p.w*(1-Math.abs(f))*.5);}
   ctx.rotate(p.ang);ctx.scale(S.dir*SQS,flipScale*SQS);
   const steep=Math.abs(Math.sin(p.ang))>.65,down=Math.sin(p.ang)*S.dir>.65;
@@ -902,7 +915,7 @@ function drawPlay(t,dt){
 const KB={down:new Set(),pull:null,t:0,ax:0,ay:0};
 const KMOVE={KeyW:[0,-1],KeyS:[0,1],KeyA:[-1,0],KeyD:[1,0]},KPULL={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0]};
 function kbVec(map){let x=0,y=0;for(const k of KB.down){const v=map[k];if(v){x+=v[0];y+=v[1];}}const m=Math.hypot(x,y);return m?{x:x/m,y:y/m}:null;}
-const kbPower=()=>clamp(.3+KB.t/0.8*.7,.3,1)*1.2;
+const kbPower=()=>(.5+.5*clamp(KB.t/.8,0,1))*1.2;
 function pollKeys(dt){const p=kbVec(KPULL);if(p){KB.ax+=p.x*dt;KB.ay+=p.y*dt;KB.t+=dt;const m=Math.hypot(KB.ax,KB.ay)||1;KB.pull={x:KB.ax/m,y:KB.ay/m};}
  else if(KB.pull){const q=KB.pull;KB.pull=null;if(KB.t>.06)jumpWith(aimFrom(-q.x,-q.y,kbPower()));KB.t=0;KB.ax=KB.ay=0;}}
 window.addEventListener('keydown',e=>{if(tab!=='play'||e.target.closest&&e.target.closest('input,textarea'))return;const c=e.code;
@@ -914,9 +927,9 @@ window.addEventListener('blur',()=>{KB.down.clear();KB.pull=null;KB.t=0;KB.ax=KB
 const DS={L:null,R:null,gp:{active:false,lx:0,ly:0,rs:null,rcur:null,aPrev:false,name:'',blocked:false},toast:null};
 const STICK_R=50,TOLERANCE=Math.cos(70*Math.PI/180);
 function aimFrom(ux,uy,pw){const ff=flexAt(S.path,S.s);const v=pw*VMAX*(.55+.45*ff);return{vx:ux*v,vy:uy*v,pw,L:100};}
-function dualAim(){if(S.flying)return null;const R=DS.R;if(R&&PLAY.scheme==='dual'){const dx=R.x-R.sx,dy=R.y-R.sy,L=Math.hypot(dx,dy);if(L>=30&&performance.now()-R.t0>110)return aimFrom(-dx/L,-dy/L,clamp(L/110,.3,1));}
+function dualAim(){if(S.flying)return null;const R=DS.R;if(R&&PLAY.scheme==='dual'){const dx=R.x-R.sx,dy=R.y-R.sy,L=Math.hypot(dx,dy);if(L>=30&&performance.now()-R.t0>110)return aimFrom(-dx/L,-dy/L,(.5+.5*clamp((L-30)/80,0,1)));}
  if(KB.pull&&KB.t>.1)return aimFrom(-KB.pull.x,-KB.pull.y,kbPower());
- const g=DS.gp;if(g.active&&g.rcur&&g.rcur.m>.45)return aimFrom(-g.rcur.x/g.rcur.m,-g.rcur.y/g.rcur.m,clamp((g.rcur.m-.3)/.7,.3,1));return null;}
+ const g=DS.gp;if(g.active&&g.rcur&&g.rcur.m>.45)return aimFrom(-g.rcur.x/g.rcur.m,-g.rcur.y/g.rcur.m,(.5+.5*clamp((g.rcur.m-.45)/.55,0,1)));return null;}
 function curAim(w,h){if(S.flying)return null;if(input.down&&input.mode==='aim'){const a=aimVel(w,h);return a.L>18?a:null;}return dualAim();}
 function jumpWith(a){if(S.flying||!a)return;S.dorsal=false;S.dorsalDraw=null;SFX.leap(a.pw||.5);const p=surfacePos();S.bx=S.by=0;S.x=p.x;S.y=p.y;S.vx=a.vx;S.vy=a.vy;S.flying=true;S.air=0;S.from=S.path;S.lx=p.x;S.ly=p.y;FX.trail.length=0;S.sagV-=60*(1-flexAt(S.path,S.s));}
 function stickVec(){let x=0,y=0;if(DS.L){x=DS.L.vx;y=DS.L.vy;}const kv=kbVec(KMOVE);if(kv&&!DS.L){x=kv.x;y=kv.y;}const g=DS.gp;if(g.active&&Math.hypot(g.lx,g.ly)>Math.hypot(x,y)){x=g.lx;y=g.ly;}return{x,y,m:Math.min(1,Math.hypot(x,y))};}
@@ -962,7 +975,7 @@ function pollPad(){const g=DS.gp;let pads;try{pads=navigator.getGamepads?navigat
  let lx=dz(p.axes[0]||0),ly=dz(p.axes[1]||0);if(b(14))lx=-1;if(b(15))lx=1;if(b(12))ly=-1;if(b(13))ly=1;g.lx=lx;g.ly=ly;
  const rx=dz(p.axes[2]||0),ry=dz(p.axes[3]||0),rm=Math.hypot(rx,ry);
  if(rm>.3){g.rcur={x:rx,y:ry,m:Math.min(1,rm)};if(!g.rs||rm>=g.rs.m)g.rs={x:rx,y:ry,m:Math.min(1,rm)};}
- else{g.rcur=null;if(g.rs){const R=g.rs;g.rs=null;if(R.m>.45)jumpWith(aimFrom(-R.x/R.m,-R.y/R.m,clamp((R.m-.3)/.7,.3,1)));}}
+ else{g.rcur=null;if(g.rs){const R=g.rs;g.rs=null;if(R.m>.45)jumpWith(aimFrom(-R.x/R.m,-R.y/R.m,(.5+.5*clamp((R.m-.45)/.55,0,1))));}}
  }
 function setPadStatus(){const el=document.getElementById('pad-status');if(!el)return;const g=DS.gp;el.textContent=g.blocked?'This viewer blocks controllers. They work once the game runs on its own page.':g.active?'Connected: '+g.name:'No controller yet. Pair one, then press any button.';}
 window.addEventListener('gamepadconnected',()=>{pollPad();setPadStatus();});
@@ -986,7 +999,7 @@ function drawSticks(ctx,w,h){const dual=PLAY.scheme==='dual';ctx.save();ctx.line
    if(DS.R&&e.pointerId===DS.R.id){DS.R.x=x;DS.R.y=y;}return;}
   if(!input.down||e.pointerId!==input.id)return;const r=c.getBoundingClientRect();input.x=e.clientX-r.left;input.y=e.clientY-r.top;[input.wx,input.wy]=toWorld(input.x,input.y,r.width,r.height);});
  const up=e=>{if(DS.L&&e.pointerId===DS.L.id){DS.L=null;return;}
-  if(DS.R&&e.pointerId===DS.R.id){const R=DS.R;DS.R=null;const dx=R.x-R.sx,dy=R.y-R.sy,L=Math.hypot(dx,dy),dtm=performance.now()-R.t0;if(L>=30)jumpWith(aimFrom(-dx/L,-dy/L,clamp(L/110,.3,1)));return;}
+  if(DS.R&&e.pointerId===DS.R.id){const R=DS.R;DS.R=null;const dx=R.x-R.sx,dy=R.y-R.sy,L=Math.hypot(dx,dy),dtm=performance.now()-R.t0;if(L>=30)jumpWith(aimFrom(-dx/L,-dy/L,(.5+.5*clamp((L-30)/80,0,1))));return;}
   if(!input.down||e.pointerId!==input.id)return;const r=c.getBoundingClientRect();const dx=input.x-input.sx,dy=input.y-input.sy,dtm=performance.now()-input.t0;
   if(input.mode==='aim'){if(!launch(r.width,r.height)&&Math.hypot(dx,dy)<12)flip();}
   else if(dtm<260&&Math.abs(dy)>28&&Math.abs(dy)>Math.abs(dx)*1.2)flip();
