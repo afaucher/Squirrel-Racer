@@ -1493,8 +1493,9 @@ ALBUM.load();
 /* ---- missions ---- */
 // every mission asks for three different species
 function pick3(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[b[i],b[j]]=[b[j],b[i]];}return b.slice(0,3);}
-// each mission rolls a forest, then a squirrel from that forest, then what to find there
-function genMissions(){const pick=a=>a[(Math.random()*a.length)|0],types=pick3(['b','n','f']);return types.map(type=>{const zid=pick(ZONE_IDS),Z=ZN[zid];return{zone:zid,squirrel:pick(Z.squirrels),type,targets:pick3(type==='b'?Z.birds:type==='n'?Z.nuts:Z.flowers),need:3};});}
+// each mission rolls a forest, then a squirrel from that forest, then what to find there.
+// Half the time the three are one of each kind (bird, nut or cone, wildflower); otherwise each kind is random.
+function genMissions(){const pick=a=>a[(Math.random()*a.length)|0],types=Math.random()<.5?pick3(['b','n','f']):[0,0,0].map(()=>pick(['b','n','f']));return types.map(type=>{const zid=pick(ZONE_IDS),Z=ZN[zid];return{zone:zid,squirrel:pick(Z.squirrels),type,targets:pick3(type==='b'?Z.birds:type==='n'?Z.nuts:Z.flowers),need:3};});}
 const isCone=id=>/cone$/i.test(NUTS[id].name);
 function nutNoun(ids){const c=ids.filter(isCone).length;return c===ids.length?'cones':c?'nuts and cones':'nuts';}
 function missionText(m){return m.type==='b'?'Photograph these 3 birds':m.type==='f'?'Photograph these 3 wildflowers':'Collect these 3 '+nutNoun(m.targets);}
