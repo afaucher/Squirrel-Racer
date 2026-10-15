@@ -20,7 +20,7 @@ then visit http://localhost:8000.
 |---|---|---|---|
 | **Move** | Left thumb (floating stick) | W A S D | Left stick or D-pad |
 | **Leap** | Right thumb: pull back, release | Hold arrows, release | Right stick: pull back, release |
-| **Photo** | Hold the camera button (top right), drag to aim, let go | Hold Space or Enter, arrows aim, let go | Hold A or B, right stick aims, let go |
+| **Photo** | Hold the camera button (top right), drag to aim, let go | Hold Space or Enter; the lens follows the mouse (or arrows aim); let go | Hold A or B, right stick aims, let go |
 | **Menu** | Acorn button (top left) | M or Esc | Start |
 | **Full screen** | Button at the bottom | F (Esc exits) | — |
 
@@ -36,7 +36,7 @@ Open the acorn menu to choose:
 - **Missions:** three missions dealt at random for the forest you pick. Photograph 3 of one bird, collect 3 of one nut or cone, or photograph 10 different wildflowers. Each find fills one of the frames on the right; tap a frame to see the species again and hear its call. Finishing a mission shows its common and scientific names. Nothing can be failed.
 - **Collection:** every bird, nut, cone and wildflower in all four forests, with a check mark on the ones you've found. Nuts and cones are shown beside the tree they come from. Your collection is saved in this browser.
 
-Holding the photo button opens a round lens (a quarter of the screen across) and dims everything else. Aim it and let go to take the photo. Only what's inside the circle can be captured: if something your mission is looking for is in it, that's always chosen first; otherwise it's the new find nearest the middle. Brackets show what's in focus. Nuts and cones are collected only when they're within reach. Each bird, nut and flower can be counted once per forest. Every card shows the common name, scientific name and native range, with a short fact.
+Holding the photo button opens a round lens (a quarter of the screen across) and dims everything else. With a mouse, the lens opens under the pointer and follows it; on touch it opens in the middle and you drag to aim. Let go to take the photo. Only what's inside the circle can be captured: if something your mission is looking for is in it, that's always chosen first; otherwise it's the new find nearest the middle. A faint warm glow shows what's in focus. Nuts and cones are collected only when they're within reach. Each bird, nut and flower can be counted once per forest. Every card shows the common name, scientific name and native range, with a short fact.
 
 | Forest | Squirrels | Trees | Birds |
 |---|---|---|---|

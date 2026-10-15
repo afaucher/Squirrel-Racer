@@ -155,7 +155,7 @@ a{color:var(--accent)}
     <li><b>Move</b>Left thumb, W A S D, or a controller's left stick. In Nimble motion (B), steer anywhere within reach of a branch: the body glides in straight lines while the feet keep hold, so slipping between nearby branches, going under, or around a trunk just happens. In Surface motion (A), run along the branch and push into it to swing to the other side.</li>
     <li><b>Leap</b>Right thumb, the arrow keys, or a controller's right stick. Pull back away from where you want to go, then let go. Hold longer to wind up a bigger leap; on keys, the direction is the average of what you've held.</li>
     <li><b>Land anywhere</b>You latch onto whatever you touch: limb, trunk or ground. Thin branch tips bend and weaken your launch, so leap from closer to the trunk.</li>
-    <li><b>Photo</b>Hold the camera (top right), Space, or a controller's A button to look through the lens. Drag (or use the arrows or right stick) to aim the circle, then let go to take the photo. Only what's inside the circle counts, and what your mission is looking for is chosen first. Nuts and cones within reach are collected.</li>
+    <li><b>Photo</b>Hold the camera (top right), Space, or a controller's A button to look through the lens. It opens under your mouse pointer and follows it; on touch, drag from the button (or use the arrows or right stick) to aim. Let go to take the photo. Only what's inside the circle counts, and what your mission is looking for is chosen first. Nuts and cones within reach are collected.</li>
     <li><b>Menu</b>The acorn (top left), M or Start. Play any of four forests as one of its squirrels, take a mission, or browse your collection.</li>
     <li><b>Missions</b>Photograph 3 of one bird, collect 3 of one nut or cone, or find 10 different wildflowers. Each find fills a frame on the right; tap a frame to see it again and hear the call.</li>
     <li><b>Big leaps</b>Long flights turn your tail into a rainbow. Land a long leap on a branch and you get stars, fireflies and falling leaves.</li>
@@ -1456,19 +1456,23 @@ function missionText(m){if(m.type==='f')return'Photograph 10 different wildflowe
 /* ---- photo: pick what's on screen, prefer what you're looking for ---- */
 function onScreen(x,y,w,h){const z=cam.zoom*(1+FX.punch),sx=(x-cam.x)*z+w/2,sy=(y-cam.y)*z+h/2;return sx>-6&&sx<w+6&&sy>-6&&sy<h+6;}
 /* ---- camera lens: hold to look through a circle, drag to aim, release to shoot ---- */
-const LENS={on:false,src:null,t0:0,cx:0,cy:0,bx:0,by:0,px:0,py:0,ax:0,ay:0,pick:null};
+const LENS={on:false,src:null,follow:false,t0:0,cx:0,cy:0,bx:0,by:0,px:0,py:0,ax:0,ay:0,pick:null};
 const LENS_READY=.3;
+// where the mouse last was over the play area, so the lens can open right under it
+const MOUSE={x:0,y:0,t:-1e9};
 function lensR(w,h){return Math.max(80,Math.max(w,h)/8);}
 function lensStart(src,px,py){if(PLAY.paused||LENS.on)return;const c=document.getElementById('play'),w=c.clientWidth,h=c.clientHeight;hideCard();input.seen=true;if(AMB.on)startAudio();
- Object.assign(LENS,{on:true,src,t0:performance.now()/1000,bx:w/2,by:h/2,cx:w/2,cy:h/2,px:px||0,py:py||0,ax:0,ay:0,pick:null});SFX.focus&&SFX.focus();}
+ const follow=src==='mouse'||(src==='key'&&MOUSE.t>0);const r=lensR(w,h);const sx=follow?clamp(MOUSE.x,r+6,w-r-6):w/2,sy=follow?clamp(MOUSE.y,r+6,h-r-6):h/2;
+ Object.assign(LENS,{on:true,src,follow,t0:performance.now()/1000,bx:sx,by:sy,cx:sx,cy:sy,px:px||0,py:py||0,ax:0,ay:0,pick:null});SFX.focus&&SFX.focus();}
 function lensAim(px,py){if(!LENS.on||LENS.src!=='touch')return;LENS.ax=(px-LENS.px)*1.6;LENS.ay=(py-LENS.py)*1.6;}
 function lensEnd(cancel){if(!LENS.on)return;LENS.on=false;if(cancel)return;
- if(performance.now()/1000-LENS.t0<LENS_READY){DS.toast={txt:'Hold the camera to aim, then let go',t:2.4};return;}takePhoto();}
+ if(performance.now()/1000-LENS.t0<LENS_READY){DS.toast={txt:'Hold the camera, then let go',t:2.4};return;}takePhoto();}
 function lensUpdate(w,h,dt){if(!LENS.on)return;const r=lensR(w,h);
  const g=DS.gp;if(LENS.src==='pad'&&g.rcur){LENS.ax+=g.rcur.x*700*dt;LENS.ay+=g.rcur.y*700*dt;}
- if(LENS.src==='key'&&KB.down.size){for(const c of KB.down){const v=KPULL[c];if(v){LENS.ax+=v[0]*500*dt;LENS.ay+=v[1]*500*dt;}}}
- const tx=clamp(LENS.bx+LENS.ax,r+6,w-r-6),ty=clamp(LENS.by+LENS.ay,r+6,h-r-6);LENS.ax=tx-LENS.bx;LENS.ay=ty-LENS.by;
- const k=1-Math.exp(-dt*18);LENS.cx+=(tx-LENS.cx)*k;LENS.cy+=(ty-LENS.cy)*k;LENS.pick=lensPick(w,h).pick;}
+ if(LENS.src==='key'&&!LENS.follow&&KB.down.size){for(const c of KB.down){const v=KPULL[c];if(v){LENS.ax+=v[0]*500*dt;LENS.ay+=v[1]*500*dt;}}}
+ if(LENS.follow){LENS.ax=MOUSE.x-LENS.bx;LENS.ay=MOUSE.y-LENS.by;}
+ const tx=clamp(LENS.bx+LENS.ax,r+6,w-r-6),ty=clamp(LENS.by+LENS.ay,r+6,h-r-6);if(!LENS.follow){LENS.ax=tx-LENS.bx;LENS.ay=ty-LENS.by;}
+ const k=1-Math.exp(-dt*(LENS.follow?30:18));LENS.cx+=(tx-LENS.cx)*k;LENS.cy+=(ty-LENS.cy)*k;LENS.pick=lensPick(w,h).pick;}
 function toScreen(x,y,w,h){const z=cam.zoom*(1+FX.punch);return[(x-cam.x)*z+w/2,(y-cam.y)*z+h/2];}
 // everything whose middle is inside the lens; what the mission wants comes first, then whatever is nearest the middle
 function lensPick(w,h){const M=PLAY.mission,taken=W.taken,r=lensR(w,h),z=cam.zoom*(1+FX.punch),c0=[];
@@ -1481,19 +1485,24 @@ function lensPick(w,h){const M=PLAY.mission,taken=W.taken,r=lensR(w,h),z=cam.zoo
  const fresh=c0.filter(o=>!taken.has(o.inst.id)),isTarget=o=>M&&!M.done&&o.kind===M.type&&(M.type==='f'?!M.got.includes(o.id):o.id===M.target);
  const pick=fresh.find(o=>isTarget(o)&&reach(o))||fresh.find(o=>isTarget(o))||fresh.find(reach)||fresh[0]||c0[0]||null;
  return{pick,isTarget,reach};}
-function drawLens(ctx,w,h,t){if(!LENS.on)return;const r=lensR(w,h),cx=LENS.cx,cy=LENS.cy,ready=clamp((performance.now()/1000-LENS.t0)/LENS_READY,0,1);
- ctx.save();ctx.fillStyle='rgba(10,14,11,.72)';ctx.beginPath();ctx.rect(0,0,w,h);ctx.arc(cx,cy,r,0,TAU,true);ctx.fill();
- // soft inner vignette and rim
- const g=ctx.createRadialGradient(cx,cy,r*.72,cx,cy,r);g.addColorStop(0,'rgba(10,14,11,0)');g.addColorStop(1,'rgba(10,14,11,.35)');ctx.fillStyle=g;ctx.beginPath();ctx.arc(cx,cy,r,0,TAU);ctx.fill();
- ctx.strokeStyle='rgba(255,248,234,.9)';ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(cx,cy,r,0,TAU);ctx.stroke();
- ctx.strokeStyle='rgba(244,194,122,.95)';ctx.lineWidth=4;ctx.lineCap='round';ctx.beginPath();ctx.arc(cx,cy,r+6,-Math.PI/2,-Math.PI/2+TAU*ready);ctx.stroke();
- ctx.strokeStyle='rgba(255,248,234,.7)';ctx.lineWidth=2;for(let i=0;i<4;i++){const a=i*Math.PI/2;ctx.beginPath();ctx.moveTo(cx+Math.cos(a)*(r-12),cy+Math.sin(a)*(r-12));ctx.lineTo(cx+Math.cos(a)*(r-4),cy+Math.sin(a)*(r-4));ctx.stroke();}
- ctx.beginPath();ctx.moveTo(cx-7,cy);ctx.lineTo(cx+7,cy);ctx.moveTo(cx,cy-7);ctx.lineTo(cx,cy+7);ctx.stroke();
- // focus brackets on what the shot will capture
- const P=LENS.pick;if(P&&ready>=1){const hs=Math.max(16,P.sz*.75),x=P.sx,y=P.sy,l=hs*.45,pulse=1+.06*Math.sin(t*8);ctx.save();ctx.translate(x,y);ctx.scale(pulse,pulse);ctx.strokeStyle='#f4c27a';ctx.lineWidth=2.5;
-  for(const[sx,sy]of[[-1,-1],[1,-1],[1,1],[-1,1]]){ctx.beginPath();ctx.moveTo(sx*hs,sy*(hs-l));ctx.lineTo(sx*hs,sy*hs);ctx.lineTo(sx*(hs-l),sy*hs);ctx.stroke();}ctx.restore();}
- ctx.fillStyle='rgba(255,248,234,.92)';ctx.font='600 13px "Atkinson Hyperlegible",sans-serif';ctx.textAlign='center';
- {const nar=w<520,msg=ready<1?'Focusing…':(LENS.src==='touch'?'Drag to aim · let go'+(nar?'':' to take the photo'):LENS.src==='pad'?'Right stick to aim · let go'+(nar?'':' to take the photo'):'Arrow keys to aim · let go'+(nar?'':' to take the photo'));const tw=ctx.measureText(msg).width/2+10;const ty=cy+r+28<h-60?cy+r+28:cy-r-16;ctx.fillText(msg,clamp(cx,tw,w-tw),ty);}
+// a camera lens, not a gunsight: the view irises open, the edge is soft, and the glass catches a little light
+function drawLens(ctx,w,h,t){if(!LENS.on)return;const R=lensR(w,h),cx=LENS.cx,cy=LENS.cy,u=clamp((performance.now()/1000-LENS.t0)/LENS_READY,0,1),e=1-Math.pow(1-u,3),r=R*(.7+.3*e);
+ ctx.save();
+ ctx.fillStyle='rgba(14,18,15,.74)';ctx.beginPath();ctx.rect(0,0,w,h);ctx.arc(cx,cy,r,0,TAU,true);ctx.fill();
+ // soft fall-off inside the edge, like a real lens vignette
+ const v=ctx.createRadialGradient(cx,cy,r*.62,cx,cy,r);v.addColorStop(0,'rgba(14,18,15,0)');v.addColorStop(.75,'rgba(14,18,15,.12)');v.addColorStop(1,'rgba(14,18,15,.55)');ctx.fillStyle=v;ctx.beginPath();ctx.arc(cx,cy,r+.5,0,TAU);ctx.fill();
+ // the barrel: a dark ring with a faint metal edge
+ ctx.lineWidth=7;ctx.strokeStyle='rgba(20,22,20,.85)';ctx.beginPath();ctx.arc(cx,cy,r+3.5,0,TAU);ctx.stroke();
+ ctx.lineWidth=1.2;ctx.strokeStyle='rgba(255,250,238,.28)';ctx.beginPath();ctx.arc(cx,cy,r+7.5,0,TAU);ctx.stroke();
+ // glass glint
+ ctx.globalCompositeOperation='lighter';ctx.lineCap='round';
+ ctx.strokeStyle='rgba(255,255,255,.16)';ctx.lineWidth=Math.max(3,r*.035);ctx.beginPath();ctx.arc(cx,cy,r*.86,Math.PI*1.08,Math.PI*1.38);ctx.stroke();
+ ctx.strokeStyle='rgba(255,255,255,.09)';ctx.lineWidth=Math.max(2,r*.02);ctx.beginPath();ctx.arc(cx,cy,r*.86,Math.PI*1.45,Math.PI*1.52);ctx.stroke();
+ // what's in focus gets a faint warm glow
+ const P=LENS.pick;if(P&&u>=1){const gr=Math.max(18,P.sz*1.1),gl=ctx.createRadialGradient(P.sx,P.sy,0,P.sx,P.sy,gr);gl.addColorStop(0,'rgba(255,220,150,.22)');gl.addColorStop(1,'rgba(255,220,150,0)');ctx.fillStyle=gl;ctx.beginPath();ctx.arc(P.sx,P.sy,gr,0,TAU);ctx.fill();}
+ ctx.globalCompositeOperation='source-over';
+ if(u>=1){const nar=w<520,msg=LENS.follow?'Let go to take the photo':(LENS.src==='touch'?'Drag to aim, let go to shoot':LENS.src==='pad'?'Right stick to aim, let go to shoot':'Arrows to aim, let go to shoot');
+  ctx.font='600 '+(nar?12:13)+'px "Atkinson Hyperlegible",sans-serif';ctx.textAlign='center';const tw=ctx.measureText(msg).width/2+10;const ty=cy+R+30<h-60?cy+R+30:cy-R-18;ctx.fillStyle='rgba(255,248,234,.75)';ctx.fillText(msg,clamp(cx,tw,w-tw),ty);}
  ctx.restore();}
 function takePhoto(){const c=document.getElementById('play'),w=c.clientWidth,h=c.clientHeight,M=PLAY.mission,taken=W.taken;flashUI();SFX.shutter();
  const{pick,isTarget,reach}=lensPick(w,h);
@@ -1522,15 +1531,17 @@ function buildUI(){const st=document.getElementById('stage');
  UI.menu=document.getElementById('sr-menu');UI.menuIn=document.getElementById('sr-menu-in');UI.card=document.getElementById('sr-card');UI.frames=document.getElementById('sr-frames');UI.mission=document.getElementById('sr-mission');
  document.getElementById('sr-menu-btn').addEventListener('click',e=>{e.stopPropagation();openMenu('main');});
  {const pb=document.getElementById('sr-photo-btn');
-  pb.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();if(PLAY.paused)return;try{pb.setPointerCapture(e.pointerId);}catch(_){}pb._pid=e.pointerId;pb.classList.add('held');lensStart('touch',e.clientX,e.clientY);});
+  pb.addEventListener('pointerdown',e=>{e.stopPropagation();e.preventDefault();if(PLAY.paused)return;try{pb.setPointerCapture(e.pointerId);}catch(_){}pb._pid=e.pointerId;pb.classList.add('held');if(e.pointerType==='mouse')trackMouse(e);lensStart(e.pointerType==='mouse'?'mouse':'touch',e.clientX,e.clientY);});
   pb.addEventListener('pointermove',e=>{if(e.pointerId===pb._pid)lensAim(e.clientX,e.clientY);});
-  const end=cancel=>e=>{if(e.pointerId!==pb._pid)return;pb._pid=null;pb.classList.remove('held');if(LENS.src==='touch')lensEnd(cancel);};
+  const end=cancel=>e=>{if(e.pointerId!==pb._pid)return;pb._pid=null;pb.classList.remove('held');if(LENS.src==='touch'||LENS.src==='mouse')lensEnd(cancel);};
+  st.addEventListener('pointermove',e=>{if(e.pointerType==='mouse')trackMouse(e);},{capture:true});st.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')trackMouse(e);},{capture:true});
   pb.addEventListener('pointerup',end(false));pb.addEventListener('pointercancel',end(true));
   pb.addEventListener('contextmenu',e=>e.preventDefault());
   pb.addEventListener('keydown',e=>{if((e.code==='Space'||e.code==='Enter')&&!e.repeat){e.preventDefault();e.stopPropagation();lensStart('key');}});
   pb.addEventListener('keyup',e=>{if((e.code==='Space'||e.code==='Enter')&&LENS.src==='key'){e.preventDefault();e.stopPropagation();lensEnd();}});}
  UI.card.addEventListener('click',()=>hideCard());
  for(const el of[UI.menu,UI.card,UI.frames])el.addEventListener('pointerdown',e=>e.stopPropagation());}
+function trackMouse(e){const r=document.getElementById('play').getBoundingClientRect();MOUSE.x=e.clientX-r.left;MOUSE.y=e.clientY-r.top;MOUSE.t=performance.now();}
 function flashUI(){const f=document.getElementById('sr-flash');f.classList.remove('go');void f.offsetWidth;f.classList.add('go');}
 function pic(kind,id,cls,W,H){const c=document.createElement('canvas');const src=pictureOf(kind,id,W,H);c.width=src.width;c.height=src.height;c.getContext('2d').drawImage(src,0,0);c.className=cls||'';return c;}
 function figHTML(info,label){return`<figcaption>${label?`<span class="sr-k">${label}</span>`:''}<b>${info.name}</b><i>${info.sci}</i><span>${info.range}</span>${info.tree?`<span class="sr-tree">From the ${info.tree}</span>`:''}${info.fact?`<em>${info.fact}</em>`:''}</figcaption>`;}
