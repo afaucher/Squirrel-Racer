@@ -1,6 +1,6 @@
 # Squirrel Racer
 
-An endless treetop run in a single HTML5 file. You're a squirrel: run the branches, leap between trees, and land the big ones. There's no score and no wrong way to go.
+A cozy treetop game in a single HTML5 file. You're a real squirrel in a real forest: run the branches, leap between trees, photograph the birds and wildflowers, and collect the nuts and cones. There's no score, no losing, and no wrong way to go.
 
 ## Play
 
@@ -20,11 +20,32 @@ then visit http://localhost:8000.
 |---|---|---|---|
 | **Move** | Left thumb (floating stick) | W A S D | Left stick or D-pad |
 | **Leap** | Right thumb: pull back, release | Hold arrows, release | Right stick: pull back, release |
-| **Full screen** | Corner button | F (Esc exits) | — |
+| **Photo** | Camera button (top right) | Space or Enter | A or B |
+| **Menu** | Acorn button (top left) | M or Esc | Start |
+| **Full screen** | Button at the bottom | F (Esc exits) | — |
 
 - **Leap** is a wind-up: pull away from where you want to go and let go. Longer pulls jump farther. On the keyboard the direction is the average of the arrows you've held.
 - **Landing** latches onto whatever you touch: limb, trunk or ground.
 - **Thin branch tips bend** and weaken your launch, so leap from closer to the trunk. (Squirrels really do weigh branch bendiness over gap distance; see Hunt et al., *Science*, 2021.)
+
+## Forests, missions and the collection
+
+Open the acorn menu to choose:
+
+- **Play:** pick a forest, then one of the squirrels that really lives there, and explore freely.
+- **Missions:** three missions dealt at random for the forest you pick. Photograph 3 of one bird, collect 3 of one nut or cone, or photograph 10 different wildflowers. Each find fills one of the frames on the right; tap a frame to see the species again and hear its call. Finishing a mission shows its common and scientific names. Nothing can be failed.
+- **Collection:** every bird, nut, cone and wildflower in all four forests, with a check mark on the ones you've found. Nuts and cones are shown beside the tree they come from. Your collection is saved in this browser.
+
+The photo button photographs what's on screen. If something your mission is looking for is in view, it is always chosen first; otherwise the nearest new find is. Nuts and cones are collected only when they're within reach. Each bird, nut and flower can be counted once per forest. Every card shows the common name, scientific name and native range, with a short fact.
+
+| Forest | Squirrels | Trees | Birds |
+|---|---|---|---|
+| Eastern Hardwood Forest | Eastern gray (and its black form), eastern fox | White and northern red oak, shagbark hickory, American beech, sugar maple | Northern cardinal, blue jay, tufted titmouse, white-breasted nuthatch, red-bellied woodpecker |
+| Boreal Forest | American red | White and black spruce, balsam fir, jack pine, paper birch, quaking aspen | Canada jay, boreal chickadee, red-breasted nuthatch, white-winged crossbill, spruce grouse, dark-eyed junco |
+| Southwest Ponderosa Pine | Abert's, Kaibab | Ponderosa pine, Gambel oak, Douglas-fir, quaking aspen, Colorado pinyon | Steller's jay, pygmy nuthatch, mountain chickadee, acorn woodpecker, western bluebird, red-faced warbler |
+| Caledonian Pinewood | Eurasian red (and its dark form) | Scots pine, silver birch, hazel, pedunculate oak, European beech, rowan | Eurasian jay, crested tit, great spotted woodpecker, coal tit, European robin, common chaffinch |
+
+Each forest also has 11 native wildflowers and 4 nuts or cones. Birds are synthesized from the rhythm and pitch of their real calls; drop a recording at `audio/birds/<id>.mp3` to use it instead (see `audio/README.md`).
 
 ## Motion models (A/B toggle in the page)
 
@@ -36,11 +57,15 @@ then visit http://localhost:8000.
 - **Trees:** playable spline trunks and limbs with second-level forks, crown limbs and flared, parent-aligned joints. Species: oak, maple, birch and pine. Some limbs start behind the trunk, and twigs sit in front of or behind their branch.
 - **Depth:** every walkable surface has a depth (behind limb, trunk, front limb). The squirrel is drawn at the depth of what it's holding, and anything in front of it is redrawn over it.
 - **Scenery layers:** space-colonization trees far away, recursive-grammar trees in the midground, hazy same-tree limbs, layered grass with depth-sorted blades, procedural flowers (phyllotaxis heads, rose-curve blossoms, racemes), and near-camera branches, grass and flowers that get pushed out of the way as the camera moves through them.
-- **Squirrel:** spline body with a flexible neck, spring tail and leg IK. Pose library drawn from real squirrel behavior (half-bound gallop, headfirst descent with reversed hind feet, sit-and-feed, alert tail flick). A random coat each run: gray, fox, red, or the rare black morph.
+- **Squirrel:** spline body with a flexible neck, spring tail and leg IK. Pose library drawn from real squirrel behavior (half-bound gallop, headfirst descent with reversed hind feet, sit-and-feed, alert tail flick). Eight real coats, including the ear tufts of Abert's and Eurasian red squirrels and the Kaibab squirrel's white tail.
+- **Birds, nuts, cones and wildflowers:** each species drawn from its real field marks. Birds perch on limbs, cling to trunks (woodpeckers head-up, nuthatches head-down) or feed on the ground.
 - **Celebrations instead of a score:** a rainbow tail on long flights, and stars, fireflies and falling leaves for big branch landings.
 - **Forest audio:** a layered mixer whose canopy wind, birds, crickets and leaf rustle fade with height and speed, plus sounds for leaps, landings and celebrations. Synthesized by default; drop CC0 recordings into `audio/` to replace the beds.
 
 ## Credits
+
+All the public sources behind the species, sounds and research are listed in [ATTRIBUTION.md](ATTRIBUTION.md).
+
 
 Research behind the motion and trees:
 - Hunt et al., "Acrobatic squirrels learn to leap and land on tree branches without falling", *Science* (2021).

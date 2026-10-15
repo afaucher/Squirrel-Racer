@@ -20,3 +20,11 @@ These were checked as CC0 (public domain, no attribution required):
 - [Rambouillet Forest](https://bigsoundbank.com/rambouillet-forest-s0136.html) on BigSoundBank. 2½ minutes of birdsong, wind and creaking branches. It includes a passing car and a plane, so trim those out.
 
 Serve the folder over HTTP (for example `python3 -m http.server`) so the browser can load the files.
+
+## Bird calls
+
+Each bird's call is synthesized from the rhythm and pitch of its real call. To use a real recording, add it as `audio/birds/<id>.mp3`, where `<id>` is one of:
+
+`cardinal`, `bluejay`, `titmouse`, `wbnut`, `rbwood`, `canjay`, `borchick`, `rbnut`, `wwcross`, `sgrouse`, `junco`, `stjay`, `pygnut`, `mtnchick`, `acornwp`, `wbluebird`, `rfwarbler`, `eujay`, `crestit`, `gspot`, `coaltit`, `robin`, `chaffinch`.
+
+Check the licence of every recording you add and credit it in `ATTRIBUTION.md`. See that file for public-domain and openly licensed sources.
