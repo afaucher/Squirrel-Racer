@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>Squirrel Racer</title>
+<title>Squirrel Ranger</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,800&family=Atkinson+Hyperlegible:wght@400;700&family=JetBrains+Mono:wght@500&display=swap">
@@ -185,19 +185,20 @@ a{color:var(--accent)}
 <main>
 <header>
   <div class="eyebrow">A cozy field guide you can climb</div>
-  <h1>Squirrel <span>Racer</span></h1>
-  <p class="lede">Be a real squirrel in four real forests. Run the branches, leap between trees, photograph the birds and wildflowers, and collect the nuts and cones. There's no score and no wrong way to go.</p>
+  <h1>Squirrel <span>Ranger</span></h1>
+  <p class="lede">Be a real squirrel in five real forests. Run the branches, leap between trees, photograph the birds and wildflowers, and collect the nuts and cones. There's no score and no wrong way to go.</p>
 </header>
 
 <section class="panel" id="panel-play">
-  <div class="stage" id="stage"><canvas id="play" aria-label="Squirrel Racer"></canvas><button class="fsbtn" id="fs-btn" type="button" aria-label="Enter full screen"></button></div>
+  <div class="stage" id="stage"><canvas id="play" aria-label="Squirrel Ranger"></canvas><button class="fsbtn" id="fs-btn" type="button" aria-label="Enter full screen"></button></div>
   <ul class="howto">
     <li><b>Move</b>Left thumb, W A S D, or a controller's left stick. In Nimble motion (B), steer anywhere within reach of a branch: the body glides in straight lines while the feet keep hold, so slipping between nearby branches, going under, or around a trunk just happens. In Surface motion (A), run along the branch and push into it to swing to the other side.</li>
     <li><b>Leap</b>Right thumb, the arrow keys, or a controller's right stick. Pull back away from where you want to go, then let go. Hold longer to wind up a bigger leap; on keys, the direction is the average of what you've held.</li>
     <li><b>Land anywhere</b>You latch onto whatever you touch: limb, trunk or ground. Thin branch tips bend and weaken your launch, so leap from closer to the trunk.</li>
     <li><b>Photo</b>Hold the camera (top right), Space, or a controller's A button to look through the lens. It opens under your finger or mouse pointer and follows it as you slide (on a keyboard or controller, the arrows or right stick aim it). Let go to take the photo. Only what's inside the circle counts, and what your mission is looking for is chosen first. Nuts and cones within reach are collected.</li>
-    <li><b>Menu</b>The acorn (top left), M or Start. Play any of four forests as one of its squirrels, take a mission (each is dealt its own forest and squirrel), or browse your collection.</li>
+    <li><b>Menu</b>The acorn (top left), M or Start. Play any of five forests as one of its squirrels, take a mission (each is dealt its own forest and squirrel), or browse your collection.</li>
     <li><b>Missions</b>Photograph three different birds, collect three different nuts or cones, or photograph three different wildflowers. Each mission shows its three in outline on the right, and each one fills in when you find it; tap a frame to see it again (and hear the call, for birds). Finish a mission and the squirrel you played joins your collection.</li>
+    <li><b>Flying squirrels glide</b>Play as a southern, northern or Humboldt's flying squirrel and, once a leap starts to fall, it spreads its gliding membrane and sails much farther.</li>
     <li><b>Big leaps</b>Long flights turn your tail into a rainbow. Land a long leap on a branch and you get stars, fireflies and falling leaves.</li>
     <li><b>Full screen</b>Tap the button at the bottom of the play area, or press F. Esc exits.</li>
   </ul>
@@ -480,6 +481,7 @@ function pose(mode,ph,t){
  switch(mode){
   case'bound':case'cling':{const a=mode==='cling'?.6:1;P.flex=s*a;P.bob=Math.max(0,s)*7*a;P.pitch=-.12*c*a;P.fU=.2+.85*s*a;P.fL=P.fU-.35;P.hA=.35-.95*s*a;P.hS=P.hA-1.3;P.hF=P.hA+.75;P.tailBase=.35+.22*c;P.curl=-.25+.35*s;P.head=-P.pitch*.85-.05*s;P.neck=.6-.9*s*a;P.far=.07;break;}
   case'leap':{P.flex=1;P.pitch=.22-.45*ph;P.fU=1.25;P.fL=1.05;P.hA=-.75;P.hS=-2;P.hF=-.7;P.tailBase=.18+.2*ph;P.curl=.25;P.wave=.05;P.ear=-1;P.neck=2.6;P.head=.1-.4*ph;break;}
+  case'glide':{P.flex=.85;P.pitch=-.04;P.fU=.95;P.fL=1.15;P.hA=-.9;P.hS=-1.15;P.hF=-1.0;P.tailBase=.08;P.curl=.08;P.wave=.03;P.ear=-.6;P.neck=2.2;P.head=.05;P.far=.1;break;}
   case'crouch':{P.flex=-1;P.bob=-3;P.pitch=.12;P.fU=-.25;P.fL=-.45;P.hA=1.35;P.hS=-.05;P.hF=1.6;P.tailBase=.6;P.curl=-.5;P.wave=.25;P.waveSpd=18;P.head=.15;P.neck=-1;break;}
   case'land':{const k=ph*ph*(3-2*ph);P.flex=1-2*k;P.pitch=-.3*(1-k);P.fU=.9-1.1*k;P.fL=P.fU-.3*k;P.hA=-.5+1.8*k;P.hS=P.hA-1.3;P.hF=P.hA+.6;P.tailBase=.2+.5*k;P.curl=.2-.6*k;P.neck=2.2-2.8*k;P.head=-P.pitch*.6;break;}
   case'descend':{P.flex=s*.55;P.pitch=-.05;P.fU=.25+.55*s;P.fL=P.fU-.25;P.hA=.3-.6*s;P.hS=P.hA-1.25;P.hF=P.hA-1.9;P.tailBase=.25;P.curl=.15;P.head=.4;P.neck=1.6+.5*s;P.far=.25;break;}
@@ -513,12 +515,12 @@ const profB=u=>u<.25?lerp(9.5,10.5,u/.25):u<.7?lerp(10.5,9,(u-.25)/.45):lerp(9,8
 function fluffyTail(ctx,pts,C,scale){const n=pts.length;for(let pass=0;pass<2;pass++){ctx.fillStyle=pass?C.tail:C.tailEdge;for(let i=1;i<n;i++){for(let h=0;h<2;h++){const u=(i-.5*h)/(n-1);const x=h?(pts[i][0]+pts[i-1][0])/2:pts[i][0],y=h?(pts[i][1]+pts[i-1][1])/2:pts[i][1];const r=(2.5+7.8*Math.pow(u,.55))*scale*(pass?.74:1);ctx.beginPath();ctx.arc(x,y,r,0,TAU);ctx.fill();}}}
  ctx.strokeStyle=C.tailEdge;ctx.globalAlpha=.5;ctx.lineWidth=.7;for(let i=3;i<n;i++){const u=i/(n-1),r=(2.5+7.8*Math.pow(u,.55))*scale;const a=Math.atan2(pts[i][1]-pts[i-1][1],pts[i][0]-pts[i-1][0]);for(const sd of[-1,1]){const bx=pts[i][0]+Math.cos(a+sd*Math.PI/2)*r*.9,by=pts[i][1]+Math.sin(a+sd*Math.PI/2)*r*.9;ctx.beginPath();ctx.moveTo(bx,by);ctx.lineTo(bx+Math.cos(a+sd*1.2)*3,by+Math.sin(a+sd*1.2)*3);ctx.stroke();}}ctx.globalAlpha=1;}
 function headB(ctx,h,C,P){ctx.save();ctx.translate(h.x,h.y);ctx.rotate(h.ang);
- ctx.fillStyle=C.back2;ctx.save();ctx.translate(-4.5,-5.5);ctx.rotate(-.55-(P.ear||0)*.4);ctx.beginPath();ctx.ellipse(0,-3,2.4,4.6,0,0,TAU);ctx.fill();ctx.restore();
- ctx.fillStyle=C.back;ctx.beginPath();ctx.ellipse(0,0,8.5,7,0,0,TAU);ctx.fill();ctx.beginPath();ctx.ellipse(6,1.6,5.6,4.5,.15,0,TAU);ctx.fill();
+ ctx.fillStyle=C.earOut||C.back2;ctx.save();ctx.translate(-4.5,-5.5);ctx.rotate(-.55-(P.ear||0)*.4);ctx.beginPath();ctx.ellipse(0,-3,2.4,4.6,0,0,TAU);ctx.fill();ctx.restore();
+ ctx.fillStyle=C.back;ctx.beginPath();ctx.ellipse(0,0,8.5,7,0,0,TAU);ctx.fill();ctx.fillStyle=C.muzzle||C.back;ctx.beginPath();ctx.ellipse(6,1.6,5.6,4.5,.15,0,TAU);ctx.fill();
  ctx.fillStyle=C.belly;ctx.beginPath();ctx.ellipse(3.5,4.2,5.4,2.5,.2,0,TAU);ctx.fill();
- ctx.fillStyle=C.ear;ctx.save();ctx.translate(-2,-6);ctx.rotate(-.3-(P.ear||0)*.4);ctx.beginPath();ctx.ellipse(0,-3.4,2.7,5,0,0,TAU);ctx.fill();ctx.fillStyle=C.back;ctx.beginPath();ctx.ellipse(.3,-2.4,1.3,3,0,0,TAU);ctx.fill();if(C.tuft){ctx.fillStyle=C.tuftC||C.back2;for(const o of[-1,0,1]){ctx.beginPath();ctx.moveTo(-1.6+o*.5,-6.6);ctx.quadraticCurveTo(o*.8,-8-C.tuft*.6,o*1.4+.4,-8.4-C.tuft);ctx.quadraticCurveTo(o*.4+1,-8,1.6+o*.5,-6.6);ctx.fill();}}ctx.restore();
- ctx.fillStyle=C.ring;ctx.beginPath();ctx.ellipse(2.6,-1.4,3.1,2.7,0,0,TAU);ctx.fill();
- ctx.fillStyle='#120f0d';ctx.beginPath();ctx.ellipse(2.9,-1.4,2.2,2.1,0,0,TAU);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(3.6,-2.2,.75,0,TAU);ctx.fill();
+ ctx.fillStyle=C.ear;ctx.save();ctx.translate(-2,-6);ctx.rotate(-.3-(P.ear||0)*.4);ctx.beginPath();ctx.ellipse(0,-3.4,2.7,5,0,0,TAU);ctx.fill();ctx.fillStyle=C.earIn||C.back;ctx.beginPath();ctx.ellipse(.3,-2.4,1.3,3,0,0,TAU);ctx.fill();if(C.tuft){ctx.fillStyle=C.tuftC||C.back2;for(const o of[-1,0,1]){ctx.beginPath();ctx.moveTo(-1.6+o*.5,-6.6);ctx.quadraticCurveTo(o*.8,-8-C.tuft*.6,o*1.4+.4,-8.4-C.tuft);ctx.quadraticCurveTo(o*.4+1,-8,1.6+o*.5,-6.6);ctx.fill();}}ctx.restore();
+ {const e=C.eye||1;ctx.fillStyle=C.ring;ctx.beginPath();ctx.ellipse(2.6,-1.4,3.1*e,2.7*e,0,0,TAU);ctx.fill();
+ ctx.fillStyle='#120f0d';ctx.beginPath();ctx.ellipse(2.9,-1.4,2.2*e,2.1*e,0,0,TAU);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(2.9+.7*e,-1.4-.8*e,.75*e,0,TAU);ctx.fill();}
  ctx.fillStyle=C.nose;ctx.beginPath();ctx.arc(11.2,1.1,1.35,0,TAU);ctx.fill();
  ctx.strokeStyle='rgba(30,25,20,.35)';ctx.lineWidth=.5;for(let k=-1;k<=1;k++){ctx.beginPath();ctx.moveTo(10,2);ctx.lineTo(16,1+k*2.5);ctx.stroke();}
  ctx.restore();}
@@ -527,15 +529,22 @@ function drawNeck(ctx,sk,C){const[a,c,b]=sk.neck;const pts=[];for(let i=0;i<=8;i
  ctx.fillStyle=g;ctx.beginPath();pts.forEach((p,i)=>{const x=p.x+p.nx*p.r,y=p.y+p.ny*p.r;i?ctx.lineTo(x,y):ctx.moveTo(x,y);});for(let i=pts.length-1;i>=0;i--){const p=pts[i];ctx.lineTo(p.x-p.nx*p.r,p.y-p.ny*p.r);}ctx.closePath();ctx.fill();
  ctx.beginPath();ctx.arc(pts[0].x,pts[0].y,pts[0].r,0,TAU);ctx.arc(pts[8].x,pts[8].y,pts[8].r,0,TAU);ctx.fill();
  ctx.fillStyle=C.belly;ctx.beginPath();for(let i=1;i<=8;i++){const p=pts[i];const x=p.x-p.nx*p.r*.3,y=p.y-p.ny*p.r*.3;i>1?ctx.lineTo(x,y):ctx.moveTo(x,y);}for(let i=8;i>=1;i--){const p=pts[i];ctx.lineTo(p.x-p.nx*p.r*.97,p.y-p.ny*p.r*.97);}ctx.closePath();ctx.fill();}
+// flying squirrels: the furry gliding membrane stretched from wrist to ankle
+function membrane(ctx,fore,hind,mid,C,far){const w=fore[fore.length-1],a=hind[2]||hind[hind.length-1];const cx=(w[0]+a[0])/2,cy=(w[1]+a[1])/2;const kx=lerp(cx,mid.x,.42),ky=lerp(cy,mid.y,.42);
+ ctx.save();ctx.fillStyle=far?C.back2:C.back;ctx.globalAlpha=far?.8:.95;ctx.beginPath();ctx.moveTo(w[0],w[1]);for(const q of fore.slice(0,-1).reverse())ctx.lineTo(q[0],q[1]);for(const q of hind.slice(0,3))ctx.lineTo(q[0],q[1]);ctx.quadraticCurveTo(kx,ky,w[0],w[1]);ctx.closePath();ctx.fill();
+ ctx.globalAlpha=1;ctx.strokeStyle=C.wash;ctx.lineWidth=1.2;ctx.beginPath();ctx.moveTo(a[0],a[1]);ctx.quadraticCurveTo(kx,ky,w[0],w[1]);ctx.stroke();ctx.restore();}
 function drawB(ctx,sk,C,tail){
- fluffyTail(ctx,tail,C,1);rainbowOverlay(ctx,tail,u=>(2.5+7.8*Math.pow(u,.55))*.9);
- limb(ctx,sk.hF,[6.5,4.5,3.4],C.back2);paw(ctx,sk.hF[3],2,C.paw);limb(ctx,sk.fF,[4.5,3.4],C.back2);paw(ctx,sk.fF[2],1.9,C.paw);
+ fluffyTail(ctx,tail,C,C.tailR||1);rainbowOverlay(ctx,tail,u=>(2.5+7.8*Math.pow(u,.55))*.9);
  const pts=bodyPts(sk,profB);const mid=pts[6];
+ if(C.glide&&SQ_MODE==='glide')membrane(ctx,sk.fF,sk.hF,mid,C,true);
+ limb(ctx,sk.hF,[6.5,4.5,3.4],C.back2);paw(ctx,sk.hF[3],2,C.paw);limb(ctx,sk.fF,[4.5,3.4],C.back2);paw(ctx,sk.fF[2],1.9,C.paw);
  const g=ctx.createLinearGradient(mid.x+mid.nx*11,mid.y+mid.ny*11,mid.x-mid.nx*11,mid.y-mid.ny*11);g.addColorStop(0,C.back2);g.addColorStop(.35,C.back);g.addColorStop(.75,C.wash);g.addColorStop(1,C.wash);
  ctx.fillStyle=g;ctx.beginPath();pts.forEach((p,i)=>{const x=p.x+p.nx*p.r,y=p.y+p.ny*p.r;i?ctx.lineTo(x,y):ctx.moveTo(x,y);});for(let i=pts.length-1;i>=0;i--){const p=pts[i];ctx.lineTo(p.x-p.nx*p.r,p.y-p.ny*p.r);}ctx.closePath();ctx.fill();
  ctx.beginPath();ctx.arc(pts[0].x,pts[0].y,pts[0].r,0,TAU);ctx.fill();
  ctx.fillStyle=C.belly;ctx.beginPath();for(let i=2;i<pts.length;i++){const p=pts[i];const x=p.x-p.nx*p.r*.35,y=p.y-p.ny*p.r*.35;i>2?ctx.lineTo(x,y):ctx.moveTo(x,y);}for(let i=pts.length-1;i>=2;i--){const p=pts[i];ctx.lineTo(p.x-p.nx*p.r*.98,p.y-p.ny*p.r*.98);}ctx.closePath();ctx.fill();
  if(C.stripe){ctx.fillStyle=C.stripe;ctx.globalAlpha=.85;ctx.beginPath();for(let i=1;i<pts.length-1;i++){const p=pts[i];ctx.lineTo(p.x+p.nx*p.r*.92,p.y+p.ny*p.r*.92);}for(let i=pts.length-2;i>=1;i--){const p=pts[i];ctx.lineTo(p.x+p.nx*p.r*.45,p.y+p.ny*p.r*.45);}ctx.closePath();ctx.fill();ctx.globalAlpha=1;}
+ if(C.side){ctx.strokeStyle=C.side;ctx.lineWidth=1.8;ctx.lineCap='round';ctx.globalAlpha=.85;ctx.beginPath();for(let i=3;i<pts.length-1;i++){const p=pts[i];const x=p.x-p.nx*p.r*.3,y=p.y-p.ny*p.r*.3;i>3?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();ctx.globalAlpha=1;}
+ if(C.glide){if(SQ_MODE==='glide')membrane(ctx,sk.fN,sk.hN,mid,C,false);else{ctx.strokeStyle=C.back2;ctx.globalAlpha=.75;ctx.lineWidth=2.6;ctx.lineCap='round';ctx.beginPath();for(let i=2;i<pts.length-1;i++){const p=pts[i];const x=p.x-p.nx*p.r*.82,y=p.y-p.ny*p.r*.82;i>2?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();ctx.globalAlpha=1;}}
  drawNeck(ctx,sk,C);
  const h0=sk.hN[0],h1=sk.hN[1];ctx.fillStyle=C.back;ctx.beginPath();ctx.ellipse((h0[0]+h1[0])/2,(h0[1]+h1[1])/2,8,5.6,Math.atan2(h1[1]-h0[1],h1[0]-h0[0]),0,TAU);ctx.fill();
  limb(ctx,sk.hN.slice(1),[4.8,3.6],C.back);paw(ctx,sk.hN[3],2.2,C.paw);
@@ -598,7 +607,8 @@ function drawDorsal(ctx,C,belly,t,paws,moving,ph){
  ctx.fillStyle='#120f0d';ctx.beginPath();ctx.arc(19.5,5.6,1.5,0,TAU);ctx.arc(19.5,-5.6,1.5,0,TAU);ctx.fill();
  ctx.fillStyle=C.nose;ctx.beginPath();ctx.arc(29.5,0,1.4,0,TAU);ctx.fill();}
 const RENDER={A:drawA,B:drawB,C:drawC};
-function drawSquirrel(ctx,kind,rig,mode,ph,t,dt,C,ik){const P=pose(mode,ph,t),PF=pose(mode,ph-(P.far||0),t);updateTail(rig,P,t,dt);springHead(rig,P,dt);const sk=skel(P,PF);if(ik)ik(sk);RENDER[kind](ctx,sk,C,tailPts(rig,sk.tailRoot,kind==='C'?5.5:5));}
+let SQ_MODE='';
+function drawSquirrel(ctx,kind,rig,mode,ph,t,dt,C,ik){SQ_MODE=mode;const P=pose(mode,ph,t),PF=pose(mode,ph-(P.far||0),t);updateTail(rig,P,t,dt);springHead(rig,P,dt);const sk=skel(P,PF);if(ik)ik(sk);RENDER[kind](ctx,sk,C,tailPts(rig,sk.tailRoot,kind==='C'?5.5:5));}
 
 /* ================= CELEBRATIONS ================= */
 const TAILFX={amt:0,t:0};
@@ -994,6 +1004,22 @@ const BIRDS=[
   marks:'Blue-gray crown, rosy face and breast, chestnut back, green rump, bold white shoulder and wing bar.',
   up:'#8a5a3c',low:'#d9a08a',head:'#6f86a8',wing:'#1d1b1d',tail:{c:'#1f1d20',len:15,p:[['outer','#ffffff']]},bill:{t:'cone',c:'#8d9aa8',len:4,d:3.2},leg:'#8a7a70',
   hp:[['face','#d48e7a']],bp:[['breast','#d48e7a'],['rump','#93a55a'],['belly','#efe6df']],wp:[['patch','#ffffff'],['wingbar','#f3e9c0']]},
+ {id:'varthrush',zone:'pnw',name:'Varied thrush',sci:'Ixoreus naevius',wiki:'Varied_thrush',sex:1,pose:'ground',size:.95,bh:1.04,
+  marks:'Slate-blue back, orange throat and breast crossed by a black band, orange eyebrow and wing bars, dark face.',
+  up:'#4c5866',low:'#e8892e',head:'#4c5866',wing:'#46525e',tail:{c:'#3f4a55',len:17},bill:{t:'thin',c:'#2a2a2c',len:4.4,d:2.6},leg:'#d6a283',
+  hp:[['brow','#ea8b30'],['eyeline','#22262c']],bp:[['breastband','#1f2328'],['vent','#eceae4']],wp:[['wingbars2','#ea8b30']]},
+ {id:'chbchick',zone:'pnw',name:'Chestnut-backed chickadee',sci:'Poecile rufescens',wiki:'Chestnut-backed_chickadee',pose:'horiz',size:.7,bw:.95,bh:1.05,hs:1.08,
+  marks:'Sooty-brown cap, black bib, white cheeks, rich chestnut back and flanks.',
+  up:'#8a4426',low:'#e9e7e2',head:'#efefea',wing:'#6e6a66',tail:{c:'#6a6764',len:14},bill:{t:'short',c:'#1a1a1c',len:2.4,d:2},leg:'#4b4c50',
+  hp:[['cap','#2a221e',-.3],['cheek','#f6f6f2'],['bib','#141416']],bp:[['flank','#9a4f2a']],wp:[['edge','#bdb8b0']]},
+ {id:'pileated',zone:'pnw',name:'Pileated woodpecker',sci:'Dryocopus pileatus',wiki:'Pileated_woodpecker',sex:1,pose:'cling',size:1.4,bh:.95,
+  marks:'Crow-sized and black, with a flaming red crest, white stripes across the face and down the neck, and a red moustache (male).',
+  up:'#18181b',low:'#1d1d20',head:'#1d1d20',wing:'#18181b',tail:{c:'#151517',len:17},crest:{len:10,c:'#d8202a'},bill:{t:'chisel',c:'#4a4a4e',len:7.5,d:2.6},leg:'#5d5a55',
+  hp:[['crown','#d8202a'],['brow','#ffffff'],['ccurve','#ffffff'],['moustache','#d8202a']]},
+ {id:'pacwren',zone:'pnw',name:'Pacific wren',sci:'Troglodytes pacificus',wiki:'Pacific_wren',pose:'horiz',size:.55,bw:.95,bh:1.12,
+  marks:'Tiny, round and dark brown with fine barring, a pale eyebrow and a stubby tail often cocked upright.',
+  up:'#7a4e30',low:'#b08860',head:'#7a4e30',wing:'#6a4430',tail:{c:'#5a3f2c',len:6,p:[['bars','#3a2a1e']]},bill:{t:'thin',c:'#2a2420',len:3.4,d:1.4},leg:'#8a6a58',
+  hp:[['brow','#b8926e']],bp:[['backbars','#3e2c20'],['scallop','#5a3e2c']],wp:[['bars','#3a2a1e']]},
 ];
 
 /* ---------- renderer: canonical frame, bird faces +x, belly toward +y ---------- */
@@ -1151,6 +1177,10 @@ Object.assign(BIRD_SP.crestit,{range:'Conifer forests of Europe; in Britain only
 Object.assign(BIRD_SP.gspot,{range:'Europe, North Africa and across temperate Asia',fact:'It wedges pine cones into a bark "anvil" to pick out the seeds.'});
 Object.assign(BIRD_SP.coaltit,{range:'Europe, North Africa and Asia',fact:'Coal tits hide spruce and pine seeds to eat later, just like squirrels.'});
 Object.assign(BIRD_SP.robin,{range:'Europe, western Asia and North Africa',fact:'Robins sing all winter to defend their territory.'});
+Object.assign(BIRD_SP.varthrush,{range:'Alaska and western Canada to northern California and the northern Rockies; some winter south to California',fact:'Its song is a long, eerie, buzzy whistle, then a pause and another on a different pitch.'});
+Object.assign(BIRD_SP.chbchick,{range:'Pacific coast from southern Alaska to central California, plus a small population in the northern Rockies',fact:'It feeds higher in the conifers than other chickadees and often travels in mixed flocks.'});
+Object.assign(BIRD_SP.pileated,{range:'Forests across Canada, the eastern US, the northern Rockies and the Pacific coast to California',fact:'It chisels big rectangular holes hunting carpenter ants, and its old holes become homes for owls and flying squirrels.'});
+Object.assign(BIRD_SP.pacwren,{range:'Pacific coast from Alaska to California, and inland to the northern Rockies',fact:'One of the smallest birds in its forest, with one of the longest, most complex songs.'});
 Object.assign(BIRD_SP.chaffinch,{pl:'Common chaffinches',range:'Europe, North Africa and western Asia',fact:'Its song speeds up and tumbles down the scale, ending in a flourish.'});
 
 /* ---- trees (species shown in the forest; every nut and cone points to one) ---- */
@@ -1175,7 +1205,13 @@ const TREE_INFO={
  hazel:['Common hazel','Corylus avellana','Europe and western Asia'],
  pedoak:['Pedunculate oak','Quercus robur','Europe to the Caucasus'],
  eubeech:['European beech','Fagus sylvatica','Western and central Europe'],
- rowan:['Rowan','Sorbus aucuparia','Europe and northern Asia']};
+ rowan:['Rowan','Sorbus aucuparia','Europe and northern Asia'],
+ westernhemlock:['Western hemlock','Tsuga heterophylla','Pacific coast from Alaska to northern California, and inland to the northern Rockies'],
+ westernredcedar:['Western redcedar','Thuja plicata','Pacific Northwest and the northern Rockies'],
+ sitkaspruce:['Sitka spruce','Picea sitchensis','Pacific coast from Alaska to northern California'],
+ bigleafmaple:['Bigleaf maple','Acer macrophyllum','Pacific coast from British Columbia to California'],
+ redalder:['Red alder','Alnus rubra','Pacific coast from Alaska to California'],
+ beakedhazel:['Beaked hazel','Corylus cornuta','Across much of North America; the western variety is called California hazelnut']};
 (function(){const S0=SPECIES,mk=(base,o)=>Object.assign({},S0[base],o);
  Object.assign(SPECIES,{
   whiteoak:mk('oak',{bark:'#857d72',barkHi:'#a39b8e',barkLo:'#5c564d',bloom:'dogwood'}),
@@ -1202,6 +1238,15 @@ const TREE_INFO={
  for(const k of['oak','maple','birch','pine'])if(SPECIES[k].bloom===undefined)SPECIES[k].bloom=k==='birch'?'cherry':k==='oak'?'dogwood':null;
  SPECIES.birch.wavy=SPECIES.paperbirch.wavy=SPECIES.aspen.wavy=SPECIES.silverbirch.wavy=1;})();
 
+// Pacific Northwest trees
+(function(){const mk=(base,o)=>Object.assign({},SPECIES[base],o);Object.assign(SPECIES,{
+ westernhemlock:mk('pine',{bark:'#5e4a3c',barkHi:'#7c6656',leaf:['#2e4a30','#3a5a3a','#25402a'],whorlN:10,wL:.85,wDroop:.22,H:1.12}),
+ westernredcedar:mk('pine',{bark:'#8a4e34',barkHi:'#b06a48',barkLo:'#5a3020',strips:'#5e3424',leaf:['#4e7a38','#5c8a40','#3e6a30'],whorlN:9,wDroop:.3,H:1.15,trunk:20}),
+ sitkaspruce:mk('pine',{bark:'#7a6e64',barkHi:'#9a8e84',barkLo:'#554b43',leaf:['#3e5e5a','#4a6e68','#33504c'],whorlN:8,H:1.25,trunk:21}),
+ bigleafmaple:mk('maple',{bark:'#6b6c4c',barkHi:'#8a8c5e',barkLo:'#4a4b33',leaf:['#6a9a34','#7aa83c','#d8b440','#5a8a2c'],leafR:15,trunk:21,spread:.6}),
+ redalder:mk('birch',{bark:'#b9b8ae',barkHi:'#dcdbd2',barkLo:'#8e8d84',mark:'#e9e7dc',leaf:['#4f7a34','#5c8a3c','#44702c'],droop:.12,wavy:0,bloom:null,trunk:14}),
+ beakedhazel:mk('maple',{bark:'#7a6050',barkHi:'#9a806e',barkLo:'#54402f',leaf:['#6a8a35','#7a9a3e','#5a7a2e'],trunk:10,H:.6,bloom:null})});})();
+
 /* ---- nuts and cones ---- */
 const NUTS={
  whiteacorn:{name:'White oak acorn',tree:'whiteoak',fact:'Sweet and low in tannin, so squirrels usually eat white oak acorns right away.',art:{t:'acorn',nut:'#a8743c',cap:'#8a7a55',capD:.3,w:4.2,h:8.6,warty:1}},
@@ -1219,7 +1264,11 @@ const NUTS={
  scotscone:{name:'Scots pine cone',tree:'scotspine',fact:'Red squirrels strip off the scales and leave a neat bare core.',art:{t:'cone',len:7.6,wid:4.4,col:'#8a7a66',hi:'#a8998a',egg:1,bosses:1}},
  hazelnut:{name:'Hazelnut',tree:'hazel',fact:'Red squirrels split hazelnuts cleanly in two; mice gnaw a round hole instead.',art:{t:'hazel'}},
  eubeechnut:{name:'European beechnut',tree:'eubeech',fact:'Beech trees fruit heavily every few years, in what are called mast years.',art:{t:'beech',col:'#7a5a3a'}},
- pedacorn:{name:'Pedunculate oak acorn',tree:'pedoak',fact:'Named for the long stalk, or peduncle, that its acorns hang from.',art:{t:'acorn',nut:'#9a6a36',cap:'#7a6a4a',capD:.28,w:4.2,h:8.2,stalk:7,warty:1}}};
+ pedacorn:{name:'Pedunculate oak acorn',tree:'pedoak',fact:'Named for the long stalk, or peduncle, that its acorns hang from.',art:{t:'acorn',nut:'#9a6a36',cap:'#7a6a4a',capD:.28,w:4.2,h:8.2,stalk:7,warty:1}},
+ hemlockcone:{name:'Western hemlock cone',tree:'westernhemlock',fact:'Tiny cones, only about 1.5 to 2.5 cm long, hang from the twigs.',art:{t:'cone',len:5.5,wid:3.4,col:'#9a7450',hi:'#b8926a',egg:1}},
+ sitkacone:{name:'Sitka spruce cone',tree:'sitkaspruce',fact:'Its thin, papery scales have ragged, toothed edges, and Douglas squirrels eat the seeds.',art:{t:'cone',len:10,wid:4.2,col:'#c09060',hi:'#dcb07c'}},
+ beakednut:{name:'Beaked hazelnut',tree:'beakedhazel',fact:'The bristly husk around each nut stretches into a tube, the "beak" in its name.',art:{t:'hazel',beak:1}},
+};
 for(const[id,n]of Object.entries(NUTS)){const ti=TREE_INFO[n.tree];n.id=id;n.sci=ti[1];n.range=ti[2];n.treeName=ti[0];}
 
 /* ---- wildflowers ---- */
@@ -1265,14 +1314,34 @@ const FLW={
  woodsorrel:['Wood sorrel','Oxalis acetosella','Europe and northern Asia',{k:'polar',v:{k:5,p:.6,notch:.1,c1:'#f4eef6',c2:'#ffffff',center:'#f2e6a0',layers:1,stripe:'#b58ac8'},R:5,low:1}],
  heather:['Heather','Calluna vulgaris','Europe and Asia Minor',{k:'raceme',v:'heather'}],
  redcampion:['Red campion','Silene dioica','Europe',{k:'polar',v:{k:5,p:.55,notch:.45,c1:'#d8487a',c2:'#ef8ab0',center:'#f2c6d6',layers:1},R:7}],
- wintergreen:['One-flowered wintergreen','Moneses uniflora','Northern forests around the world',{k:'polar',v:{k:5,p:.55,notch:0,c1:'#f4f2ec',c2:'#ffffff',center:'#b8c86a',layers:1},R:6,nod:1,low:1}]};
+ wintergreen:['One-flowered wintergreen','Moneses uniflora','Northern forests around the world',{k:'polar',v:{k:5,p:.55,notch:0,c1:'#f4f2ec',c2:'#ffffff',center:'#b8c86a',layers:1},R:6,nod:1,low:1}],
+ westerntrillium:['Western trillium','Trillium ovatum','Southern British Columbia to central California, east to the northern Rockies',{k:'polar',v:{k:3,p:.55,notch:0,c1:'#f3efe6',c2:'#ffffff',center:'#e8c84a',layers:1},R:9}],
+ bleedingheart:['Pacific bleeding heart','Dicentra formosa','Pacific coast from British Columbia to California',{k:'hearts',c:'#e27aa6',tip:'#f8dfea',n:5}],
+ dwarforegongrape:['Dwarf Oregon grape','Berberis nervosa','Southern British Columbia to central California, plus northern Idaho',{k:'cluster',c:'#f2cf2a',eye:'#d8a000',dome:1}],
+ westerncolumbine:['Western columbine','Aquilegia formosa','Western North America',{k:'columbine',c1:'#e2442a',c2:'#f6dc4a',nod:1}],
+ tigerlily:['Columbia lily','Lilium columbianum','British Columbia to northern California, east to Idaho and Montana',{k:'polar',v:{k:6,p:.5,notch:0,c1:'#f07a22',c2:'#f9a84a',center:'#c8501a',layers:1,spots:'#5a1e0c'},R:9,nod:1}],
+ fawnlily:['Oregon fawn lily','Erythronium oregonum','Southwestern British Columbia to northern California, west of the Cascades',{k:'polar',v:{k:6,p:.5,notch:0,c1:'#f6f2e6',c2:'#fff6d0',center:'#f0c840',layers:1},R:8,nod:1}],
+ salmonberry:['Salmonberry','Rubus spectabilis','Pacific coast from Alaska to California',{k:'polar',v:{k:5,p:.55,notch:.05,c1:'#cf3a78',c2:'#ec7aa8',center:'#f2d06a',layers:1},R:8}],
+ redcurrant:['Red-flowering currant','Ribes sanguineum','Pacific coast from British Columbia to California',{k:'raceme',v:'currant'}],
+ skunkcabbage:['Western skunk cabbage','Lysichiton americanus','Wet forests and swamps from Alaska to central California',{k:'spathe'}],
+ vanillaleaf:['Vanilla leaf','Achlys triphylla','Coast Ranges and Cascades from British Columbia to northern California',{k:'raceme',v:'vanilla',leaf3:1}],
+};
 for(const id in FLW){const[name,sci,range,art]=FLW[id];FLW[id]={id,name,sci,range,art};}
 Object.assign(PHYLLO,{goldeneye:{p:'#f2c21a',p2:'#d8a010',d:['#8a5a14','#b07a1a'],n:13,len:.95,wid:.3},blanket:{p:'#f2b62a',p2:'#c8402a',d:['#7a2a14','#a8401e'],n:13,len:1,wid:.36,tip:1}});
 Object.assign(RACEME,{fireweed:{c:['#c23a8a','#d85aa4','#f0a0cc'],shape:'spike4',n:14},gilia:{c:['#d8282c','#e8503a','#f39a6a'],shape:'trumpet',n:10},paintbrush:{c:['#d8402a','#e86a3a','#7a8a3a'],shape:'bract',n:12},
- silverlupine:{c:['#6a5ab8','#8a7ad0','#c8c0ec'],shape:'pea',n:14},penstemon:{c:['#c8202a','#e0403a','#f08a6a'],shape:'trumpet',n:8,slim:1},heather:{c:['#b25aa8','#c97ac0','#e0b0d8'],shape:'spike4',n:16,small:1}});
+ silverlupine:{c:['#6a5ab8','#8a7ad0','#c8c0ec'],shape:'pea',n:14},vanilla:{c:['#e6e2cc','#f6f4e8','#d8d4bc'],shape:'spike4',n:16},currant:{c:['#c8305e','#de5a80','#f2a0bc'],shape:'trumpet',n:12},penstemon:{c:['#c8202a','#e0403a','#f08a6a'],shape:'trumpet',n:8,slim:1},heather:{c:['#b25aa8','#c97ac0','#e0b0d8'],shape:'spike4',n:16,small:1}});
 
 /* ---- squirrels ---- */
 Object.assign(COATS,{
+ egraywhite:{stripe:'#c9c0b2',back:'#f1eee8',back2:'#ddd8cf',wash:'#ece7de',belly:'#ffffff',tail:'#eeeae2',tailEdge:'#ffffff',paw:'#d8d2c8',ring:'#ffffff',ear:'#efe2dc',nose:'#c98a8a',earOut:'#e2ddd4',earIn:'#f2d6d0'},
+ efoxdark:{back:'#211d1b',back2:'#141211',wash:'#2e2824',belly:'#2a2420',tail:'#231e1b',tailEdge:'#4a3e36',paw:'#ece6dc',ring:'#3a332e',ear:'#f2eee6',earOut:'#e8e2d8',earIn:'#f6f2ea',muzzle:'#f2eee6',nose:'#2a1e1a'},
+ sflying:{back:'#9a8670',back2:'#7a6854',wash:'#a8957f',belly:'#f7f4ec',tail:'#8f7c67',tailEdge:'#b8a690',paw:'#d8cdbd',ring:'#3a302a',ear:'#a8957f',nose:'#3a2a24',eye:1.4,glide:1,tailR:.72},
+ nflying:{back:'#8a6a4f',back2:'#6a4f39',wash:'#9a7a5c',belly:'#ece6dc',tail:'#7f6249',tailEdge:'#a88a6c',paw:'#cfc0aa',ring:'#3a2c22',ear:'#9a7a5c',nose:'#2a1e18',eye:1.4,glide:1,tailR:.75},
+ humboldt:{back:'#6a4a35',back2:'#4e3424',wash:'#7a5640',belly:'#d9b48a',tail:'#5e4130',tailEdge:'#8a6648',paw:'#c0a080',ring:'#2a1e16',ear:'#7a5640',nose:'#20160f',eye:1.4,glide:1,tailR:.75},
+ arizonagray:{back:'#7f8084',back2:'#5f6064',wash:'#9a8f80',belly:'#f3f1ea',tail:'#77787b',tailEdge:'#f4f3ee',paw:'#55565a',ring:'#efeee8',ear:'#8a8b8f',nose:'#2a2a2c'},
+ abertblack:{back:'#1f1c1b',back2:'#141211',wash:'#2a2624',belly:'#2a2522',tail:'#26221f',tailEdge:'#3e3632',paw:'#141211',ring:'#3a3430',ear:'#2a2624',nose:'#0e0c0b',tuft:9,tuftC:'#151312'},
+ douglas:{back:'#5a4632',back2:'#43331f',wash:'#6a5238',belly:'#e3a25e',tail:'#4a3826',tailEdge:'#c9a070',paw:'#3a2a1c',ring:'#f0d8a8',ear:'#6a5238',nose:'#20160e',side:'#1a1410'},
+ westerngray:{back:'#8d9298',back2:'#6f747a',wash:'#a5a9ad',belly:'#fbfaf6',tail:'#868b91',tailEdge:'#ffffff',paw:'#5e6268',ring:'#f4f3ef',ear:'#9a8a80',nose:'#2a2a2c',tailR:1.15},
  amred:{back:'#8a5a35',back2:'#6c4426',wash:'#9b6a3f',belly:'#f2efe6',tail:'#8c5530',tailEdge:'#c98a4e',paw:'#5a3a22',ring:'#fbf8f0',ear:'#9b6a3f',nose:'#2a1a10'},
  abert:{back:'#73767a',back2:'#55585c',wash:'#8a7a6c',belly:'#f4f2ec',tail:'#7a7d80',tailEdge:'#efeee9',paw:'#4a4c50',ring:'#f2f0ea',ear:'#55585c',nose:'#2a2a2c',tuft:9,tuftC:'#3a3c3f',stripe:'#9a5a32'},
  kaibab:{back:'#5a5654',back2:'#3e3b3a',wash:'#6a5a50',belly:'#262220',tail:'#f2f0ea',tailEdge:'#ffffff',paw:'#2a2624',ring:'#e8e4dc',ear:'#3e3b3a',nose:'#141414',tuft:9,tuftC:'#2a2826',stripe:'#7a5034'},
@@ -1286,27 +1355,40 @@ const SQUIRRELS={
  abert:{name:"Abert's squirrel",sci:'Sciurus aberti',coat:'abert',range:'Ponderosa pine forests of the Southwest US and northern Mexico',fact:'Lives almost entirely in ponderosa pines and eats their inner bark in winter.'},
  kaibab:{name:'Kaibab squirrel',sci:'Sciurus aberti kaibabensis',coat:'kaibab',range:'Only the Kaibab Plateau, north of the Grand Canyon',fact:'A form of Abert\'s squirrel found nowhere else, with a black belly and white tail.'},
  eured:{name:'Eurasian red squirrel',sci:'Sciurus vulgaris',coat:'eured',range:'Europe and northern Asia, from Ireland to Japan',fact:'Its ear tufts grow longer in winter.'},
+ egraywhite:{wiki:'Eastern_gray_squirrel',name:'Eastern gray squirrel (white form)',sci:'Sciurus carolinensis',coat:'egraywhite',range:'A few towns in the eastern US and Canada',fact:'White gray squirrels are rare; towns like Brevard, North Carolina, are famous for them. Their dark eyes show they are not albinos.'},
+ efoxdark:{wiki:'Fox_squirrel',name:'Eastern fox squirrel (dark form)',sci:'Sciurus niger',coat:'efoxdark',range:'Pine and oak woods of the southeastern US',fact:'In the Southeast, fox squirrels often have a black mask with a white nose and white ear tips, and about a third are all black.'},
+ sflying:{wiki:'Southern_flying_squirrel',name:'Southern flying squirrel',sci:'Glaucomys volans',coat:'sflying',range:'Eastern North America from southeastern Canada to Florida, plus highland patches in Mexico and Central America',fact:'Active at night, it can glide up to about 60 metres on a furry membrane stretched from wrist to ankle, though most glides are much shorter.'},
+ nflying:{wiki:'Northern_flying_squirrel',name:'Northern flying squirrel',sci:'Glaucomys sabrinus',coat:'nflying',range:'Canada, Alaska and northern and mountain forests of the US',fact:'It digs up and eats truffles, spreading their spores and helping the trees those fungi live with.'},
+ arizonagray:{wiki:'Arizona_gray_squirrel',name:'Arizona gray squirrel',sci:'Sciurus arizonensis',coat:'arizonagray',range:'Mountain canyons of central and southeastern Arizona, western New Mexico and northern Sonora, Mexico',fact:'It lives mostly in streamside canyon woods of sycamore, walnut, cottonwood and oak.'},
+ abertblack:{wiki:'Abert%27s_squirrel',name:"Abert's squirrel (black form)",sci:'Sciurus aberti',coat:'abertblack',range:"Ponderosa pine forests of the southern Rockies; the black form lives mainly in Colorado's Front Range foothills",fact:"In some Colorado forests, many Abert's squirrels are entirely black."},
+ douglas:{wiki:'Douglas_squirrel',name:'Douglas squirrel',sci:'Tamiasciurus douglasii',coat:'douglas',range:'Coastal, Cascade and Sierra Nevada forests from southwestern British Columbia to central California',fact:'Its loud chatter fills northwestern forests, and it stores conifer cones in piles like its red squirrel cousin.'},
+ westerngray:{wiki:'Western_gray_squirrel',name:'Western gray squirrel',sci:'Sciurus griseus',coat:'westerngray',range:'Drier oak, pine and Douglas-fir woods from Washington to California',fact:'The largest tree squirrel native to the Pacific Northwest, with a long, bushy gray tail frosted white along its edges.'},
+ humboldt:{wiki:'Humboldt%27s_flying_squirrel',name:"Humboldt's flying squirrel",sci:'Glaucomys oregonensis',coat:'humboldt',range:'Pacific coast from southern British Columbia to southern California',fact:'Recognised as its own species only in 2017; it glides between trees at night and eats truffles.'},
  eudark:{name:'Eurasian red squirrel (dark form)',sci:'Sciurus vulgaris',coat:'eudark',range:'Across its range, most often in conifer forests of continental Europe',fact:'Red squirrels range from fiery orange to nearly black.'}};
 
 /* ---- zones ---- */
 const ZN={
  east:{name:'Eastern Hardwood Forest',where:'Eastern United States',sky:['#9fc0d3','#e3ead8'],hills:'#b9cbc7',far:'#93a8b5',farLeaf:['#9db1bd','#a6b9c4'],
-  trees:[['whiteoak',3],['redoak',3],['hickory',2],['beech',2],['sugarmaple',2]],squirrels:['egray','eblack','efox'],
+  trees:[['whiteoak',3],['redoak',3],['hickory',2],['beech',2],['sugarmaple',2]],squirrels:['egray','eblack','egraywhite','efox','efoxdark','sflying'],
   birds:['cardinal','bluejay','titmouse','wbnut','rbwood'],nuts:['whiteacorn','redacorn','hickorynut','beechnut'],
   flowers:['bloodroot','trillium','vabluebells','wildcolumbine','mayapple','springbeauty','wildgeranium','blackeyedsusan','neaster','goldenrod','coneflower']},
  boreal:{name:'Boreal Forest',where:'Canada and Alaska',sky:['#a6bfcc','#e6ebe4'],hills:'#a9bcb8',far:'#8ea3a8',farLeaf:['#8fa6a4','#9ab0ad'],
-  trees:[['whitespruce',4],['blackspruce',2],['balsamfir',3],['jackpine',2],['paperbirch',2],['aspen',2]],squirrels:['amred'],
+  trees:[['whitespruce',4],['blackspruce',2],['balsamfir',3],['jackpine',2],['paperbirch',2],['aspen',2]],squirrels:['amred','nflying'],
   birds:['canjay','borchick','rbnut','wwcross','sgrouse','junco'],nuts:['whitesprucecone','blacksprucecone','balsamfircone','jackpinecone'],
   flowers:['fireweed','bunchberry','twinflower','pricklyrose','ladyslipper','pearly','marshmarigold','labradortea','arcticlupine','woodlily','harebell']},
  sw:{name:'Southwest Ponderosa Pine',where:'Arizona, New Mexico and Colorado',sky:['#8fbbe0','#efe7d4'],hills:'#c9bba3',far:'#a5a59a',farLeaf:['#a8ae96','#b3b8a0'],
-  trees:[['ponderosa',6],['gambeloak',3],['douglasfir',2],['aspen',1],['pinyon',2]],squirrels:['abert','kaibab'],
+  trees:[['ponderosa',6],['gambeloak',3],['douglasfir',2],['aspen',1],['pinyon',2]],squirrels:['abert','abertblack','kaibab','arizonagray'],
   birds:['stjay','pygnut','mtnchick','acornwp','wbluebird','rfwarbler'],nuts:['ponderosacone','gambelacorn','douglascone','pinyonnut'],
   flowers:['scarletgilia','paintbrush','silverylupine','blueflax','rmiris','bluecolumbine','goldeneye','globemallow','mexicanhat','blanketflower','penstemon']},
+ pnw:{name:'Pacific Northwest Forest',where:'Western Washington, Oregon and British Columbia',sky:['#a9bcc3','#e2e7e2'],hills:'#9fb3ad',far:'#7f9690',farLeaf:['#86a096','#90a99f'],
+  trees:[['douglasfir',4],['westernhemlock',3],['westernredcedar',2],['sitkaspruce',2],['bigleafmaple',2],['redalder',1],['beakedhazel',1]],squirrels:['douglas','westerngray','humboldt'],
+  birds:['stjay','chbchick','varthrush','pileated','rbnut','pacwren'],nuts:['douglascone','hemlockcone','sitkacone','beakednut'],
+  flowers:['westerntrillium','bleedingheart','dwarforegongrape','westerncolumbine','tigerlily','fawnlily','salmonberry','redcurrant','skunkcabbage','vanillaleaf','bunchberry']},
  cal:{name:'Caledonian Pinewood',where:'Scottish Highlands and northern Europe',sky:['#a7bcc6','#e4e8df'],hills:'#aebfb8',far:'#91a5a8',farLeaf:['#98aca6','#a3b6b0'],
   trees:[['scotspine',6],['silverbirch',3],['hazel',2],['pedoak',2],['eubeech',2],['rowan',1]],squirrels:['eured','eudark'],
   birds:['eujay','crestit','gspot','coaltit','robin','chaffinch'],nuts:['scotscone','hazelnut','eubeechnut','pedacorn'],
   flowers:['bluebell','woodanemone','primrose','celandine','twinflower','foxglove','woodsorrel','heather','redcampion','harebell','wintergreen']}};
-const ZONE_IDS=['east','boreal','sw','cal'];
+const ZONE_IDS=['east','boreal','sw','pnw','cal'];
 function zone(){return ZN[PLAY.zone||'east'];}
 function itemInfo(kind,id){if(kind==='s'){const q=SQUIRRELS[id];return{kind,id,name:q.name,sci:q.sci,range:q.range,fact:q.fact};}
  if(kind==='b'){const b=BIRD_SP[id];return{kind,id,name:b.name,sci:b.sci,range:b.range,fact:b.fact,pl:b.pl};}
@@ -1329,6 +1411,9 @@ function drawNutArt(g,id){const a=NUTS[id].art;g.lineCap='round';g.lineJoin='rou
  if(a.t==='beech'){g.strokeStyle='#5a4a32';g.lineWidth=.9;g.beginPath();g.moveTo(0,0);g.lineTo(0,1.5);g.stroke();
   for(const s of[-1,1]){g.fillStyle='#b88a54';g.beginPath();g.moveTo(s*.6,4);g.lineTo(s*3,10.5);g.lineTo(s*.2,11);g.closePath();g.fill();}
   for(let v=0;v<4;v++){const an=-.8+v*.53,s=v<2?-1:1;g.save();g.translate(0,2.6);g.rotate(an*.9);g.fillStyle=a.col;g.beginPath();g.ellipse(0,4.6,1.9,4.4,0,0,TAU);g.fill();g.strokeStyle='#5a4228';g.lineWidth=.45;for(let k=0;k<6;k++){g.beginPath();g.moveTo(-1.4+(k%2)*2.8,1.6+k*1.2);g.lineTo(-2.4+(k%2)*4.8,1.2+k*1.2);g.stroke();}g.restore();}return;}
+ if(a.t==='hazel'&&a.beak){g.strokeStyle='#5a4a32';g.lineWidth=.9;g.beginPath();g.moveTo(0,0);g.lineTo(0,1.6);g.stroke();
+  g.fillStyle='#8aa64a';g.beginPath();g.moveTo(-3.4,4.5);g.quadraticCurveTo(-3.8,1.4,0,1.4);g.quadraticCurveTo(3.8,1.4,3.4,4.5);g.quadraticCurveTo(3.2,8.5,1.2,10.5);g.lineTo(1,16.5);g.lineTo(1.9,17.6);g.lineTo(-1.9,17.6);g.lineTo(-1,16.5);g.lineTo(-1.2,10.5);g.quadraticCurveTo(-3.2,8.5,-3.4,4.5);g.fill();
+  g.fillStyle='rgba(168,106,52,.55)';g.beginPath();g.ellipse(0,5.2,2.3,2.8,0,0,TAU);g.fill();g.strokeStyle='rgba(60,80,30,.5)';g.lineWidth=.35;for(let k=0;k<9;k++){const y=6+k*1.2,x=k%2?1.3:-1.3;g.beginPath();g.moveTo(x*.6,y);g.lineTo(x*1.4,y-.6);g.stroke();}return;}
  if(a.t==='hazel'){g.strokeStyle='#5a4a32';g.lineWidth=.9;g.beginPath();g.moveTo(0,0);g.lineTo(0,1.6);g.stroke();
   g.fillStyle='#a86a34';g.beginPath();g.ellipse(0,7.4,3.6,4,0,0,TAU);g.fill();g.fillStyle='#d8b88a';g.beginPath();g.ellipse(0,4.3,2.6,1.3,0,0,TAU);g.fill();
   g.fillStyle='#7a9a3a';g.beginPath();g.moveTo(-4,2.2);for(let i=0;i<=8;i++){const x=-4+i,y=2.2+(i%2?4.2:6.2)+(i===0||i===8?-2:0);g.lineTo(x,y);}g.lineTo(4,2.2);g.quadraticCurveTo(0,.8,-4,2.2);g.fill();
@@ -1352,7 +1437,7 @@ function drawNutArt(g,id){const a=NUTS[id].art;g.lineCap='round';g.lineJoin='rou
 function leafPair(g,x,y,h,c){g.fillStyle=c||'#5b8a3a';for(const s of[-1,1]){g.save();g.translate(x,y-h*.18);g.rotate(s*1.05);g.beginPath();g.ellipse(0,-h*.12,h*.05,h*.13,0,0,TAU);g.fill();g.restore();}}
 function bellShape(g,x,y,s,c,ang){g.save();g.translate(x,y);g.rotate(ang||0);g.fillStyle=c;g.beginPath();g.moveTo(-s*.45,0);g.quadraticCurveTo(-s*.55,s*.9,-s*.75,s*1.25);g.lineTo(-s*.35,s*1.1);g.lineTo(0,s*1.3);g.lineTo(s*.35,s*1.1);g.lineTo(s*.75,s*1.25);g.quadraticCurveTo(s*.55,s*.9,s*.45,0);g.quadraticCurveTo(0,-s*.25,-s*.45,0);g.fill();g.restore();}
 function drawFlowerSp(g,id,x,y,h,t,seed){const F=FLW[id],a=F.art;const sw=RM?0:Math.sin(t*1.3+x*.03)*h*.04;
- if(a.k==='raceme'){drawRaceme(g,x,y,a.v,h*1.25,t,seed);return;}
+ if(a.k==='raceme'){if(a.leaf3){const ly=y-h*.45;g.strokeStyle='#4b7432';g.lineWidth=1;g.beginPath();g.moveTo(x-1,y);g.lineTo(x-4,ly);g.stroke();g.fillStyle='#5f9a3e';for(const an of[-1.05,0,1.05]){g.save();g.translate(x-4,ly);g.rotate(an-Math.PI/2);g.beginPath();g.moveTo(0,0);g.quadraticCurveTo(h*.12,-h*.12,h*.26,-h*.06);g.lineTo(h*.27,h*.03);g.quadraticCurveTo(h*.14,h*.1,0,0);g.fill();g.restore();}}drawRaceme(g,x,y,a.v,h*1.25,t,seed);return;}
  const H=a.low?h*.55:h;
  if(a.k==='phyllo'){const R=6.5;const tp=stem(g,x,y,H,sw,1.6);if(ART_HI){g.save();g.translate(tp[0],tp[1]);g.scale(R/14,R/14);drawPhyllo(g,a.v,14,seed%3+1);g.restore();}else drawPhylloSprite(g,a.v,seed,tp[0],tp[1],R,sw*.03);return;}
  if(a.k==='polar'){const R=a.R||6;g.strokeStyle='#4b7432';g.lineWidth=1.4;g.lineCap='round';g.beginPath();g.moveTo(x,y);g.quadraticCurveTo(x,y-H*.6,x+sw,y-H);g.stroke();leafPair(g,x,y,H);
@@ -1379,17 +1464,27 @@ function drawFlowerSp(g,id,x,y,h,t,seed){const F=FLW[id],a=F.art;const sw=RM?0:M
   const gr=g.createRadialGradient(top[0],top[1]+3.4,.5,top[0],top[1]+3.4,4.2);gr.addColorStop(0,'#fbe4ee');gr.addColorStop(1,'#de6a9a');g.fillStyle=gr;g.beginPath();g.ellipse(top[0],top[1]+3.6,3.4,3.8,0,0,TAU);g.fill();return;}
  if(a.k==='cluster'){g.strokeStyle='#6a8a5a';g.lineWidth=1.3;const top=[x+sw,y-H*.85];g.beginPath();g.moveTo(x,y);g.lineTo(top[0],top[1]);g.stroke();leafPair(g,x,y,H*.8,'#7a9a6a');
   for(let i=0;i<9;i++){const an=i*2.39,rr=Math.sqrt(i)*1.9;const cx=top[0]+Math.cos(an)*rr*1.3,cy=top[1]+Math.sin(an)*rr*(a.dome?.6:.8)-(a.dome?1:0);g.fillStyle=a.c;g.beginPath();g.arc(cx,cy,1.7,0,TAU);g.fill();g.fillStyle=a.eye;g.beginPath();g.arc(cx,cy,.7,0,TAU);g.fill();}return;}
+ if(a.k==='hearts'){const P0=[x,y],P1=[x+sw,y-H*1.15],P2=[x+H*.55+sw,y-H*.62];const q=u=>{const A=(1-u)*(1-u),B=2*(1-u)*u,C2=u*u;return[A*P0[0]+B*P1[0]+C2*P2[0],A*P0[1]+B*P1[1]+C2*P2[1]];};
+  g.fillStyle='#7aa86a';for(const sd of[-1,1]){g.save();g.translate(x+sd*3,y-H*.18);g.rotate(sd*.5);g.beginPath();g.ellipse(0,-H*.12,H*.1,H*.14,0,0,TAU);g.fill();g.restore();}
+  g.strokeStyle='#8a6a7a';g.lineWidth=1.1;g.lineCap='round';g.beginPath();g.moveTo(P0[0],P0[1]);g.quadraticCurveTo(P1[0],P1[1],P2[0],P2[1]);g.stroke();
+  for(let i=0;i<a.n;i++){const u=.5+.5*i/(a.n-1),pp=q(u),hy=pp[1]+3.2,s2=2.4-i*.15;g.strokeStyle='#8a6a7a';g.lineWidth=.6;g.beginPath();g.moveTo(pp[0],pp[1]);g.lineTo(pp[0],hy-s2);g.stroke();
+   g.fillStyle=a.c;g.beginPath();g.arc(pp[0]-s2*.5,hy,s2*.62,0,TAU);g.arc(pp[0]+s2*.5,hy,s2*.62,0,TAU);g.fill();g.beginPath();g.moveTo(pp[0]-s2*1.1,hy+.2);g.lineTo(pp[0],hy+s2*1.5);g.lineTo(pp[0]+s2*1.1,hy+.2);g.fill();g.fillStyle=a.tip;g.beginPath();g.ellipse(pp[0],hy+s2*1.35,s2*.28,s2*.4,0,0,TAU);g.fill();}return;}
+ if(a.k==='spathe'){const Hs=H*.9;g.fillStyle='#4f8a3a';for(const[sd,an]of[[-1,-.38],[1,.42],[0,.08]]){g.save();g.translate(x+sd*2,y);g.rotate(an);g.beginPath();g.ellipse(0,-Hs*.42,Hs*.17,Hs*.44,0,0,TAU);g.fill();g.strokeStyle='#3e7030';g.lineWidth=.6;g.beginPath();g.moveTo(0,0);g.lineTo(0,-Hs*.8);g.stroke();g.restore();}
+  const bx=x+sw*.5+1,by=y-Hs*.2;g.fillStyle='#f4d02a';g.beginPath();g.moveTo(bx-Hs*.12,by);g.quadraticCurveTo(bx-Hs*.2,by-Hs*.38,bx+Hs*.02,by-Hs*.62);g.quadraticCurveTo(bx+Hs*.18,by-Hs*.36,bx+Hs*.12,by);g.closePath();g.fill();
+  g.fillStyle='#d8b018';g.beginPath();g.moveTo(bx-Hs*.05,by-Hs*.05);g.quadraticCurveTo(bx-Hs*.08,by-Hs*.3,bx+Hs*.02,by-Hs*.5);g.quadraticCurveTo(bx+Hs*.07,by-Hs*.3,bx+Hs*.05,by-Hs*.05);g.fill();
+  g.fillStyle='#8aa83a';g.beginPath();g.ellipse(bx,by-Hs*.22,Hs*.045,Hs*.15,0,0,TAU);g.fill();return;}
  if(a.k==='iris'){g.strokeStyle='#4b7432';g.lineWidth=1.4;const top=[x+sw,y-H];g.beginPath();g.moveTo(x,y);g.lineTo(top[0],top[1]);g.stroke();g.fillStyle='#5f8a4a';for(const s of[-1,1]){g.beginPath();g.ellipse(x+s*2,y-H*.4,1.4,H*.38,s*.12,0,TAU);g.fill();}
   g.save();g.translate(top[0],top[1]);g.fillStyle='#8a86d8';for(const s of[-1,0,1]){g.save();g.rotate(s*1.1+Math.PI);g.beginPath();g.ellipse(0,-4.2,2.3,4.2,0,0,TAU);g.fill();g.fillStyle='#f2d24a';g.beginPath();g.ellipse(0,-2.6,.6,1.6,0,0,TAU);g.fill();g.fillStyle='#8a86d8';g.restore();}
   g.fillStyle='#a8a4ec';for(const s of[-1,1]){g.save();g.rotate(s*.35);g.beginPath();g.ellipse(0,-4,1.6,3.6,0,0,TAU);g.fill();g.restore();}g.restore();return;}}
 // raceme shapes that the original renderer lacks
 const _drawRacemeBase=drawRaceme;
-drawRaceme=function(ctx,x,y,v,H,t,seed){const V=RACEME[v];if(!V||!['spike4','trumpet','bract'].includes(V.shape))return _drawRacemeBase(ctx,x,y,v,H,t,seed);
+drawRaceme=function(ctx,x,y,v,H,t,seed){const V=RACEME[v];if(!V||!['spike4','trumpet','bract','star'].includes(V.shape))return _drawRacemeBase(ctx,x,y,v,H,t,seed);
  const sway=RM?0:Math.sin(t*1.3+x*.05)*H*.05;const P0=[x,y],P1=[x,y-H*.55],P2=[x+sway,y-H];const q=u=>{const a=(1-u)*(1-u),b=2*(1-u)*u,c=u*u;return[a*P0[0]+b*P1[0]+c*P2[0],a*P0[1]+b*P1[1]+c*P2[1]];};
  ctx.strokeStyle='#4b7432';ctx.lineWidth=Math.max(1.1,H*.018);ctx.lineCap='round';ctx.beginPath();ctx.moveTo(P0[0],P0[1]);ctx.quadraticCurveTo(P1[0],P1[1],P2[0],P2[1]);ctx.stroke();
  ctx.fillStyle='#5b8a3a';for(let i=0;i<4;i++){const b=q(.12+i*.1),sd=i%2?1:-1;ctx.save();ctx.translate(b[0],b[1]);ctx.rotate(sd*(V.shape==='bract'?.6:1)-Math.PI/2);ctx.beginPath();ctx.ellipse(H*.06,0,H*.07,H*(V.small?.012:.02),0,0,TAU);ctx.fill();ctx.restore();}
  for(let i=0;i<V.n;i++){const f=i/V.n,u=.45+.55*f,p=q(u),sz=lerp(H*(V.small?.035:.05),H*.02,f),col=V.c[Math.min(2,Math.floor(f*3))],sd=i%2?1:-1;
   if(V.shape==='spike4'){ctx.fillStyle=col;for(let k=0;k<4;k++){ctx.beginPath();ctx.ellipse(p[0]+sd*sz*.7+Math.cos(k*1.57)*sz*.45,p[1]+Math.sin(k*1.57)*sz*.45,sz*.42,sz*.3,k*1.57,0,TAU);ctx.fill();}}
+  else if(V.shape==='star'){ctx.save();ctx.translate(p[0]+sd*sz*.8,p[1]);ctx.fillStyle=col;for(let k=0;k<6;k++){ctx.rotate(TAU/6);ctx.beginPath();ctx.ellipse(sz*.55,0,sz*.55,sz*.2,0,0,TAU);ctx.fill();}ctx.fillStyle='#f2e08a';ctx.beginPath();ctx.arc(0,0,sz*.18,0,TAU);ctx.fill();ctx.restore();}
   else if(V.shape==='trumpet'){ctx.save();ctx.translate(p[0],p[1]);ctx.rotate(sd*(V.slim?.9:1.1));ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(sz*(V.slim?2.6:2.2),-sz*.25);ctx.lineTo(sz*(V.slim?2.9:2.6),-sz*.7);ctx.lineTo(sz*(V.slim?3:2.8),sz*.5);ctx.lineTo(sz*(V.slim?2.6:2.2),sz*.3);ctx.closePath();ctx.fill();ctx.restore();}
   else{ctx.fillStyle=f>.4?col:'#7a8a3a';ctx.beginPath();ctx.ellipse(p[0]+sd*sz*.6,p[1],sz*.9,sz*.55,sd*.6,0,TAU);ctx.fill();ctx.fillStyle=V.c[0];ctx.beginPath();ctx.ellipse(p[0]+sd*sz*1.1,p[1]-sz*.2,sz*.45,sz*.35,sd*.6,0,TAU);ctx.fill();}}};
 // polar extras: veins and spots
@@ -1445,6 +1540,10 @@ const CALLS={
  gspot:()=>[...rep(2,.35,t=>[[t,3200,3000,.04,'square',.35]]),...rep(18,.05,t=>[[.9+t,900,800,.02,'noise',.8]])],
  coaltit:()=>rep(4,.32,t=>[[t,5200,4800,.1,'sine',.7],[t+.12,3800,3600,.1,'sine',.7]]),
  robin:()=>{const r=rng(7),a=[];let t=0;for(let i=0;i<14;i++){const f=2600+r()*3900;a.push([t,f,f*(.85+r()*.3),.06+r()*.05,'sine',.55]);t+=.08+r()*.05;}return a;},
+ varthrush:()=>[[0,3300,3250,1.3,'sine',.55,55],[1.9,4400,4350,1.2,'sine',.45,65]],
+ chbchick:()=>[[0,7000,6500,.06,'sine',.6],[.1,6800,6400,.06,'sine',.6],[.25,4200,4000,.18,'sawtooth',.25,70],[.5,4200,4000,.18,'sawtooth',.25,70]],
+ pileated:()=>rep(9,.14,(t,i)=>[[t,1300-i*20,1100-i*20,.09,'square',.3]]),
+ pacwren:()=>{const r=rng(11),a=[];let t=0;for(let i=0;i<40;i++){const f=4000+r()*4000;a.push([t,f,f*(.8+r()*.4),.04,'sine',.5]);t+=.05+r()*.03;}return a;},
  chaffinch:()=>{const a=[];let t=0,dt=.13;for(let i=0;i<12;i++){a.push([t,5200-i*130,5000-i*130,.05,'sine',.65]);t+=dt;dt=Math.max(.055,dt*.9);}a.push([t+.08,3200,5200,.12,'sine',.7],[t+.22,5200,2800,.14,'sine',.7]);return a;}};
 const REC={};
 function playCall(id,o){o=o||{};if(!AMB.on)return;startAudio();if(!AMB.ctx)return;const ctx=AMB.ctx,dest=o.world?AMB.L.birds.synth:AMB.fx,t0=ctx.currentTime+.03,vol=o.vol==null?1:o.vol;
@@ -1487,7 +1586,7 @@ function drawGroundCritters(ctx,T,t){for(const n of T.nuts){if(!n.ground)continu
 function drawOneBird(ctx,b,t){const sp=BIRD_SP[b.sp],[x,y]=birdPos(b);const st=BirdArt.idle(sp,RM?0:t,b.seed);ctx.save();ctx.translate(x,y);if(b.kind!=='trunk'&&b.face<0)ctx.scale(-1,1);if(b.lean)ctx.rotate(b.lean*b.face*.5);BirdArt.drawBird(ctx,sp,0,0,BIRD_SCALE,st);ctx.restore();}
 
 /* ---- album (saved in this browser) ---- */
-const ALBUM={has:{},load(){try{this.has=JSON.parse(localStorage.getItem('squirrelRacer.album')||'{}')||{};}catch(e){this.has={};}},add(k){this.has[k]=this.has[k]||1;this.save();},bump(k){this.has[k]=(+this.has[k]||0)+1;this.save();return this.has[k];},save(){try{localStorage.setItem('squirrelRacer.album',JSON.stringify(this.has));}catch(e){}}};
+const ALBUM={has:{},load(){try{this.has=JSON.parse(localStorage.getItem('squirrelRacer.album')/* key kept from the old name so saved collections carry over */||'{}')||{};}catch(e){this.has={};}},add(k){this.has[k]=this.has[k]||1;this.save();},bump(k){this.has[k]=(+this.has[k]||0)+1;this.save();return this.has[k];},save(){try{localStorage.setItem('squirrelRacer.album',JSON.stringify(this.has));}catch(e){}}};
 ALBUM.load();
 
 /* ---- missions ---- */
@@ -1636,7 +1735,7 @@ UI.go=function(v){const[a,b,c]=v.split(':');
  if(a==='collection'&&b==='back'){openMenu('collection');UI.menuIn.scrollTop=UI.collScroll||0;return;}
  openMenu(a,b);};
 const ICON_PLAY='<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a8.5 8.5 0 0 1 0 12"/></svg>';
-function wikiURL(k,id){const sci=k==='b'?null:itemInfo(k,id).sci;return'https://en.wikipedia.org/wiki/'+(k==='b'?BIRD_SP[id].wiki:sci.replace(/ /g,'_'));}
+function wikiURL(k,id){const w=k==='b'?BIRD_SP[id].wiki:k==='s'&&SQUIRRELS[id].wiki;return'https://en.wikipedia.org/wiki/'+(w||itemInfo(k,id).sci.replace(/ /g,'_'));}
 // the full page for one species, opened from the collection
 function infoView(k,id){const i=itemInfo(k,id),have=ALBUM.has[k+':'+id],zones=ZONE_IDS.filter(z=>(k==='s'?ZN[z].squirrels:k==='b'?ZN[z].birds:k==='n'?ZN[z].nuts:ZN[z].flowers).includes(id)).map(z=>ZN[z].name);
  const kindName={s:'Squirrel',b:'Bird',n:NUTS[id]&&isCone(id)?'Cone':'Nut',f:'Wildflower'}[k];
@@ -1651,7 +1750,7 @@ function infoView(k,id){const i=itemInfo(k,id),have=ALBUM.has[k+':'+id],zones=ZO
  if(k==='n'){const n=NUTS[id],t=TREE_INFO[n.tree];h+=`<div class="sr-info-tree"><div data-pic="t:${n.tree}" data-w="160" data-h="120"></div><div><span class="sr-k">From the tree</span><b>${t[0]}</b><i>${t[1]}</i><span>${t[2]}</span></div></div>`;}
  return h;}
 function openMenu(view,arg){hideCard();let h='';
- if(view==='main'){h=`<div class="sr-title">${ICON.acorn}<div><h2>Squirrel Racer</h2><p>Explore real forests as a real squirrel.</p></div></div><div class="sr-main">
+ if(view==='main'){h=`<div class="sr-title">${ICON.acorn}<div><h2>Squirrel Ranger</h2><p>Explore real forests as a real squirrel.</p></div></div><div class="sr-main">
   ${W&&PLAY.started?'<button type="button" data-go="resume" class="primary">Resume</button>':''}<button type="button" data-go="playz">Play<span>Explore freely. Pick a forest and a squirrel.</span></button>
   <button type="button" data-go="missions">Missions<span>Find birds, nuts, cones and wildflowers.</span></button><button type="button" data-go="collection">Collection<span>Everything you've found, with names and ranges.</span></button></div>`;}
  if(view==='playz'||view==='missionz'){h=`<div class="sr-head"><button type="button" data-go="main" class="back">Back</button><h2>${view==='playz'?'Choose a forest':'Missions: choose a forest'}</h2></div><div class="sr-grid zones">`+ZONE_IDS.map(z=>{const Z=ZN[z];const tr=Z.trees[0][0];
@@ -1712,10 +1811,10 @@ function latch(P,pr){SFX.land();S.path=P;S.s=pr.s;S.side=P.noFlip?-1:pr.side;con
  else{const score=Math.abs(S.x-(S.lx||S.x))+Math.max(0,(S.ly||S.y)-S.y)*.7;const tier=score>420?3:score>270?2:score>160?1:0;if(tier)celebrate(tier,sp.x,sp.y,sp.nx,sp.ny,S.side===1,P.sp&&P.sp.leaf);}}
 function updatePlay(dt,w,h){
  updateAudio(dt);pollKeys(dt);if(S.flying)pollPad();
- if(S.flying&&PLAY.motion==='nimble'){S.vy+=G*dt;S.x+=S.vx*dt;S.y+=S.vy*dt;S.air+=dt;if(Math.abs(S.x-S.lx)>270&&S.air>.45)FX.rbHold=Math.max(FX.rbHold,.35);if(FX.rb>.3){const a=Math.atan2(S.vy,S.vx);FX.trail.push({x:S.x-Math.cos(a)*18,y:S.y-Math.sin(a)*8,age:0});}
+ if(S.flying&&PLAY.motion==='nimble'){S.vy+=G*dt;S.vy=glideVy(S.vy,dt);S.x+=S.vx*dt;S.y+=S.vy*dt;S.air+=dt;if(Math.abs(S.x-S.lx)>270&&S.air>.45)FX.rbHold=Math.max(FX.rbHold,.35);if(FX.rb>.3){const a=Math.atan2(S.vy,S.vx);FX.trail.push({x:S.x-Math.cos(a)*18,y:S.y-Math.sin(a)*8,age:0});}
   if(S.air>.12||S.y>-NIM.stand){const ns=nearestSurf(S.x,S.y);if(S.y>=-NIM.stand)landNimble(nearestSurf(S.x,-NIM.stand)||ns);else if(ns&&ns.gap<NIM.stand*.9&&!(ns.P===S.from&&S.air<.3))landNimble(ns);}
   if(S.y>2000||Math.abs(S.x-cam.x)>5000){resetSquirrel();}
- }else if(S.flying){S.vy+=G*dt;S.x+=S.vx*dt;S.y+=S.vy*dt;S.air+=dt;if(Math.abs(S.x-S.lx)>270&&S.air>.45)FX.rbHold=Math.max(FX.rbHold,.35);if(FX.rb>.3){const a=Math.atan2(S.vy,S.vx);FX.trail.push({x:S.x-Math.cos(a)*18,y:S.y-Math.sin(a)*18-10,age:0});}
+ }else if(S.flying){S.vy+=G*dt;S.vy=glideVy(S.vy,dt);S.x+=S.vx*dt;S.y+=S.vy*dt;S.air+=dt;if(Math.abs(S.x-S.lx)>270&&S.air>.45)FX.rbHold=Math.max(FX.rbHold,.35);if(FX.rb>.3){const a=Math.atan2(S.vy,S.vx);FX.trail.push({x:S.x-Math.cos(a)*18,y:S.y-Math.sin(a)*18-10,age:0});}
   if(S.y>=0){S.vy=Math.max(S.vy,1);latch(W.ground,{s:S.x+OFF,side:-1,d:0});}
   else if(S.air>.06){for(const P of W.paths){if(P.kind==='ground')continue;if(P===S.from&&S.air<.3)continue;const b=P.bb;if(S.x<b[0]-40||S.x>b[2]+40||S.y<b[1]-40||S.y>b[3]+40)continue;const pr=pathProject(P,S.x,S.y);const half=wAt(P,pr.s)/2;if(pr.d<half+7){latch(P,pr);break;}}}
   if(S.y>2000||Math.abs(S.x-cam.x)>5000){resetSquirrel();}
@@ -1741,6 +1840,9 @@ function updatePlay(dt,w,h){
  let tx=px+cam.lx*(w/6)/cam.zoom,ty=py+cam.ly*(h/6)/cam.zoom-12;
  const maxY=((PLAY.scheme==='dual'?170:60)-h/2)/cam.zoom;ty=Math.min(ty,maxY);const k=1-Math.exp(-dt*(S.flying?5:4));const ox=cam.x,oy=cam.y;cam.x+=(tx-cam.x)*k;cam.y+=(ty-cam.y)*k;cam.vx=lerp(cam.vx,(cam.x-ox)/Math.max(dt,1e-3)/300,.2);cam.vy=lerp(cam.vy||0,(cam.y-oy)/Math.max(dt,1e-3)/300,.2);
 }
+// flying squirrels: once falling, the membrane holds the fall to a slow glide (about 130 units/s)
+const GLIDE_VY=70;
+function glideVy(vy,dt){const C=COATS[PLAY.coat];if(!C||!C.glide||vy<=GLIDE_VY)return vy;return vy-(vy-GLIDE_VY)*(1-Math.exp(-dt*16));}
 function resetSquirrel(){S.path=W.ground;S.s=cam.x+OFF;S.side=-1;S.flying=false;S.speed=0;S.sag=0;S.sagV=0;S.x=cam.x;S.y=-NIM.stand;S.held=W.ground;S.ta=0;S.nfy=1;S.fyA=1;S.hip=null;S.turnT=0;S.rollSg=1;}
 function drawLayer(ctx,w,h,list,k,spacing,yoff,offset){if(!list.length)return;ctx.save();ctx.translate(w/2,h/2);ctx.scale(cam.zoom*k,cam.zoom*k);ctx.translate(-cam.x,-cam.y+yoff);const vw=w/(cam.zoom*k);const i0=Math.floor((cam.x-vw/2-300)/spacing),i1=Math.ceil((cam.x+vw/2+300)/spacing);for(let i=i0;i<=i1;i++){const c=list[(hash(i,offset)%list.length)];const x=i*spacing+(hash(i,offset+1)%80)-40;const sc=.85+(hash(i,offset+2)%30)/100;ctx.drawImage(c,x-260*sc,-470*sc,520*sc,480*sc);}ctx.restore();}
 function drawPlay(t,dt){
@@ -1772,13 +1874,13 @@ function drawPlay(t,dt){
  grassBand(ctx,vx0,vx1,t,{seed:37,step:2.4,yMin:9,yMax:24,hMin:7,hMax:19,bw:3.4,wind:1,boost:1.1,cols:GRASS_FRONT},trunks);
  // aim arc
  let mode,ph=S.phase;const aimA=curAim(w,h),aiming=!!aimA;
- if(aimA){const a=aimA;{const p=surfacePos();let x=p.x,y=p.y,vx=a.vx,vy=a.vy;for(let i=1;i<=64;i++){const st=.03;vy+=G*st;x+=vx*st;y+=vy*st;if(y>0)break;if(i%3===0){ctx.globalAlpha=1-i/66;ctx.fillStyle='#fff8e8';ctx.beginPath();ctx.arc(x,y,3.2/cam.zoom+1,0,TAU);ctx.fill();}}ctx.globalAlpha=1;const sp=surfacePos();ctx.strokeStyle='#e58b44';ctx.lineWidth=3;ctx.beginPath();ctx.arc(sp.x+sp.nx*12*SQS,sp.y+sp.ny*12*SQS,22,-Math.PI/2,-Math.PI/2+TAU*a.pw);ctx.stroke();}}
+ if(aimA){const a=aimA;{const p=surfacePos();let x=p.x,y=p.y,vx=a.vx,vy=a.vy;for(let i=1;i<=64;i++){const st=.03;vy+=G*st;vy=glideVy(vy,st);x+=vx*st;y+=vy*st;if(y>0)break;if(i%3===0){ctx.globalAlpha=1-i/66;ctx.fillStyle='#fff8e8';ctx.beginPath();ctx.arc(x,y,3.2/cam.zoom+1,0,TAU);ctx.fill();}}ctx.globalAlpha=1;const sp=surfacePos();ctx.strokeStyle='#e58b44';ctx.lineWidth=3;ctx.beginPath();ctx.arc(sp.x+sp.nx*12*SQS,sp.y+sp.ny*12*SQS,22,-Math.PI/2,-Math.PI/2+TAU*a.pw);ctx.stroke();}}
  drawTrail(ctx);
  if(FX.aura>0){const p=S.flying?{x:S.x,y:S.y,nx:0,ny:-1}:surfacePos();const a=Math.min(1,FX.aura)*.18;ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=a*(.75+.25*Math.sin(t*9));ctx.drawImage(glowSprite('#ffd84a'),p.x+p.nx*14-46,p.y+p.ny*14-46,92,92);ctx.restore();}
  // squirrel
  const C=COATS[PLAY.coat],rig=S.rig;ctx.save();
  let ikFn=null;
- if(S.flying){mode='leap';ph=clamp(S.air/.8,0,1);ctx.translate(S.x,S.y);if(S.vx<0)ctx.scale(-1,1);ctx.rotate(Math.atan2(S.vy,Math.abs(S.vx))*.7);ctx.scale(SQS,SQS);if(PLAY.motion==='nimble')ctx.translate(0,19);}
+ if(S.flying){mode=(C.glide&&S.vy>-80)?'glide':'leap';ph=clamp(S.air/.8,0,1);ctx.translate(S.x,S.y);if(S.vx<0)ctx.scale(-1,1);ctx.rotate(Math.atan2(S.vy,Math.abs(S.vx))*.7);ctx.scale(SQS,SQS);if(PLAY.motion==='nimble')ctx.translate(0,19);}
  else if(PLAY.motion==='nimble'){const ta=S.ta||0;S.fxA=S.nfx;{let r=clamp((S.rollU==null?1:S.rollU)*1.35,-1,1);const sg=Math.sign(r||1),tnow=performance.now()/1000;if(S.rollSg&&sg!==S.rollSg){if(tnow-(S.rollT||0)<.35&&Math.abs(r)<.75)r=S.rollSg*.3;else{S.rollSg=sg;S.rollT=tnow;}}else if(!S.rollSg)S.rollSg=sg;const tgt=Math.sign(r||1)*Math.pow(Math.abs(r),.6);S.fyA=S.fyA==null?tgt:S.fyA+clamp(tgt-S.fyA,-4.5*dt,4.5*dt);} const fyDraw=Math.sign(S.fyA||1);
   // mid-roll: switch to the back (or belly, when passing behind a thick branch) view, with hysteresis
   const af=Math.abs(S.fyA);if(S.dorsal){if(af>.7||S.turnT>0)S.dorsal=false;}else if(af<.55&&!S.turnT&&S.prim&&S.prim.P.kind!=='ground')S.dorsal=true;

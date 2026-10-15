@@ -1,6 +1,6 @@
 # Adding a forest
 
-This is how the four current forests were researched and modelled. Follow the same steps to add a new one (the Pacific Northwest is next on the list).
+This is how the five current forests were researched and modelled. Follow the same steps to add a new one. The Pacific Northwest Forest was the first one built from this guide, so it makes a good worked example.
 
 A forest is a list of real species plus a few colours. All the species art, calls and placement come from data, so adding a forest means **researching** the species, **writing their data**, then **checking it**. No new drawing code is needed unless a species has a shape the renderers can't draw yet.
 
@@ -21,10 +21,12 @@ Each forest has the same shape:
 | What | How many | How to choose |
 |---|---|---|
 | **Trees** | 5–6 | The dominant canopy trees, weighted roughly by how common they are. Every nut or cone below must come from one of these. |
-| **Squirrels** | 1–3 | Native tree squirrels. A common colour form (the black eastern gray, the dark Eurasian red) counts as its own entry with the same scientific name. |
+| **Squirrels** | 1–6 | Native tree squirrels. A common colour form (the black eastern gray, the dark Eurasian red) counts as its own entry with the same scientific name. |
 | **Birds** | 5–6 | Common, easy to see, and visually distinct from each other. Aim for a mix of poses (see below). Prefer birds with a link to squirrels or seeds: jays that bury acorns, crossbills that eat spruce seed, tits that nest in old dreys. |
 | **Nuts and cones** | 4 | One per bearing tree. Pick ones that look different from each other. |
 | **Wildflowers** | 11 | Native woodland or clearing flowers. Mix colours, shapes and seasons. |
+
+**Check habitat, not just range.** A species can live in the right region but in the wrong place, like a meadow, prairie or dry oak woodland. For the Pacific Northwest, common camas and broadleaf lupine were swapped for Oregon fawn lily and vanilla leaf, and tall Oregon grape for the dwarf Oregon grape of the forest floor. When you keep a weaker fit on purpose (the western gray squirrel prefers drier oak and Douglas-fir woods), say so in its range.
 
 Missions pick 3 of each kind, so a forest needs **at least 3** birds, nuts or cones, and wildflowers. More gives variety.
 
@@ -104,7 +106,7 @@ douglascone: {name:'Douglas-fir cone', tree:'douglasfir', fact:'…',
 | `cone` | `len`, `wid`; `col` (body) and `hi` (scales); `egg` (egg-shaped), `barrel` (straight-sided), `upright` (stands on the branch, like firs); `open` (scales open), `prickle` (scale prickles), `bract` (three-pointed bract colour), `bosses` (Scots pine knobs), `nuts` (seed colour showing), `curve` (a lopsided cone, like jack pine) |
 | `hickory` | No parameters: a split husk |
 | `beech` | `col`: a spiny husk with three-sided nuts |
-| `hazel` | No parameters: a nut in a frilled husk |
+| `hazel` | A nut in a frilled husk. `beak: 1` gives the long bristly husk of the beaked hazel. |
 
 Hanging nuts are placed under their own tree's limbs (upright cones on top), and 1–2 lie fallen nearby.
 
@@ -116,11 +118,13 @@ Hanging nuts are placed under their own tree's limbs (upright cones on top), and
 |---|---|---|
 | `polar` | Open flower with petals | `v:{k (petal count), p (petal fullness), notch, c1 (edge), c2 (centre), center, layers:1, stripe?, spots?, tip?}`, `R` (size), `low` (short stem), `nod` (hangs down) |
 | `phyllo` | Daisy-like head | `v`: a `PHYLLO` key. Add new heads to `PHYLLO`: `{p, p2, d:[disc colours], n (rays), len, wid, tip?}` |
-| `raceme` | Spike of flowers on a stem | `v`: a `RACEME` key: `{c:[3 colours, base to tip], shape, n, slim?, small?}`. `shape` is `pea` (lupines), `bell` (foxglove), `plume` (goldenrod), `spike4` (fireweed, heather), `trumpet` (gilia, penstemon) or `bract` (paintbrush). |
+| `raceme` | Spike of flowers on a stem | `v`: a `RACEME` key: `{c:[3 colours, base to tip], shape, n, slim?, small?}`. `shape` is `pea` (lupines), `bell` (foxglove), `plume` (goldenrod), `spike4` (fireweed, heather, vanilla leaf), `star` (six-petalled stars). Add `leaf3: 1` to the `art` for a big three-part leaf (vanilla leaf), `trumpet` (gilia, penstemon) or `bract` (paintbrush). |
 | `droop` | Cone with drooping rays | `ray`, `ray2`, `cone` colours; `coneH` (cone height) |
 | `bells` | Hanging bells | `c`, `n`; `oneSide` (bluebell), `cluster` (Virginia bluebells, with `bud` colour), `twin` (twinflower) |
 | `columbine` | Spurred columbine | `c1` (sepals and spurs), `c2` (petals), `nod` |
 | `cluster` | Flat or domed cluster of tiny flowers | `c`, `eye`, `dome` |
+| `hearts` | Hearts hanging from an arching stem (bleeding heart) | `c`, `tip`, `n` |
+| `spathe` | Big leaves around a hooded spathe (skunk cabbage) | None |
 | `mayapple`, `slipper`, `iris` | One-off shapes | None |
 
 If a flower needs a shape that doesn't exist, add a new `art.k` branch in `drawFlowerSp` and keep it to simple filled shapes.
@@ -176,6 +180,11 @@ abert: {back:'#73767a', back2:'#55585c', wash:'#8a7a6c', belly:'#f4f2ec', tail:'
 | `paw`, `ring`, `ear`, `nose` | Paws, eye ring, inner ear, nose |
 | `tuft`, `tuftC` | Ear tufts: length (0 for none, 7–9 for tufted) and colour |
 | `stripe` | An optional coloured band along the back (Abert's) |
+| `side` | A dark line along the flank (Douglas squirrel) |
+| `muzzle`, `earOut`, `earIn` | Colours for the muzzle and the outer and inner ear, when they differ from the coat (the white nose and ears of the southeastern fox squirrel, the pink ears of the white gray squirrel) |
+| `eye` | Eye size (1 is normal; 1.4 for the big night eyes of flying squirrels) |
+| `tailR` | Tail fluffiness (0.75 for a flying squirrel's flat tail, 1.15 for the western gray's huge one) |
+| `glide: 1` | A flying squirrel: draws the furry membrane from wrist to ankle, and once a leap starts to fall, the squirrel glides (a slow, capped fall). The aim arc shows it. |
 
 `SQUIRRELS.<id> = {name, sci, coat, range, fact}`, where `coat` is the `COATS` key.
 
@@ -193,7 +202,7 @@ sw: {name:'Southwest Ponderosa Pine', where:'Arizona, New Mexico and Colorado',
 
 - `trees` are `[id, weight]`.
 - `sky`, `hills`, `far` and `farLeaf` set the backdrop. Keep them hazy and low-contrast, and give them a tint that suggests the place: cooler blue-gray for boreal, warm dust for the Southwest.
-- Add the id to `ZONE_IDS`. The menus, missions and collection all pick the new forest up from there.
+- Add the id to `ZONE_IDS` (its position sets the order in the menus). The menus, missions and collection all pick the new forest up from there.
 
 ---
 

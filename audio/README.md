@@ -25,6 +25,6 @@ Serve the folder over HTTP (for example `python3 -m http.server`) so the browser
 
 Each bird's call is synthesized from the rhythm and pitch of its real call. To use a real recording, add it as `audio/birds/<id>.mp3`, where `<id>` is one of:
 
-`cardinal`, `bluejay`, `titmouse`, `wbnut`, `rbwood`, `canjay`, `borchick`, `rbnut`, `wwcross`, `sgrouse`, `junco`, `stjay`, `pygnut`, `mtnchick`, `acornwp`, `wbluebird`, `rfwarbler`, `eujay`, `crestit`, `gspot`, `coaltit`, `robin`, `chaffinch`.
+`cardinal`, `bluejay`, `titmouse`, `wbnut`, `rbwood`, `canjay`, `borchick`, `rbnut`, `wwcross`, `sgrouse`, `junco`, `stjay`, `pygnut`, `mtnchick`, `acornwp`, `wbluebird`, `rfwarbler`, `eujay`, `crestit`, `gspot`, `coaltit`, `robin`, `chaffinch`, `varthrush`, `chbchick`, `pileated`, `pacwren`.
 
 Check the licence of every recording you add and credit it in `ATTRIBUTION.md`. See that file for public-domain and openly licensed sources.
