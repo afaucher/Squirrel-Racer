@@ -20,6 +20,7 @@ then visit http://localhost:8000.
 |---|---|---|---|
 | **Move** | Left thumb (floating stick) | W A S D | Left stick or D-pad |
 | **Leap** | Right thumb: pull back, release | Hold arrows, release | Right stick: pull back, release |
+| **Full screen** | Corner button | F (Esc exits) | — |
 
 - **Leap** is a wind-up: pull away from where you want to go and let go. Longer pulls jump farther. On the keyboard the direction is the average of the arrows you've held.
 - **Landing** latches onto whatever you touch: limb, trunk or ground.

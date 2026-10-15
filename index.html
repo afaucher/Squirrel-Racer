@@ -40,6 +40,14 @@ section.panel{padding-block:20px;display:grid;gap:18px}
 .chips button.act{background:transparent;border-color:var(--line)}
 .label{font:500 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .ctl{display:grid;gap:6px}
+.stage{position:relative;border-radius:12px}
+.fsbtn{position:absolute;top:10px;right:10px;z-index:3;display:flex;align-items:center;gap:6px;border:0;border-radius:999px;padding:8px 12px;background:rgba(20,26,20,.55);color:#f3f1e8;font:700 13px/1 var(--body);cursor:pointer;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
+.fsbtn svg{width:16px;height:16px;display:block}
+.fsbtn:hover{background:rgba(20,26,20,.75)}
+.stage:fullscreen{width:100vw;height:100vh;background:#9fc0d3;border-radius:0}
+.stage.immersive{position:fixed;inset:0;z-index:50;width:100vw;height:100vh;height:100dvh;background:#9fc0d3;border-radius:0}
+.stage:fullscreen #play,.stage.immersive #play{height:100%;border-radius:0}
+.stage:fullscreen .fsbtn,.stage.immersive .fsbtn{top:calc(10px + env(safe-area-inset-top,0px));right:calc(10px + env(safe-area-inset-right,0px))}
 #play{width:100%;height:min(72vh,640px);border-radius:12px;display:block;touch-action:none;user-select:none;-webkit-user-select:none;background:#c9dbe4;cursor:grab}
 .bar{display:flex;flex-wrap:wrap;gap:14px 22px;align-items:end}
 .foot{margin:0;color:var(--muted);font-size:14px;max-width:72ch}
@@ -60,13 +68,14 @@ a{color:var(--accent)}
 </header>
 
 <section class="panel" id="panel-play">
-  <canvas id="play" aria-label="Squirrel Racer"></canvas>
+  <div class="stage" id="stage"><canvas id="play" aria-label="Squirrel Racer"></canvas><button class="fsbtn" id="fs-btn" type="button" aria-label="Enter full screen"></button></div>
   <ul class="howto">
     <li><b>Move</b>Left thumb, W A S D, or a controller's left stick. In Nimble motion (B), steer anywhere within reach of a branch: the body glides in straight lines while the feet keep hold, so slipping between nearby branches, going under, or around a trunk just happens. In Surface motion (A), run along the branch and push into it to swing to the other side.</li>
     <li><b>Leap</b>Right thumb, the arrow keys, or a controller's right stick. Pull back away from where you want to go, then let go. Hold longer to wind up a bigger leap; on keys, the direction is the average of what you've held.</li>
     <li><b>Land anywhere</b>You latch onto whatever you touch: limb, trunk or ground. Thin branch tips bend and weaken your launch, so leap from closer to the trunk.</li>
     <li><b>A new squirrel each run</b>Gray, fox or red squirrel, or, if you're lucky, the rare black morph.</li>
     <li><b>Big leaps</b>Long flights turn your tail into a rainbow. Land a long leap on a branch and you get stars, fireflies and falling leaves.</li>
+    <li><b>Full screen</b>Tap the button in the corner of the play area, or press F. Esc exits.</li>
   </ul>
   <div class="bar">
     <div class="ctl"><span class="label">Forest sound</span>
@@ -885,7 +894,7 @@ function drawPlay(t,dt){
  drawFG(ctx,w,h,t,dt);
  drawSticks(ctx,w,h);
  // HUD
- if(!input.seen){ctx.fillStyle='rgba(20,26,20,.6)';const tw=Math.min(w-20,330);ctx.fillRect(w/2-tw/2,PLAY.scheme==='dual'?14:h-58,tw,42);ctx.fillStyle='#f3f1e8';ctx.font='600 13px "Atkinson Hyperlegible",sans-serif';ctx.textAlign='center';ctx.fillText(PLAY.scheme==='dual'?'Left: move · Right: pull back to leap':'Drag to run · grab squirrel & pull back to jump',w/2,PLAY.scheme==='dual'?40:h-32);ctx.textAlign='start';}
+ if(!input.seen){ctx.fillStyle='rgba(20,26,20,.6)';const tw=Math.min(w-20,330);ctx.fillRect(w/2-tw/2,PLAY.scheme==='dual'?54:h-58,tw,42);ctx.fillStyle='#f3f1e8';ctx.font='600 13px "Atkinson Hyperlegible",sans-serif';ctx.textAlign='center';ctx.fillText(PLAY.scheme==='dual'?'Left: move · Right: pull back to leap':'Drag to run · grab squirrel & pull back to jump',w/2,PLAY.scheme==='dual'?80:h-32);ctx.textAlign='start';}
 }
 
 
@@ -988,6 +997,18 @@ function drawSticks(ctx,w,h){const dual=PLAY.scheme==='dual';ctx.save();ctx.line
 /* ================= UI ================= */
 function chipGroup(id,fn){const el=document.getElementById(id);el.addEventListener('click',e=>{const b=e.target.closest('button[data-v]');if(!b)return;for(const x of el.querySelectorAll('button[data-v]'))x.setAttribute('aria-pressed',x===b?'true':'false');fn(b.dataset.v);});}
 setPadStatus();chipGroup('play-motion',v=>setMotion(v));chipGroup('play-sound',v=>setSound(v==='on'));
+// full screen: the real Fullscreen API where allowed, otherwise an immersive window-filling mode
+const stage=document.getElementById('stage'),fsb=document.getElementById('fs-btn');
+const IC_FULL='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4"/></svg>',IC_EXIT='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 2v4H2M14 6h-4V2M10 14v-4h4M2 10h4v4"/></svg>';
+const isFull=()=>document.fullscreenElement===stage||stage.classList.contains('immersive');
+function fsLabel(){const f=isFull();fsb.innerHTML=(f?IC_EXIT:IC_FULL)+'<span>'+(f?'Exit':'Full screen')+'</span>';fsb.setAttribute('aria-label',f?'Exit full screen':'Enter full screen');}
+async function toggleFull(){if(isFull()){if(document.fullscreenElement){try{await document.exitFullscreen();}catch(e){}}stage.classList.remove('immersive');document.documentElement.style.overflow='';}
+ else{let ok=false;try{if(stage.requestFullscreen){await stage.requestFullscreen({navigationUI:'hide'});ok=document.fullscreenElement===stage;}}catch(e){}
+  if(!ok){stage.classList.add('immersive');document.documentElement.style.overflow='hidden';}}fsLabel();if(AMB.on)startAudio();}
+fsb.addEventListener('click',e=>{e.stopPropagation();toggleFull();});
+document.addEventListener('fullscreenchange',fsLabel);
+window.addEventListener('keydown',e=>{if(e.code==='KeyF'&&!e.repeat&&!(e.target.closest&&e.target.closest('input,textarea'))){e.preventDefault();toggleFull();}else if(e.code==='Escape'&&stage.classList.contains('immersive')){toggleFull();}});
+fsLabel();
 document.getElementById('play-reset').addEventListener('click',resetSquirrel);
 document.getElementById('play-new').addEventListener('click',()=>newWorld((Math.random()*1e6)|0));
 const tab='play';
