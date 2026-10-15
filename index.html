@@ -144,6 +144,27 @@ button.sr-tile{cursor:pointer}
 .sr-award b{font:800 16px/1.2 var(--display)}
 .sr-award span{color:#596455;font-size:13.5px}
 .sr-award i{color:#4c6c30}
+.sr-info{display:grid;grid-template-columns:minmax(0,320px) 1fr;gap:18px;align-items:start}
+.sr-info-pic canvas{width:100%;height:auto;aspect-ratio:4/3;border-radius:14px;background:#e1e8d8;display:block}
+.sr-info-pic.dim canvas{filter:grayscale(.6) opacity(.75)}
+.sr-info-txt h2{margin:0}
+.sr-info-txt .sci{margin:2px 0 8px;color:#4c6c30;font-size:17px}
+.sr-info-txt .status{display:flex;gap:8px;align-items:center;margin:0 0 10px;padding:8px 12px;border-radius:12px;background:#eef1e7;color:#596455;font-size:14.5px}
+.sr-info-txt .status.got{background:#fff4dd;color:#1b221c;box-shadow:inset 0 0 0 2px #f4c27a}
+.sr-info-txt .status .tick{position:static;flex:none}
+.sr-info dl{margin:0;display:grid;gap:2px}
+.sr-info dt{font:500 11px/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:#b65c17;margin-top:8px}
+.sr-info dd{margin:0;font-size:15.5px;line-height:1.45}
+.sr-info-act{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:14px}
+.sr-info-act button{display:inline-flex;gap:8px;align-items:center;font:700 15px/1 var(--body);border:0;border-radius:999px;padding:10px 16px;background:#b65c17;color:#fff;cursor:pointer}
+.sr-info-act a{color:#b65c17;font-weight:700}
+.sr-info-tree{display:grid;grid-template-columns:140px 1fr;gap:14px;align-items:center;margin-top:16px;padding:12px;border-radius:14px;background:#eef1e7}
+.sr-info-tree canvas{width:100%;height:auto;aspect-ratio:4/3;border-radius:10px;background:#e1e8d8;display:block}
+.sr-info-tree>div:last-child{display:grid;gap:2px;font-size:14px}
+.sr-info-tree b{font:800 17px/1.2 var(--display)}
+.sr-info-tree i{color:#4c6c30}
+.sr-info-tree span:not(.sr-k){color:#596455}
+@media (max-width:560px){.sr-info{grid-template-columns:1fr}.sr-info-tree{grid-template-columns:110px 1fr}}
 .sr-actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
 .sr-actions button{font-size:16px;padding:11px 16px}
 @media (max-width:520px){.sr-succ{grid-template-columns:1fr}.sr-mission{font-size:12.5px;top:12px;max-width:calc(100% - 140px);border-radius:14px}.sr-frames{top:78px}.sr-fr{width:50px;height:50px}}
@@ -1607,7 +1628,25 @@ UI.go=function(v){const[a,b,c]=v.split(':');
  if(a==='resume'){closeMenu();return;}
  if(a==='play'&&b&&c){startGame({zone:b,squirrel:c});return;}
  if(a==='mission'){const m=UI.missions[+b];startGame({zone:m.zone,squirrel:m.squirrel,mission:{...m,got:[]}});return;}
+ if(a==='call'){playCall(b);return;}
+ if(a==='info'){UI.collScroll=UI.menuIn.scrollTop;openMenu('info',b+':'+c);return;}
+ if(a==='collection'&&b==='back'){openMenu('collection');UI.menuIn.scrollTop=UI.collScroll||0;return;}
  openMenu(a,b);};
+const ICON_PLAY='<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a8.5 8.5 0 0 1 0 12"/></svg>';
+function wikiURL(k,id){const sci=k==='b'?null:itemInfo(k,id).sci;return'https://en.wikipedia.org/wiki/'+(k==='b'?BIRD_SP[id].wiki:sci.replace(/ /g,'_'));}
+// the full page for one species, opened from the collection
+function infoView(k,id){const i=itemInfo(k,id),have=ALBUM.has[k+':'+id],zones=ZONE_IDS.filter(z=>(k==='s'?ZN[z].squirrels:k==='b'?ZN[z].birds:k==='n'?ZN[z].nuts:ZN[z].flowers).includes(id)).map(z=>ZN[z].name);
+ const kindName={s:'Squirrel',b:'Bird',n:NUTS[id]&&isCone(id)?'Cone':'Nut',f:'Wildflower'}[k];
+ const status=have?(k==='s'?`In your collection · ${have} mission${have>1?'s':''} completed`:k==='n'?'Collected':'Photographed'):(k==='s'?'Complete a mission as this squirrel to add it':`Not found yet. Look for it in the ${andList(zones)}.`);
+ let h=`<div class="sr-head"><button type="button" data-go="collection:back" class="back">Back</button><span class="sr-k">${kindName}</span></div>
+ <div class="sr-info"><div class="sr-info-pic${have?'':' dim'}"><div data-pic="${k}:${id}" data-w="240" data-h="180"></div></div><div class="sr-info-txt">
+ <h2>${i.name}</h2><p class="sci"><i>${i.sci}</i></p><p class="status${have?' got':''}">${have?'<span class="tick" role="img" aria-label="Found"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>':''}${status}</p>
+ <dl><dt>Native range</dt><dd>${i.range}</dd><dt>Lives in</dt><dd>${andList(zones)}</dd>`;
+ if(k==='b')h+=`<dt>Field marks</dt><dd>${BIRD_SP[id].marks}</dd>`;
+ if(i.fact)h+=`<dt>Did you know?</dt><dd>${i.fact}</dd>`;
+ h+=`</dl><div class="sr-info-act">${k==='b'?`<button type="button" data-go="call:${id}">${ICON_PLAY}Play its call</button>`:''}<a href="${wikiURL(k,id)}" target="_blank" rel="noopener">Read more on Wikipedia</a></div></div></div>`;
+ if(k==='n'){const n=NUTS[id],t=TREE_INFO[n.tree];h+=`<div class="sr-info-tree"><div data-pic="t:${n.tree}" data-w="160" data-h="120"></div><div><span class="sr-k">From the tree</span><b>${t[0]}</b><i>${t[1]}</i><span>${t[2]}</span></div></div>`;}
+ return h;}
 function openMenu(view,arg){hideCard();let h='';
  if(view==='main'){h=`<div class="sr-title">${ICON.acorn}<div><h2>Squirrel Racer</h2><p>Explore real forests as a real squirrel.</p></div></div><div class="sr-main">
   ${W&&PLAY.started?'<button type="button" data-go="resume" class="primary">Resume</button>':''}<button type="button" data-go="playz">Play<span>Explore freely. Pick a forest and a squirrel.</span></button>
@@ -1617,10 +1656,11 @@ function openMenu(view,arg){hideCard();let h='';
  if(view==='plays'){const Z=ZN[arg];h=`<div class="sr-head"><button type="button" data-go="playz" class="back">Back</button><h2>${Z.name}: choose your squirrel</h2></div><div class="sr-grid">`+Z.squirrels.map(s=>{const q=SQUIRRELS[s];return`<button type="button" class="sr-tile" data-go="play:${arg}:${s}"><div data-pic="sh:${s}"></div><b>${q.name}</b><i>${q.sci}</i><span>${q.range}</span></button>`;}).join('')+'</div>';}
  if(view==='missions'){UI.missions=genMissions(arg);h=`<div class="sr-head"><button type="button" data-go="missionz" class="back">Back</button><h2>${ZN[arg].name}: pick a mission</h2></div><div class="sr-grid missions">`+UI.missions.map((m,k)=>{const q=SQUIRRELS[m.squirrel];const ids=m.targets;
    return`<button type="button" class="sr-tile mission" data-go="mission:${k}"><div class="quad"><div data-pic="sh:${m.squirrel}" data-w="100" data-h="90"></div>${ids.map(id=>`<div data-pic="${m.type}:${id}" data-w="100" data-h="90"></div>`).join('')}</div><b>${missionText(m)}</b><span class="sr-names">${missionNames(m)}</span><span>As the ${q.name.replace(/ \(.*\)/,'')}</span></button>`;}).join('')+'</div><p class="sr-note">New missions are dealt each time you open this screen.</p>';}
+ if(view==='info'){const[k,id]=arg.split(':');h=infoView(k,id);}
  if(view==='collection'){const tot=[];h=`<div class="sr-head"><button type="button" data-go="main" class="back">Back</button><h2>Collection</h2></div>`;
   for(const z of ZONE_IDS){const Z=ZN[z];const sec=[['Squirrels','s',Z.squirrels],['Birds','b',Z.birds],['Nuts and cones','n',Z.nuts],['Wildflowers','f',Z.flowers]];
    h+=`<h3 class="sr-zone">${Z.name}</h3>`;for(const[lab,k,ids]of sec){const got=ids.filter(id=>ALBUM.has[k+':'+id]).length;h+=`<h4>${lab} <span>${got} of ${ids.length}</span></h4><div class="sr-grid coll">`+ids.map(id=>{const i=itemInfo(k,id),have=ALBUM.has[k+':'+id];
-     return`<div class="sr-tile${have?' done':''}">${have?'<span class="tick" role="img" aria-label="Found"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>':''}${k==='n'?`<div class="duo"><div data-pic="t:${NUTS[id].tree}" data-w="90" data-h="80"></div><div data-pic="n:${id}" data-w="90" data-h="80"></div></div>`:`<div data-pic="${k}:${id}"></div>`}<b>${i.name}</b><i>${i.sci}</i>${k==='n'?`<span>${i.tree}</span>`:''}${k==='s'?`<span>${have?(have>1?have+' missions completed':'1 mission completed'):'Complete a mission as this squirrel'}</span>`:''}</div>`;}).join('')+'</div>';}}}
+     return`<button type="button" class="sr-tile${have?' done':''}" data-go="info:${k}:${id}" aria-label="${i.name}">${have?'<span class="tick" role="img" aria-label="Found"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>':''}${k==='n'?`<div class="duo"><div data-pic="t:${NUTS[id].tree}" data-w="90" data-h="80"></div><div data-pic="n:${id}" data-w="90" data-h="80"></div></div>`:`<div data-pic="${k}:${id}"></div>`}<b>${i.name}</b><i>${i.sci}</i>${k==='n'?`<span>${i.tree}</span>`:''}${k==='s'?`<span>${have?(have>1?have+' missions completed':'1 mission completed'):'Complete a mission as this squirrel'}</span>`:''}</button>`;}).join('')+'</div>';}}}
  renderMenu(h);}
 function startGame(cfg){PLAY.zone=cfg.zone;PLAY.squirrel=cfg.squirrel;PLAY.mission=cfg.mission||null;PLAY.started=1;newWorld((Math.random()*1e6)|0);buildFrames();closeMenu();input.seen=false;}
 
