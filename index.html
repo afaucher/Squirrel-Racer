@@ -140,6 +140,7 @@ function genRecursive(sp,seed,x,y,s){
  return{segs,leaves};
 }
 function drawSegs(ctx,segs,sp,flat){
+ if(segs.some(g=>g.own&&ownSag(g)))segs=segs.map(g=>{const oy=g.own?ownSag(g):0;return oy?{...g,y1:g.y1+oy,y2:g.y2+oy}:g;});
  ctx.fillStyle=flat||sp.bark;
  for(const g of segs){const dx=g.x2-g.x1,dy=g.y2-g.y1,l=Math.hypot(dx,dy)||1,nx=-dy/l,ny=dx/l;
   ctx.beginPath();ctx.moveTo(g.x1+nx*g.w1/2,g.y1+ny*g.w1/2);ctx.lineTo(g.x2+nx*g.w2/2,g.y2+ny*g.w2/2);ctx.lineTo(g.x2-nx*g.w2/2,g.y2-ny*g.w2/2);ctx.lineTo(g.x1-nx*g.w1/2,g.y1-ny*g.w1/2);ctx.closePath();ctx.fill();
@@ -152,7 +153,8 @@ function drawSegs(ctx,segs,sp,flat){
   if(sp.mark){ctx.strokeStyle=sp.mark;ctx.lineWidth=1.2;const n=Math.floor(l/8);for(let i=0;i<n;i++){const t=(i+.5)/n,px=lerp(g.x1,g.x2,t),py=lerp(g.y1,g.y2,t),w=lerp(g.w1,g.w2,t)*(.25+((i*37)%5)/12),o=((i*53)%7-3)/10*w;ctx.beginPath();ctx.moveTo(px+nx*(o-w/2),py+ny*(o-w/2));ctx.lineTo(px+nx*(o+w/2),py+ny*(o+w/2));ctx.stroke();}}
  }
 }
-function drawLeaves(ctx,leaves,flat,alpha){ctx.globalAlpha=alpha==null?1:alpha;for(const L of leaves)for(const b of L.blobs){ctx.fillStyle=flat||b.c;ctx.beginPath();ctx.ellipse(L.x+b.dx,L.y+b.dy,b.rx,b.ry,b.rot,0,TAU);ctx.fill();}ctx.globalAlpha=1;}
+function ownSag(o){return o.own?sagAt(o.own,o.os):0;}
+function drawLeaves(ctx,leaves,flat,alpha){ctx.globalAlpha=alpha==null?1:alpha;for(const L of leaves){const oy=L.own?ownSag(L):0;for(const b of L.blobs){ctx.fillStyle=flat||b.c;ctx.beginPath();ctx.ellipse(L.x+b.dx,L.y+b.dy+oy,b.rx,b.ry,b.rot,0,TAU);ctx.fill();}}ctx.globalAlpha=1;}
 
 const CROWNS={round:{rx:150,ry:120,cy:260},tall:{rx:95,ry:175,cy:290},wide:{rx:205,ry:95,cy:235}};
 function genSpaceCol(seed,x,y,s,crown,N){
@@ -219,12 +221,12 @@ function genSplineTree(key,seed,x,gy,s){
  trunk.depth=0;for(const lb of limbs){lb.path.depth=lb.behind?-1:1;lb.path.lb=lb;}
  const twigs=[],leaves=[],blooms=[],twigsF=[],leavesF=[];const bloomV=key==='maple'?null:(key==='birch'?'cherry':key==='oak'?'dogwood':null);
  for(const lb of limbs){const P=lb.path;const m=2+Math.floor(r()*3);
-  for(let q=0;q<m;q++){const a=pathAt(P,P.len*(.3+.62*r()));let ang;if(sp.whorl)ang=Math.PI/2*(r()<.5?.7:-.6);else{const upSide=Math.sin(a.ang+.7)<Math.sin(a.ang-.7)?1:-1,sd=r()<.78?upSide:-upSide;ang=a.ang+sd*(.45+r()*.55);}
+  for(let q=0;q<m;q++){const os=P.len*(.3+.62*r()),a=pathAt(P,os);let ang;if(sp.whorl)ang=Math.PI/2*(r()<.5?.7:-.6);else{const upSide=Math.sin(a.ang+.7)<Math.sin(a.ang-.7)?1:-1,sd=r()<.78?upSide:-upSide;ang=a.ang+sd*(.45+r()*.55);}
    const l=(28+r()*34)*s;const mx=a.x+Math.cos(ang)*l*.5,my=a.y+Math.sin(ang)*l*.5,ex=mx+Math.cos(ang+(r()-.5)*.6)*l*.5,ey=my+Math.sin(ang+(r()-.5)*.6)*l*.5;const w=Math.max(1.2*s,a.w*.32);
    // about 40% of twigs grow toward the viewer and are drawn in front of the squirrel
-   const front=r()<.4;(front?twigsF:twigs).push({x1:a.x,y1:a.y,x2:mx,y2:my,w1:w,w2:w*.7},{x1:mx,y1:my,x2:ex,y2:ey,w1:w*.7,w2:w*.4});
-   leafBlob(r,sp,ex,ey,sp.leafR*s*1.25,front?leavesF:leaves);if(bloomV&&r()<.55)blooms.push({x:ex+(r()-.5)*8*s,y:ey+(r()-.5)*8*s,v:bloomV,rot:r()*TAU,front});}
-  const tip=pathAt(P,P.len);leafBlob(r,sp,tip.x,tip.y-4*s,sp.leafR*s*1.3,leaves);}
+   const front=r()<.4;(front?twigsF:twigs).push({x1:a.x,y1:a.y,x2:mx,y2:my,w1:w,w2:w*.7,own:P,os},{x1:mx,y1:my,x2:ex,y2:ey,w1:w*.7,w2:w*.4,own:P,os});
+   {const arr=front?leavesF:leaves;leafBlob(r,sp,ex,ey,sp.leafR*s*1.25,arr);Object.assign(arr[arr.length-1],{own:P,os});}if(bloomV&&r()<.55)blooms.push({x:ex+(r()-.5)*8*s,y:ey+(r()-.5)*8*s,v:bloomV,rot:r()*TAU,front,own:P,os});}
+  const tip=pathAt(P,P.len);leafBlob(r,sp,tip.x,tip.y-4*s,sp.leafR*s*1.3,leaves);Object.assign(leaves[leaves.length-1],{own:P,os:P.len});}
  const back=[],backTw=[],backLv=[];const nb=3+Math.floor(r()*3);
  for(let k=0;k<nb;k++){const st=trunk.len*(.25+.65*r());const P=pathAt(trunk,st);const sd=r()<.5?-1:1;const L=(sp.whorl?90:70+r()*90)*s;const rise=sp.whorl?-.1:.5+r()*.7;const pts=[[P.x,P.y]];
   for(let j=1;j<=3;j++){const t=j/3;pts.push([P.x+sd*L*t,P.y-L*rise*t*.7+(r()-.5)*8*s]);}
@@ -291,9 +293,9 @@ function drawFoot(ctx,lb,par,sp){const P=lb.path,fl=P.w0*1.3,s0=trimS(P,par);con
  ctx.fillStyle=sp.bark;ctx.beginPath();ctx.moveTo(Lk[0],Lk[1]);ctx.quadraticCurveTo(L0[0],L0[1],cL[0],cL[1]);ctx.lineTo(cR[0],cR[1]);ctx.quadraticCurveTo(R0[0],R0[1],Rk[0],Rk[1]);ctx.closePath();ctx.fill();}
 function drawTreeLayer(ctx,T,z,sagFor,sag){
  if(z===0){drawPath(ctx,T.trunk,T.sp,null,true);return;}
- for(const lb of T.limbs){if((lb.behind?-1:1)!==z)continue;const sg=sagFor===lb.path?sag:null;
+ for(const lb of T.limbs){if((lb.behind?-1:1)!==z)continue;const sg=(sagLoad(lb.path)||(lb.parent&&sagAt(lb.path,0)))?(c=>sagAt(lb.path,c)):null;
   if(lb.behind){const g=drawPath(ctx,lb.path,T.sp,sg,true);ctx.save();ctx.globalAlpha=.16;ctx.fillStyle='#120c06';ctx.beginPath();g.Lp.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]));for(let i=g.Rp.length-1;i>=0;i--)ctx.lineTo(g.Rp[i][0],g.Rp[i][1]);ctx.closePath();ctx.fill();ctx.restore();}
-  else{const par=lb.parent||T.trunk;drawFoot(ctx,lb,par,T.sp);drawPath(ctx,lb.path,T.sp,sg,true,{flare:lb.path.w0*1.3,parent:par});}}}
+  else{const par=lb.parent||T.trunk,fy=lb.parent?sagAt(lb.path,0):0;if(fy){ctx.save();ctx.translate(0,fy);}drawFoot(ctx,lb,par,T.sp);if(fy)ctx.restore();drawPath(ctx,lb.path,T.sp,sg,true,{flare:lb.path.w0*1.3,parent:par});}}}
 function drawTreeBody(ctx,T,sagFor,sag){for(const z of[-1,0,1])drawTreeLayer(ctx,T,z,sagFor,sag);}
 function drawSplineTree(ctx,T,opt){
  opt=opt||{};drawLeaves(ctx,T.leaves,null,opt.leafAlpha==null?.92:opt.leafAlpha);
@@ -797,7 +799,9 @@ function bakePool(){const q=W.pool.queue.shift();if(!q)return;
 }
 function surfacePos(){if(PLAY.motion==='nimble'&&!S.flying)return{x:S.x,y:S.y+sagAt(S.path,S.s),ang:S.ta||0,nx:0,ny:0,w:0};const a=pathAt(S.path,S.s);const nx=-S.side*Math.sin(a.ang),ny=S.side*Math.cos(a.ang);const sag=sagAt(S.path,S.s);return{x:a.x+nx*a.w/2,y:a.y+ny*a.w/2+sag,ang:a.ang,nx,ny,w:a.w};}
 function flexAt(P,s){if(P.kind!=='limb')return 1;const w=wAt(P,s);return clamp((w-2.5)/10,0,1);}
-function sagAt(P,s){if(P!==S.path||P.kind!=='limb'||S.flying)return 0;const us=Math.max(8,S.s),D=S.sag;return s<=us?D*(s/us)*(s/us):D*(1+(s-us)/us*.8);}
+function sagLoad(P){if(S.flying||P.kind!=='limb')return null;if(P===S.path)return{us:Math.max(8,S.s),D:S.sag};const c=S.path&&S.path.lb;if(c&&c.parent===P)return{us:Math.max(8,c.at),D:S.sag*.45};return null;}
+// a limb bends under the squirrel (or under a fork the squirrel is on), and carries everything that grows from it
+function sagAt(P,s){const L=sagLoad(P);let y=0;if(L){const{us,D}=L;y=s<=us?D*(s/us)*(s/us):D*(1+(s-us)/us*.8);}const lb=P.lb;if(lb&&lb.parent)y+=sagAt(lb.parent,lb.at);return y;}
 const input={down:false,mode:null,sx:0,sy:0,x:0,y:0,t0:0,id:null};
 function toWorld(px,py,w,h){return[(px-w/2)/cam.zoom+cam.x,(py-h/2)/cam.zoom+cam.y];}
 function sqScreen(w,h){const p=surfacePos();const cx=p.x+p.nx*12*SQS,cy=p.y+p.ny*12*SQS;return[(cx-cam.x)*cam.zoom+w/2,(cy-cam.y)*cam.zoom+h/2];}
@@ -861,7 +865,7 @@ function drawPlay(t,dt){
  grassBand(ctx,vx0,vx1,t,{seed:11,step:2.4,yMin:-8,yMax:1,hMin:7,hMax:19,bw:3.4,wind:.8,boost:.4,cols:GRASS_BACK},trunks);
  for(const T of trees)drawBack(ctx,T);
  for(const T of trees)drawLeaves(ctx,T.leaves,null,.9);
- for(const T of trees){drawSegs(ctx,T.twigs,T.sp);for(const b of T.blooms)if(!b.front)drawBloomSprite(ctx,b.v,b.x,b.y,6,b.rot);}
+ for(const T of trees){drawSegs(ctx,T.twigs,T.sp);for(const b of T.blooms)if(!b.front)drawBloomSprite(ctx,b.v,b.x,b.y+ownSag(b),6,b.rot);}
  for(const T of trees)drawTreeBody(ctx,T,S.path,sagFn);
  for(const T of trees)drawTreeBase(ctx,T);
  grassBand(ctx,vx0,vx1,t,{seed:23,step:2.2,yMin:1,yMax:9,hMin:6,hMax:17,bw:3,wind:1,boost:.9,cols:GRASS_FRONT},trunks);
@@ -901,7 +905,7 @@ function drawPlay(t,dt){
  // depth: redraw any branch layer that sits in front of the squirrel, only around the squirrel
  {const zs=squirrelDepth();if(zs<1.5){const p=surfacePos(),cx=p.x+p.nx*14,cy=p.y+p.ny*14;ctx.save();ctx.beginPath();ctx.arc(cx,cy,72,0,TAU);ctx.clip();
    for(const z of[-1,0,1])if(z>zs)for(const T of trees)drawTreeLayer(ctx,T,z,S.path,sagFn);ctx.restore();}}
- {const sp0=S.flying?{x:S.x,y:S.y}:surfacePos();for(const T of trees){drawSegs(ctx,T.twigsF,T.sp);for(const L of T.leavesF){const d=Math.hypot(L.x-sp0.x,L.y-sp0.y+10);drawLeaves(ctx,[L],null,d<42?.45+.5*clamp((d-20)/22,0,1):.95);}for(const b of T.blooms)if(b.front)drawBloomSprite(ctx,b.v,b.x,b.y,6,b.rot);}}
+ {const sp0=S.flying?{x:S.x,y:S.y}:surfacePos();for(const T of trees){drawSegs(ctx,T.twigsF,T.sp);for(const L of T.leavesF){const d=Math.hypot(L.x-sp0.x,L.y+ownSag(L)-sp0.y+10);drawLeaves(ctx,[L],null,d<42?.45+.5*clamp((d-20)/22,0,1):.95);}for(const b of T.blooms)if(b.front)drawBloomSprite(ctx,b.v,b.x,b.y+ownSag(b),6,b.rot);}}
  grassBand(ctx,vx0,vx1,t,{seed:53,step:7,yMin:25,yMax:34,hMin:6,hMax:15,bw:3.2,wind:1.1,boost:.5,cols:GRASS_FRINGE},trunks);
  drawFX(ctx);ctx.restore();
  drawFG(ctx,w,h,t,dt);
