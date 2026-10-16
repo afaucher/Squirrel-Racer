@@ -215,6 +215,10 @@ a{color:var(--accent)}
 </section>
 </main>
 
+<script src="data/squirrels.js"></script>
+<script src="data/birds.js"></script>
+<script src="data/trees.js"></script>
+<script src="data/flowers.js"></script>
 <script>
 "use strict";
 const TAU=Math.PI*2;
@@ -895,118 +899,94 @@ function setSound(on){AMB.on=on;if(on){startAudio();if(AMB.ctx){AMB.ctx.resume&&
 
 
 /* ================= NATURE: zones, species, artwork, calls, photos, missions, menu ================= */
+/* ---- species facts live in data/*.js; each claim there is {text, src, checked, sig}, and the game only needs the text ---- */
+const SPECIES_DATA=window.SPECIES_DATA;
+const facts=r=>Object.fromEntries(Object.entries(r).map(([k,v])=>[k,v&&typeof v==='object'&&'text' in v?v.text:v]));
 /* ---- bird artwork (from the Bird Sketchbook) ---- */
 const BirdArt=(function(){
 const BIRDS=[
- {id:'cardinal',zone:'east',name:'Northern cardinal',sci:'Cardinalis cardinalis',wiki:'Northern_cardinal',sex:1,pose:'perch',size:.95,
-  marks:'All-red body, tall pointed crest, black face mask, thick coral bill.',
+ {id:'cardinal',zone:'east',sex:1,pose:'perch',size:.95,
   up:'#b3202a',low:'#cf2b33',head:'#cf2b33',wing:'#97202a',tail:{c:'#8c1d25',len:17},crest:{len:8,c:'#cf2b33'},bill:{t:'cone',c:'#f0703c',len:5.2,d:4.6},leg:'#8b5a4a',
   hp:[['mask','#141114']]},
- {id:'bluejay',zone:'east',name:'Blue jay',sci:'Cyanocitta cristata',wiki:'Blue_jay',pose:'perch',size:1.15,bw:1.08,bh:.95,
-  marks:'Blue crest and back, black necklace, white-tipped wings and tail with black bars.',
+ {id:'bluejay',zone:'east',pose:'perch',size:1.15,bw:1.08,bh:.95,
   up:'#4a82cf',low:'#eceef0',head:'#eceef0',wing:'#3f78c8',tail:{c:'#3f74c4',len:22,p:[['bars','#14203a'],['tip','#ffffff']]},crest:{len:8,c:'#4a86d2'},bill:{t:'jay',c:'#16181c',len:5.4,d:2.8},leg:'#22252b',
   hp:[['cap','#4a86d2',-1.6],['eyeline','#16181d'],['necklace','#16181d']],wp:[['bars','#14203a'],['wingbar','#ffffff'],['tips','#ffffff']]},
- {id:'titmouse',zone:'east',name:'Tufted titmouse',sci:'Baeolophus bicolor',wiki:'Tufted_titmouse',pose:'horiz',size:.8,bh:1.05,hs:1.08,
-  marks:'Soft gray crest, black forehead patch, big dark eye, peach flanks.',
+ {id:'titmouse',zone:'east',pose:'horiz',size:.8,bh:1.05,hs:1.08,
   up:'#8b9198',low:'#eceeec',head:'#8f959c',wing:'#848a91',tail:{c:'#7f858c',len:15},crest:{len:6,c:'#8f959c'},bill:{t:'short',c:'#1c1d20',len:2.8,d:2.4},leg:'#5d6168',
   hp:[['face','#eef0ee',1],['forehead','#18181b']],bp:[['flank','#e7a774']]},
- {id:'wbnut',zone:'east',name:'White-breasted nuthatch',sci:'Sitta carolinensis',wiki:'White-breasted_nuthatch',pose:'headdown',size:.85,
-  marks:'Black cap, white face and breast, blue-gray back, chestnut under the tail. Climbs head-first down trunks.',
+ {id:'wbnut',zone:'east',pose:'headdown',size:.85,
   up:'#7d91a6',low:'#f3f4f2',head:'#f3f4f2',wing:'#6f8297',tail:{c:'#5f7186',len:9,p:[['tip','#e9ecef']]},bill:{t:'thin',c:'#3a3f46',len:6,d:1.7,up:1},leg:'#4b4f55',
   hp:[['capback','#15171a']],bp:[['vent','#a5532c']],wp:[['edge','#2a2f36']]},
- {id:'rbwood',zone:'east',name:'Red-bellied woodpecker',sci:'Melanerpes carolinus',wiki:'Red-bellied_woodpecker',sex:1,pose:'cling',size:1.0,bh:.92,
-  marks:'Zebra-barred back, red crown and nape, pale buff face, faint red belly wash.',
+ {id:'rbwood',zone:'east',sex:1,pose:'cling',size:1.0,bh:.92,
   up:'#f4f1e8',low:'#e9e1d2',head:'#ece6da',wing:'#f4f1e8',tail:{c:'#1a1a1c',len:14,p:[['bars','#f1ede4']]},bill:{t:'chisel',c:'#1b1b1d',len:6.5,d:2.3},leg:'#5d5a55',
   hp:[['crown','#d8262c'],['nape','#d8262c']],bp:[['backbars','#1a1a1c'],['wash','rgba(225,90,80,.5)']],wp:[['bars','#1a1a1c']]},
 
- {id:'canjay',zone:'boreal',name:'Canada jay',sci:'Perisoreus canadensis',wiki:'Canada_jay',pose:'perch',size:1.05,bw:1.05,bh:1.06,hs:1.05,
-  marks:'Fluffy gray body, white forehead and face, dark gray nape, short black bill.',
+ {id:'canjay',zone:'boreal',pose:'perch',size:1.05,bw:1.05,bh:1.06,hs:1.05,
   up:'#7d8085',low:'#c9cac6',head:'#f2f2ee',wing:'#6e7176',tail:{c:'#6e7176',len:19,p:[['tip','#d9dad6']]},bill:{t:'jay',c:'#18191b',len:4,d:2.4},leg:'#25262a',
   hp:[['hood','#2f3135']],wp:[['tips','#c8c9c6']]},
- {id:'borchick',zone:'boreal',name:'Boreal chickadee',sci:'Poecile hudsonicus',wiki:'Boreal_chickadee',pose:'horiz',size:.72,bw:.95,bh:1.05,hs:1.08,
-  marks:'Brown cap, black bib, white cheeks, cinnamon-brown flanks.',
+ {id:'borchick',zone:'boreal',pose:'horiz',size:.72,bw:.95,bh:1.05,hs:1.08,
   up:'#7a6a58',low:'#dad7d0',head:'#cfcfca',wing:'#6f6457',tail:{c:'#6c635a',len:14},bill:{t:'short',c:'#1a1a1c',len:2.4,d:2},leg:'#4b4c50',
   hp:[['cap','#6b4a30',-.3],['cheek','#f3f3ef'],['bib','#141416']],bp:[['flank','#b5793f']],wp:[['edge','#b9b0a3']]},
- {id:'rbnut',zone:'boreal',name:'Red-breasted nuthatch',sci:'Sitta canadensis',wiki:'Red-breasted_nuthatch',pose:'headdown',size:.72,
-  marks:'Black cap and eye line, white eyebrow, rusty underparts. Tiny, and head-first.',
+ {id:'rbnut',zone:'boreal',pose:'headdown',size:.72,
   up:'#7489a6',low:'#d98a4f',head:'#f2efe8',wing:'#667b98',tail:{c:'#5d6f88',len:8},bill:{t:'thin',c:'#2d3238',len:5,d:1.5,up:1},leg:'#4b4f55',
   hp:[['cap','#151618',-1.4],['brow','#ffffff'],['eyeline','#151618']]},
- {id:'wwcross',zone:'boreal',name:'White-winged crossbill',sci:'Loxia leucoptera',wiki:'White-winged_crossbill',sex:1,pose:'perch',size:.82,
-  marks:'Rose-pink body, black wings with two bold white bars, crossed bill tips for prying open cones.',
+ {id:'wwcross',zone:'boreal',sex:1,pose:'perch',size:.82,
   up:'#d24b67',low:'#e2637d',head:'#d85570',wing:'#1c1b1f',tail:{c:'#1c1b1f',len:13},bill:{t:'cross',c:'#3a3436',len:4.6,d:3},leg:'#3a3436',
   wp:[['wingbars2','#ffffff']]},
- {id:'sgrouse',zone:'boreal',name:'Spruce grouse',sci:'Canachites canadensis',wiki:'Spruce_grouse',sex:1,pose:'ground',size:1.5,bw:1.25,bh:1.12,hs:.9,
-  marks:'Chunky ground bird; gray above, black throat and breast with white spots, red comb over the eye.',
+ {id:'sgrouse',zone:'boreal',sex:1,pose:'ground',size:1.5,bw:1.25,bh:1.12,hs:.9,
   up:'#5a5650',low:'#1d1c1d',head:'#4f4c48',wing:'#57534c',tail:{c:'#1c1c1e',len:9,p:[['tip','#c88a4a']]},bill:{t:'grouse',c:'#1c1c1e',len:2.8,d:2.6},leg:'#8a7c6a',
   hp:[['bib','#141416',1.4],['comb','#e1302b']],bp:[['scallop','#45423d'],['spots','#ffffff']],wp:[['edge','#7b766e']]},
- {id:'junco',zone:'boreal',name:'Dark-eyed junco',sci:'Junco hyemalis',wiki:'Dark-eyed_junco',pose:'ground',size:.8,
-  marks:'Slate-gray hood and back, clean white belly, pale pink bill, white outer tail feathers.',
+ {id:'junco',zone:'boreal',pose:'ground',size:.8,
   up:'#4f5560',low:'#f2f2f0',head:'#4f5560',wing:'#4a4f58',tail:{c:'#3e434b',len:15,p:[['outer','#ffffff']]},bill:{t:'cone',c:'#ecbcb3',len:3.4,d:2.7},leg:'#a4877c',
   bp:[['breast','#4f5560']]},
 
- {id:'stjay',zone:'sw',name:"Steller's jay",sci:'Cyanocitta stelleri',wiki:"Steller%27s_jay",pose:'perch',size:1.15,bw:1.08,bh:.95,
-  marks:'Black crested head with pale forehead streaks, sooty back, deep blue wings, belly and tail.',
+ {id:'stjay',zone:'sw',pose:'perch',size:1.15,bw:1.08,bh:.95,
   up:'#2f3a52',low:'#2b4f9e',head:'#16171b',wing:'#2a55b0',tail:{c:'#2a52a8',len:22,p:[['bars','#121a33']]},crest:{len:9,c:'#16171b'},bill:{t:'jay',c:'#121316',len:5.4,d:2.8},leg:'#1c1d21',
   hp:[['fstreaks','#a9c6ec']],bp:[['breast','#20263a']],wp:[['bars','#121a33']]},
- {id:'pygnut',zone:'sw',name:'Pygmy nuthatch',sci:'Sitta pygmaea',wiki:'Pygmy_nuthatch',pose:'perch',size:.6,
-  marks:'Tiny. Gray-brown cap down to the eye, dark eye line, pale nape spot, creamy underparts.',
+ {id:'pygnut',zone:'sw',pose:'perch',size:.6,
   up:'#7a8ea8',low:'#efe7d6',head:'#efe7d6',wing:'#6e8099',tail:{c:'#5f7088',len:7},bill:{t:'thin',c:'#2d3238',len:4.4,d:1.5},leg:'#4b4f55',
   hp:[['capback2','#8a6c55'],['eyeline','#3a2f28'],['napespot','#f2ece0']]},
- {id:'mtnchick',zone:'sw',name:'Mountain chickadee',sci:'Poecile gambeli',wiki:'Mountain_chickadee',pose:'horiz',size:.72,bw:.95,bh:1.05,hs:1.08,
-  marks:'Black cap split by a white eyebrow, black bib, white cheeks, gray back.',
+ {id:'mtnchick',zone:'sw',pose:'horiz',size:.72,bw:.95,bh:1.05,hs:1.08,
   up:'#8b8e8f',low:'#dcddd9',head:'#f2f2ee',wing:'#7f8283',tail:{c:'#7c7f81',len:14},bill:{t:'short',c:'#1a1a1c',len:2.4,d:2},leg:'#4b4c50',
   hp:[['cap','#141416',-.2],['brow','#ffffff'],['bib','#141416']],bp:[['flank','#d3cbbd']],wp:[['edge','#c7c9c9']]},
- {id:'acornwp',zone:'sw',name:'Acorn woodpecker',sci:'Melanerpes formicivorus',wiki:'Acorn_woodpecker',sex:1,pose:'cling',size:.95,bh:.94,
-  marks:'Clown face: black chin, white forehead and throat ring, red crown, pale eye. Glossy black back, white belly.',
+ {id:'acornwp',zone:'sw',sex:1,pose:'cling',size:.95,bh:.94,
   up:'#15161a',low:'#f1ece1',head:'#16161a',wing:'#15161a',tail:{c:'#15161a',len:13},bill:{t:'chisel',c:'#161618',len:6,d:2.2},leg:'#4f4d4a',
   hp:[['clown','#f2e6b0'],['crown','#d5232c'],['iris','#f4f2ea']],bp:[['breastband','#16161a'],['streaks','#16161a']],wp:[['patch','#ffffff']]},
- {id:'wbluebird',zone:'sw',name:'Western bluebird',sci:'Sialia mexicana',wiki:'Western_bluebird',sex:1,pose:'perch',size:.85,
-  marks:'Deep blue hood, throat and wings, rusty breast and shoulders, gray belly.',
+ {id:'wbluebird',zone:'sw',sex:1,pose:'perch',size:.85,
   up:'#2a4fbd',low:'#a6adba',head:'#2a4fbd',wing:'#2a4fbd',tail:{c:'#284cb8',len:13},bill:{t:'thin',c:'#1d1d22',len:3.4,d:1.9},leg:'#25262a',
   bp:[['breast','#c8682e']],sp:[['shoulder','#b8632f']]},
- {id:'rfwarbler',zone:'sw',name:'Red-faced warbler',sci:'Cardellina rubrifrons',wiki:'Red-faced_warbler',pose:'perch',size:.66,
-  marks:'Bright red face and throat, black helmet, white nape spot, gray back, white rump.',
+ {id:'rfwarbler',zone:'sw',pose:'perch',size:.66,
   up:'#8e9399',low:'#f2f2f0',head:'#e0272f',wing:'#80868d',tail:{c:'#7a8087',len:15},bill:{t:'thin',c:'#2a2a2e',len:3.6,d:1.6},leg:'#6f6560',
   hp:[['helmet','#141416'],['napespot','#ffffff']],bp:[['breast','#e0272f',.7],['rump','#f5f5f3']],wp:[['wingbar','#d9dcdf']]},
 
- {id:'eujay',zone:'cal',name:'Eurasian jay',sci:'Garrulus glandarius',wiki:'Eurasian_jay',pose:'perch',size:1.15,bw:1.08,bh:.98,
-  marks:'Pinkish-brown body, black moustache, streaked crown, pale eye, bright blue barred wing patch.',
+ {id:'eujay',zone:'cal',pose:'perch',size:1.15,bw:1.08,bh:.98,
   up:'#b8907e',low:'#cba693',head:'#c4a291',wing:'#1d1c20',tail:{c:'#141416',len:19},crest:{len:4,c:'#e6dbd2',streak:'#2a2422'},bill:{t:'jay',c:'#1b1b1d',len:5,d:2.8},leg:'#b29a8a',
   hp:[['streakcrown','#ece4dc'],['chin','#f5f2ee'],['moustache','#141416'],['iris','#b8d2ee']],bp:[['rump','#ffffff']],wp:[['panel','#3f86d6'],['patch','#ffffff']]},
- {id:'crestit',zone:'cal',name:'Crested tit',sci:'Lophophanes cristatus',wiki:'European_crested_tit',pose:'perch',size:.72,bh:1.04,hs:1.06,
-  marks:'Black-and-white speckled crest, white face with a black C-shaped line, black bib and collar, brown back.',
+ {id:'crestit',zone:'cal',pose:'perch',size:.72,bh:1.04,hs:1.06,
   up:'#8b6e52',low:'#e3d6c2',head:'#f1ede6',wing:'#7d644c',tail:{c:'#7b6249',len:14},crest:{len:8,c:'#f1ede6',barred:'#141416'},bill:{t:'short',c:'#1a1a1c',len:2.4,d:2},leg:'#5d5a57',
   hp:[['ccurve','#141416'],['bib','#141416'],['collar','#141416']],bp:[['flank','#c9a985']]},
- {id:'gspot',zone:'cal',name:'Great spotted woodpecker',sci:'Dendrocopos major',wiki:'Great_spotted_woodpecker',sex:1,pose:'cling',size:.95,bh:.94,
-  marks:'Black and white with big white shoulder ovals, bright red under the tail, red nape patch.',
+ {id:'gspot',zone:'cal',sex:1,pose:'cling',size:.95,bh:.94,
   up:'#141416',low:'#f0ece2',head:'#f3efe6',wing:'#141416',tail:{c:'#141416',len:13,p:[['outer','#f3efe6']]},bill:{t:'chisel',c:'#1b1b1d',len:6.3,d:2.2},leg:'#5d5a55',
   hp:[['cap','#141416',-3.4],['napered','#d8202a'],['moustache3','#141416']],bp:[['vent','#d8202a']],wp:[['spots','#ffffff']],sp:[['shoulder','#ffffff']]},
- {id:'coaltit',zone:'cal',name:'Coal tit',sci:'Periparus ater',wiki:'Coal_tit',pose:'perch',size:.62,bh:1.04,hs:1.08,
-  marks:'Black cap and bib, white cheeks, white patch on the nape, two white wing bars.',
+ {id:'coaltit',zone:'cal',pose:'perch',size:.62,bh:1.04,hs:1.08,
   up:'#7d8079',low:'#ddd1bd',head:'#f1ede4',wing:'#6f736d',tail:{c:'#696c66',len:13},bill:{t:'short',c:'#1a1a1c',len:2.4,d:1.9},leg:'#4b4c50',
   hp:[['cap','#141416',.6],['cheek','#f3f1ea'],['bib','#141416'],['napespot','#f3f1ea']],wp:[['wingbars2','#f1efe8']]},
- {id:'robin',zone:'cal',name:'European robin',sci:'Erithacus rubecula',wiki:'European_robin',pose:'ground',size:.78,bw:.95,bh:1.12,
-  marks:'Round; brown above, orange face and breast edged with gray, white belly.',
+ {id:'robin',zone:'cal',pose:'ground',size:.78,bw:.95,bh:1.12,
   up:'#7a6650',low:'#f0ece3',head:'#7a6650',wing:'#6f5d49',tail:{c:'#6e5b47',len:13},bill:{t:'thin',c:'#2a2522',len:3.6,d:1.8},leg:'#7b6a5d',
   hp:[['face','#e2683a']],bp:[['breast','#e2683a'],['breastedge','#a9aaa7']]},
- {id:'chaffinch',zone:'cal',name:'Common chaffinch',sci:'Fringilla coelebs',wiki:'Common_chaffinch',sex:1,pose:'perch',size:.8,
-  marks:'Blue-gray crown, rosy face and breast, chestnut back, green rump, bold white shoulder and wing bar.',
+ {id:'chaffinch',zone:'cal',sex:1,pose:'perch',size:.8,
   up:'#8a5a3c',low:'#d9a08a',head:'#6f86a8',wing:'#1d1b1d',tail:{c:'#1f1d20',len:15,p:[['outer','#ffffff']]},bill:{t:'cone',c:'#8d9aa8',len:4,d:3.2},leg:'#8a7a70',
   hp:[['face','#d48e7a']],bp:[['breast','#d48e7a'],['rump','#93a55a'],['belly','#efe6df']],wp:[['patch','#ffffff'],['wingbar','#f3e9c0']]},
- {id:'varthrush',zone:'pnw',name:'Varied thrush',sci:'Ixoreus naevius',wiki:'Varied_thrush',sex:1,pose:'ground',size:.95,bh:1.04,
-  marks:'Slate-blue back, orange throat and breast crossed by a black band, orange eyebrow and wing bars, dark face.',
+ {id:'varthrush',zone:'pnw',sex:1,pose:'ground',size:.95,bh:1.04,
   up:'#4c5866',low:'#e8892e',head:'#4c5866',wing:'#46525e',tail:{c:'#3f4a55',len:17},bill:{t:'thin',c:'#2a2a2c',len:4.4,d:2.6},leg:'#d6a283',
   hp:[['brow','#ea8b30'],['eyeline','#22262c']],bp:[['breastband','#1f2328'],['vent','#eceae4']],wp:[['wingbars2','#ea8b30']]},
- {id:'chbchick',zone:'pnw',name:'Chestnut-backed chickadee',sci:'Poecile rufescens',wiki:'Chestnut-backed_chickadee',pose:'horiz',size:.7,bw:.95,bh:1.05,hs:1.08,
-  marks:'Sooty-brown cap, black bib, white cheeks, rich chestnut back and flanks.',
+ {id:'chbchick',zone:'pnw',pose:'horiz',size:.7,bw:.95,bh:1.05,hs:1.08,
   up:'#8a4426',low:'#e9e7e2',head:'#efefea',wing:'#6e6a66',tail:{c:'#6a6764',len:14},bill:{t:'short',c:'#1a1a1c',len:2.4,d:2},leg:'#4b4c50',
   hp:[['cap','#2a221e',-.3],['cheek','#f6f6f2'],['bib','#141416']],bp:[['flank','#9a4f2a']],wp:[['edge','#bdb8b0']]},
- {id:'pileated',zone:'pnw',name:'Pileated woodpecker',sci:'Dryocopus pileatus',wiki:'Pileated_woodpecker',sex:1,pose:'cling',size:1.4,bh:.95,
-  marks:'Crow-sized and black, with a flaming red crest, white stripes across the face and down the neck, and a red moustache (male).',
+ {id:'pileated',zone:'pnw',sex:1,pose:'cling',size:1.4,bh:.95,
   up:'#18181b',low:'#1d1d20',head:'#1d1d20',wing:'#18181b',tail:{c:'#151517',len:17},crest:{len:10,c:'#d8202a'},bill:{t:'chisel',c:'#4a4a4e',len:7.5,d:2.6},leg:'#5d5a55',
   hp:[['crown','#d8202a'],['brow','#ffffff'],['ccurve','#ffffff'],['moustache','#d8202a']]},
- {id:'pacwren',zone:'pnw',name:'Pacific wren',sci:'Troglodytes pacificus',wiki:'Pacific_wren',pose:'horiz',size:.55,bw:.95,bh:1.12,
-  marks:'Tiny, round and dark brown with fine barring, a pale eyebrow and a stubby tail often cocked upright.',
+ {id:'pacwren',zone:'pnw',pose:'horiz',size:.55,bw:.95,bh:1.12,
   up:'#7a4e30',low:'#b08860',head:'#7a4e30',wing:'#6a4430',tail:{c:'#5a3f2c',len:6,p:[['bars','#3a2a1e']]},bill:{t:'thin',c:'#2a2420',len:3.4,d:1.4},leg:'#8a6a58',
   hp:[['brow','#b8926e']],bp:[['backbars','#3e2c20'],['scallop','#5a3e2c']],wp:[['bars','#3a2a1e']]},
 ];
@@ -1144,63 +1124,10 @@ function idle(sp,t,seed){const st={t};const r=(a)=>Math.sin(t*a+seed);
 
 return{drawBird,idle,BIRDS};})();
 const BIRD_SP={};for(const b of BirdArt.BIRDS)BIRD_SP[b.id]=b;
-Object.assign(BIRD_SP.cardinal,{range:'Eastern and central US, southeastern Canada and Mexico',fact:'Both males and females sing, often in duets.'});
-Object.assign(BIRD_SP.bluejay,{range:'Eastern and central North America',fact:'Blue jays bury acorns like squirrels do, and the forgotten ones grow into oaks.'});
-Object.assign(BIRD_SP.titmouse,{pl:'Tufted titmice',range:'Eastern United States',fact:'Titmice hoard seeds in bark crevices, usually close to the feeder or tree they came from.'});
-Object.assign(BIRD_SP.wbnut,{range:'Wooded areas across most of North America',fact:'Nuthatches wedge nuts into bark and hammer them open, the "hatch" in their name.'});
-Object.assign(BIRD_SP.rbwood,{range:'Eastern United States',fact:'Its red belly is only a faint wash; the red crown is much easier to see.'});
-Object.assign(BIRD_SP.canjay,{range:'Boreal and mountain forests of Canada, Alaska and the western US',fact:'Canada jays store food under bark with sticky saliva and raise chicks in late winter.'});
-Object.assign(BIRD_SP.borchick,{range:'Boreal forests of Canada, Alaska and northern New England',fact:'Boreal chickadees cache thousands of seeds and insects to survive the winter.'});
-Object.assign(BIRD_SP.rbnut,{range:'Conifer forests of Canada, Alaska and the western and northeastern US',fact:'They smear sticky conifer resin around their nest hole to keep intruders out.'});
-Object.assign(BIRD_SP.wwcross,{range:'Boreal forests of North America and Eurasia',fact:'The crossed bill pries open spruce cones, the same food red squirrels hoard.'});
-Object.assign(BIRD_SP.sgrouse,{pl:'Spruce grouse',range:'Boreal forests of Canada, Alaska and the northernmost US',fact:'All winter, spruce grouse live almost entirely on conifer needles.'});
-Object.assign(BIRD_SP.junco,{range:'Across North America; breeds in northern and mountain forests',fact:'Juncos flash white outer tail feathers when they fly up from the ground.'});
-Object.assign(BIRD_SP.stjay,{range:'Western North America, from Alaska to Central America',fact:"Steller's jays can mimic the screams of hawks."});
-Object.assign(BIRD_SP.pygnut,{range:'Pine forests of the western US and Mexico',fact:'On cold nights, dozens of pygmy nuthatches may huddle together in one tree hole.'});
-Object.assign(BIRD_SP.mtnchick,{range:'Mountain conifer forests of western North America',fact:'Its white eyebrow is the quickest way to tell it from other chickadees.'});
-Object.assign(BIRD_SP.acornwp,{range:'Oak and pine-oak woodlands of the western US, Mexico and Central America',fact:'Families store thousands of acorns in holes drilled into one "granary" tree.'});
-Object.assign(BIRD_SP.wbluebird,{range:'Western United States and Mexico',fact:'Western bluebirds nest in old woodpecker holes.'});
-Object.assign(BIRD_SP.rfwarbler,{range:'Mountains of Arizona and New Mexico in summer; Mexico and Central America in winter',fact:'Unusually for a warbler, it nests on the ground under a plant or log.'});
-Object.assign(BIRD_SP.eujay,{range:'Europe, North Africa and Asia',fact:'One Eurasian jay can bury thousands of acorns in autumn, planting new oak woods.'});
-Object.assign(BIRD_SP.crestit,{range:'Conifer forests of Europe; in Britain only the Scottish Highlands',fact:'Crested tits nest in rotten pine stumps, and sometimes in old red squirrel dreys.'});
-Object.assign(BIRD_SP.gspot,{range:'Europe, North Africa and across temperate Asia',fact:'It wedges pine cones into a bark "anvil" to pick out the seeds.'});
-Object.assign(BIRD_SP.coaltit,{range:'Europe, North Africa and Asia',fact:'Coal tits hide spruce and pine seeds to eat later, just like squirrels.'});
-Object.assign(BIRD_SP.robin,{range:'Europe, western Asia and North Africa',fact:'Robins sing all winter to defend their territory.'});
-Object.assign(BIRD_SP.varthrush,{range:'Alaska and western Canada to northern California and the northern Rockies; some winter south to California',fact:'Its song is a long, eerie, buzzy whistle, then a pause and another on a different pitch.'});
-Object.assign(BIRD_SP.chbchick,{range:'Pacific coast from southern Alaska to central California, plus a small population in the northern Rockies',fact:'It feeds higher in the conifers than other chickadees and often travels in mixed flocks.'});
-Object.assign(BIRD_SP.pileated,{range:'Forests across Canada, the eastern US, the northern Rockies and the Pacific coast to California',fact:'It chisels big rectangular holes hunting carpenter ants, and its old holes become homes for owls and flying squirrels.'});
-Object.assign(BIRD_SP.pacwren,{range:'Pacific coast from Alaska to California, and inland to the northern Rockies',fact:'One of the smallest birds in its forest, with one of the longest, most complex songs.'});
-Object.assign(BIRD_SP.chaffinch,{pl:'Common chaffinches',range:'Europe, North Africa and western Asia',fact:'Its song speeds up and tumbles down the scale, ending in a flourish.'});
+for(const[id,r]of Object.entries(SPECIES_DATA.birds))Object.assign(BIRD_SP[id],facts(r));
 
 /* ---- trees (species shown in the forest; every nut and cone points to one) ---- */
-const TREE_INFO={
- whiteoak:['White oak','Quercus alba','Eastern and central US, southeastern Canada'],
- redoak:['Northern red oak','Quercus rubra','Eastern US and southeastern Canada'],
- hickory:['Shagbark hickory','Carya ovata','Eastern US and southeastern Canada'],
- beech:['American beech','Fagus grandifolia','Eastern US and southeastern Canada'],
- sugarmaple:['Sugar maple','Acer saccharum','Northeastern US and southeastern Canada'],
- whitespruce:['White spruce','Picea glauca','Across Canada and Alaska'],
- blackspruce:['Black spruce','Picea mariana','Canada, Alaska and the northern US'],
- balsamfir:['Balsam fir','Abies balsamea','Eastern and central Canada, northeastern US'],
- jackpine:['Jack pine','Pinus banksiana','Canada and the northern US'],
- paperbirch:['Paper birch','Betula papyrifera','Across Canada, Alaska and the northern US'],
- aspen:['Quaking aspen','Populus tremuloides','Canada, Alaska and the mountains of the western US'],
- ponderosa:['Ponderosa pine','Pinus ponderosa','Western North America'],
- gambeloak:['Gambel oak','Quercus gambelii','Southern Rocky Mountains and the Southwest'],
- douglasfir:['Douglas-fir','Pseudotsuga menziesii','Western North America'],
- pinyon:['Colorado pinyon','Pinus edulis','Colorado Plateau and the Southwest US'],
- scotspine:['Scots pine','Pinus sylvestris',"Europe and northern Asia; Scotland's native pine"],
- silverbirch:['Silver birch','Betula pendula','Europe and western and central Asia'],
- hazel:['Common hazel','Corylus avellana','Europe and western Asia'],
- pedoak:['Pedunculate oak','Quercus robur','Europe to the Caucasus'],
- eubeech:['European beech','Fagus sylvatica','Western and central Europe'],
- rowan:['Rowan','Sorbus aucuparia','Europe and northern Asia'],
- westernhemlock:['Western hemlock','Tsuga heterophylla','Pacific coast from Alaska to northern California, and inland to the northern Rockies'],
- westernredcedar:['Western redcedar','Thuja plicata','Pacific Northwest and the northern Rockies'],
- sitkaspruce:['Sitka spruce','Picea sitchensis','Pacific coast from Alaska to northern California'],
- bigleafmaple:['Bigleaf maple','Acer macrophyllum','Pacific coast from British Columbia to California'],
- redalder:['Red alder','Alnus rubra','Pacific coast from Alaska to California'],
- beakedhazel:['Beaked hazel','Corylus cornuta','Across much of North America; the western variety is called California hazelnut']};
+const TREE_INFO={};for(const[id,r]of Object.entries(SPECIES_DATA.trees)){const t=facts(r);TREE_INFO[id]=[t.name,t.sci,t.range];}
 (function(){const S0=SPECIES,mk=(base,o)=>Object.assign({},S0[base],o);
  Object.assign(SPECIES,{
   whiteoak:mk('oak',{bark:'#857d72',barkHi:'#a39b8e',barkLo:'#5c564d',bloom:'dogwood'}),
@@ -1238,84 +1165,85 @@ const TREE_INFO={
 
 /* ---- nuts and cones ---- */
 const NUTS={
- whiteacorn:{name:'White oak acorn',tree:'whiteoak',fact:'Sweet and low in tannin, so squirrels usually eat white oak acorns right away.',art:{t:'acorn',nut:'#a8743c',cap:'#8a7a55',capD:.3,w:4.2,h:8.6,warty:1}},
- redacorn:{name:'Northern red oak acorn',tree:'redoak',fact:'Bitter with tannin and slow to sprout, so squirrels bury red oak acorns to eat later.',art:{t:'acorn',nut:'#8e5a2e',cap:'#6f5a3e',capD:.2,w:5,h:7.2,flat:1}},
- hickorynut:{name:'Shagbark hickory nut',tree:'hickory',fact:'A thick husk splits into four parts around one of the richest nuts in the forest.',art:{t:'hickory'}},
- beechnut:{name:'American beechnut',tree:'beech',fact:'Two or three three-sided nuts ride in each soft-spined husk.',art:{t:'beech',col:'#8a6a44'}},
- whitesprucecone:{name:'White spruce cone',tree:'whitespruce',fact:'Red squirrels cut thousands of these in late summer and pile them in middens.',art:{t:'cone',len:13,wid:4.2,col:'#a17a4e',hi:'#c49a68'}},
- blacksprucecone:{name:'Black spruce cone',tree:'blackspruce',fact:'Small, purplish cones that can stay on the tree for years.',art:{t:'cone',len:7.5,wid:4.2,col:'#6e4a46',hi:'#8e6660',egg:1}},
- balsamfircone:{name:'Balsam fir cone',tree:'balsamfir',fact:'It stands upright on the branch and falls apart there, so squirrels cut them first.',art:{t:'cone',len:10,wid:4.4,col:'#5a3f62',hi:'#7d5f86',upright:1,barrel:1}},
- jackpinecone:{name:'Jack pine cone',tree:'jackpine',fact:'Sealed with resin; many only open after the heat of a forest fire.',art:{t:'cone',len:8.5,wid:4.2,col:'#8a6a44',hi:'#a8885c',curve:.5}},
- ponderosacone:{name:'Ponderosa pine cone',tree:'ponderosa',fact:'Each scale ends in a small prickle.',art:{t:'cone',len:12,wid:7.4,col:'#8a5232',hi:'#b07450',egg:1,open:1,prickle:1}},
- gambelacorn:{name:'Gambel oak acorn',tree:'gambeloak',fact:'Acorn woodpeckers, jays and squirrels all depend on these acorns.',art:{t:'acorn',nut:'#a07040',cap:'#7a6a4a',capD:.45,w:4.4,h:7.4,warty:1}},
- douglascone:{name:'Douglas-fir cone',tree:'douglasfir',fact:'Its three-pointed bracts look like the hind legs and tail of a mouse hiding in the cone.',art:{t:'cone',len:10.5,wid:4.6,col:'#9a6e44',hi:'#b88c5c',bract:'#c9b48a'}},
- pinyonnut:{name:'Pinyon nut',tree:'pinyon',fact:'Big wingless seeds; jays and squirrels plant new pinyons by burying them.',art:{t:'cone',len:6.5,wid:6.2,col:'#8a5e3a',hi:'#a87a52',open:1,nuts:'#6a4428',egg:1}},
- scotscone:{name:'Scots pine cone',tree:'scotspine',fact:'Red squirrels strip off the scales and leave a neat bare core.',art:{t:'cone',len:7.6,wid:4.4,col:'#8a7a66',hi:'#a8998a',egg:1,bosses:1}},
- hazelnut:{name:'Hazelnut',tree:'hazel',fact:'Red squirrels split hazelnuts cleanly in two; mice gnaw a round hole instead.',art:{t:'hazel'}},
- eubeechnut:{name:'European beechnut',tree:'eubeech',fact:'Beech trees fruit heavily every few years, in what are called mast years.',art:{t:'beech',col:'#7a5a3a'}},
- pedacorn:{name:'Pedunculate oak acorn',tree:'pedoak',fact:'Named for the long stalk, or peduncle, that its acorns hang from.',art:{t:'acorn',nut:'#9a6a36',cap:'#7a6a4a',capD:.28,w:4.2,h:8.2,stalk:7,warty:1}},
- hemlockcone:{name:'Western hemlock cone',tree:'westernhemlock',fact:'Tiny cones, only about 1.5 to 2.5 cm long, hang from the twigs.',art:{t:'cone',len:5.5,wid:3.4,col:'#9a7450',hi:'#b8926a',egg:1}},
- sitkacone:{name:'Sitka spruce cone',tree:'sitkaspruce',fact:'Its thin, papery scales have ragged, toothed edges, and Douglas squirrels eat the seeds.',art:{t:'cone',len:10,wid:4.2,col:'#c09060',hi:'#dcb07c'}},
- beakednut:{name:'Beaked hazelnut',tree:'beakedhazel',fact:'The bristly husk around each nut stretches into a tube, the "beak" in its name.',art:{t:'hazel',beak:1}},
+ whiteacorn:{art:{t:'acorn',nut:'#a8743c',cap:'#8a7a55',capD:.3,w:4.2,h:8.6,warty:1}},
+ redacorn:{art:{t:'acorn',nut:'#8e5a2e',cap:'#6f5a3e',capD:.2,w:5,h:7.2,flat:1}},
+ hickorynut:{art:{t:'hickory'}},
+ beechnut:{art:{t:'beech',col:'#8a6a44'}},
+ whitesprucecone:{art:{t:'cone',len:13,wid:4.2,col:'#a17a4e',hi:'#c49a68'}},
+ blacksprucecone:{art:{t:'cone',len:7.5,wid:4.2,col:'#6e4a46',hi:'#8e6660',egg:1}},
+ balsamfircone:{art:{t:'cone',len:10,wid:4.4,col:'#5a3f62',hi:'#7d5f86',upright:1,barrel:1}},
+ jackpinecone:{art:{t:'cone',len:8.5,wid:4.2,col:'#8a6a44',hi:'#a8885c',curve:.5}},
+ ponderosacone:{art:{t:'cone',len:12,wid:7.4,col:'#8a5232',hi:'#b07450',egg:1,open:1,prickle:1}},
+ gambelacorn:{art:{t:'acorn',nut:'#a07040',cap:'#7a6a4a',capD:.45,w:4.4,h:7.4,warty:1}},
+ douglascone:{art:{t:'cone',len:10.5,wid:4.6,col:'#9a6e44',hi:'#b88c5c',bract:'#c9b48a'}},
+ pinyonnut:{art:{t:'cone',len:6.5,wid:6.2,col:'#8a5e3a',hi:'#a87a52',open:1,nuts:'#6a4428',egg:1}},
+ scotscone:{art:{t:'cone',len:7.6,wid:4.4,col:'#8a7a66',hi:'#a8998a',egg:1,bosses:1}},
+ hazelnut:{art:{t:'hazel'}},
+ eubeechnut:{art:{t:'beech',col:'#7a5a3a'}},
+ pedacorn:{art:{t:'acorn',nut:'#9a6a36',cap:'#7a6a4a',capD:.28,w:4.2,h:8.2,stalk:7,warty:1}},
+ hemlockcone:{art:{t:'cone',len:5.5,wid:3.4,col:'#9a7450',hi:'#b8926a',egg:1}},
+ sitkacone:{art:{t:'cone',len:10,wid:4.2,col:'#c09060',hi:'#dcb07c'}},
+ beakednut:{art:{t:'hazel',beak:1}}
 };
+for(const[id,r]of Object.entries(SPECIES_DATA.nuts))Object.assign(NUTS[id],facts(r));
 for(const[id,n]of Object.entries(NUTS)){const ti=TREE_INFO[n.tree];n.id=id;n.sci=ti[1];n.range=ti[2];n.treeName=ti[0];}
 
 /* ---- wildflowers ---- */
 const FLW={
- bloodroot:['Bloodroot','Sanguinaria canadensis','Eastern North America',{k:'polar',v:{k:8,p:.75,notch:0,c1:'#f2f0e8',c2:'#ffffff',center:'#efbe2c',layers:1}}],
- trillium:['Large-flowered trillium','Trillium grandiflorum','Eastern North America',{k:'polar',v:{k:3,p:.55,notch:0,c1:'#efece4',c2:'#ffffff',center:'#e8d36a',layers:1},R:9}],
- vabluebells:['Virginia bluebells','Mertensia virginica','Eastern United States',{k:'bells',c:'#6f8fe0',bud:'#e08ab0',n:5,cluster:1}],
- wildcolumbine:['Wild columbine','Aquilegia canadensis','Eastern North America',{k:'columbine',c1:'#d8302c',c2:'#f4d040',nod:1}],
- mayapple:['Mayapple','Podophyllum peltatum','Eastern North America',{k:'mayapple'}],
- springbeauty:['Spring beauty','Claytonia virginica','Eastern United States',{k:'polar',v:{k:5,p:.6,notch:0,c1:'#f5dbe6',c2:'#ffffff',center:'#f0c0d0',layers:1,stripe:'#d86a9a'},R:5}],
- wildgeranium:['Wild geranium','Geranium maculatum','Eastern North America',{k:'polar',v:{k:5,p:.7,notch:0,c1:'#c79bd6',c2:'#ecdcf2',center:'#f4ecf6',layers:1,stripe:'#a77ab8'},R:7}],
- blackeyedsusan:['Black-eyed Susan','Rudbeckia hirta','Across North America',{k:'phyllo',v:'susan'}],
- neaster:['New England aster','Symphyotrichum novae-angliae','Eastern and central North America',{k:'phyllo',v:'aster'}],
- goldenrod:['Canada goldenrod','Solidago canadensis','Across North America',{k:'raceme',v:'goldenrod'}],
- coneflower:['Purple coneflower','Echinacea purpurea','Central and eastern United States',{k:'droop',ray:'#c45a9a',ray2:'#a8407e',cone:'#a8541e',coneH:.5}],
- fireweed:['Fireweed','Chamaenerion angustifolium','Across the Northern Hemisphere',{k:'raceme',v:'fireweed'}],
- bunchberry:['Bunchberry','Cornus canadensis','Northern North America and northeast Asia',{k:'polar',v:{k:4,p:.45,notch:.2,c1:'#eee9dc',c2:'#ffffff',center:'#7a8a3a',layers:1},R:7,low:1}],
- twinflower:['Twinflower','Linnaea borealis','Northern forests around the world',{k:'bells',c:'#f0a8c4',n:2,twin:1}],
- pricklyrose:['Prickly wild rose','Rosa acicularis','Northern North America, Europe and Asia',{k:'polar',v:{k:5,p:.5,notch:.08,c1:'#e5739a',c2:'#f8c4d6',center:'#f0c64a',layers:1},R:9}],
- ladyslipper:["Showy lady's-slipper",'Cypripedium reginae','Northeastern North America',{k:'slipper'}],
- pearly:['Pearly everlasting','Anaphalis margaritacea','Across North America and Asia',{k:'cluster',c:'#f4f2ea',eye:'#e6c64a'}],
- marshmarigold:['Marsh marigold','Caltha palustris','Wetlands across the Northern Hemisphere',{k:'polar',v:{k:6,p:.45,notch:0,c1:'#f2c018',c2:'#ffe46a',center:'#e0a000',layers:1},R:7,low:1}],
- labradortea:['Labrador tea','Rhododendron groenlandicum','Northern North America and Greenland',{k:'cluster',c:'#fbfaf4',eye:'#f2ecd0',dome:1}],
- arcticlupine:['Arctic lupine','Lupinus arcticus','Alaska and northwestern Canada',{k:'raceme',v:'lupine'}],
- woodlily:['Wood lily','Lilium philadelphicum','Across much of North America',{k:'polar',v:{k:6,p:.55,notch:0,c1:'#e2562a',c2:'#f49a3a',center:'#f2c040',layers:1,spots:'#4a1e10'},R:9}],
- harebell:['Harebell','Campanula rotundifolia','Across the Northern Hemisphere',{k:'bells',c:'#7d84d8',n:2}],
- scarletgilia:['Scarlet gilia','Ipomopsis aggregata','Western North America',{k:'raceme',v:'gilia'}],
- paintbrush:['Wholeleaf Indian paintbrush','Castilleja integra','Southwest US and northern Mexico',{k:'raceme',v:'paintbrush'}],
- silverylupine:['Silvery lupine','Lupinus argenteus','Western North America',{k:'raceme',v:'silverlupine'}],
- blueflax:['Blue flax','Linum lewisii','Western North America',{k:'polar',v:{k:5,p:.6,notch:0,c1:'#7fa8e0',c2:'#c4d8f4',center:'#f0e08a',layers:1,stripe:'#5a80c8'},R:7}],
- rmiris:['Rocky Mountain iris','Iris missouriensis','Western North America',{k:'iris'}],
- bluecolumbine:['Colorado blue columbine','Aquilegia coerulea','Southern Rocky Mountains',{k:'columbine',c1:'#7d9ae0',c2:'#fbfaf4'}],
- goldeneye:['Showy goldeneye','Heliomeris multiflora','Rocky Mountains and the Southwest',{k:'phyllo',v:'goldeneye'}],
- globemallow:['Scarlet globemallow','Sphaeralcea coccinea','Western and central North America',{k:'polar',v:{k:5,p:.5,notch:.05,c1:'#e2683a',c2:'#f3a36a',center:'#f0c66a',layers:1},R:6}],
- mexicanhat:['Mexican hat','Ratibida columnifera','Central and western North America',{k:'droop',ray:'#c8402a',ray2:'#f2b62a',cone:'#5a3a22',coneH:1.4}],
- blanketflower:['Common blanketflower','Gaillardia aristata','Western North America',{k:'phyllo',v:'blanket'}],
- penstemon:['Beardlip penstemon','Penstemon barbatus','Southwest US and Mexico',{k:'raceme',v:'penstemon'}],
- bluebell:['Bluebell','Hyacinthoides non-scripta',"Western Europe; Britain has about half the world's bluebells",{k:'bells',c:'#5a5ad0',n:6,oneSide:1}],
- woodanemone:['Wood anemone','Anemonoides nemorosa','Europe',{k:'polar',v:{k:6,p:.55,notch:0,c1:'#f6eef0',c2:'#ffffff',center:'#e8d36a',layers:1},R:6}],
- primrose:['Primrose','Primula vulgaris','Western and southern Europe',{k:'polar',v:{k:5,p:.6,notch:.28,c1:'#f2e49a',c2:'#fbf3c8',center:'#e0a83a',layers:1},R:7,low:1}],
- celandine:['Lesser celandine','Ficaria verna','Europe and western Asia',{k:'polar',v:{k:8,p:.9,notch:0,c1:'#f6cc20',c2:'#ffe873',center:'#e0a800',layers:1},R:6,low:1}],
- foxglove:['Foxglove','Digitalis purpurea','Western Europe',{k:'raceme',v:'foxglove'}],
- woodsorrel:['Wood sorrel','Oxalis acetosella','Europe and northern Asia',{k:'polar',v:{k:5,p:.6,notch:.1,c1:'#f4eef6',c2:'#ffffff',center:'#f2e6a0',layers:1,stripe:'#b58ac8'},R:5,low:1}],
- heather:['Heather','Calluna vulgaris','Europe and Asia Minor',{k:'raceme',v:'heather'}],
- redcampion:['Red campion','Silene dioica','Europe',{k:'polar',v:{k:5,p:.55,notch:.45,c1:'#d8487a',c2:'#ef8ab0',center:'#f2c6d6',layers:1},R:7}],
- wintergreen:['One-flowered wintergreen','Moneses uniflora','Northern forests around the world',{k:'polar',v:{k:5,p:.55,notch:0,c1:'#f4f2ec',c2:'#ffffff',center:'#b8c86a',layers:1},R:6,nod:1,low:1}],
- westerntrillium:['Western trillium','Trillium ovatum','Southern British Columbia to central California, east to the northern Rockies',{k:'polar',v:{k:3,p:.55,notch:0,c1:'#f3efe6',c2:'#ffffff',center:'#e8c84a',layers:1},R:9}],
- bleedingheart:['Pacific bleeding heart','Dicentra formosa','Pacific coast from British Columbia to California',{k:'hearts',c:'#e27aa6',tip:'#f8dfea',n:5}],
- dwarforegongrape:['Dwarf Oregon grape','Berberis nervosa','Southern British Columbia to central California, plus northern Idaho',{k:'cluster',c:'#f2cf2a',eye:'#d8a000',dome:1}],
- westerncolumbine:['Western columbine','Aquilegia formosa','Western North America',{k:'columbine',c1:'#e2442a',c2:'#f6dc4a',nod:1}],
- tigerlily:['Columbia lily','Lilium columbianum','British Columbia to northern California, east to Idaho and Montana',{k:'polar',v:{k:6,p:.5,notch:0,c1:'#f07a22',c2:'#f9a84a',center:'#c8501a',layers:1,spots:'#5a1e0c'},R:9,nod:1}],
- fawnlily:['Oregon fawn lily','Erythronium oregonum','Southwestern British Columbia to northern California, west of the Cascades',{k:'polar',v:{k:6,p:.5,notch:0,c1:'#f6f2e6',c2:'#fff6d0',center:'#f0c840',layers:1},R:8,nod:1}],
- salmonberry:['Salmonberry','Rubus spectabilis','Pacific coast from Alaska to California',{k:'polar',v:{k:5,p:.55,notch:.05,c1:'#cf3a78',c2:'#ec7aa8',center:'#f2d06a',layers:1},R:8}],
- redcurrant:['Red-flowering currant','Ribes sanguineum','Pacific coast from British Columbia to California',{k:'raceme',v:'currant'}],
- skunkcabbage:['Western skunk cabbage','Lysichiton americanus','Wet forests and swamps from Alaska to central California',{k:'spathe'}],
- vanillaleaf:['Vanilla leaf','Achlys triphylla','Coast Ranges and Cascades from British Columbia to northern California',{k:'raceme',v:'vanilla',leaf3:1}],
+ bloodroot:{k:'polar',v:{k:8,p:.75,notch:0,c1:'#f2f0e8',c2:'#ffffff',center:'#efbe2c',layers:1}},
+ trillium:{k:'polar',v:{k:3,p:.55,notch:0,c1:'#efece4',c2:'#ffffff',center:'#e8d36a',layers:1},R:9},
+ vabluebells:{k:'bells',c:'#6f8fe0',bud:'#e08ab0',n:5,cluster:1},
+ wildcolumbine:{k:'columbine',c1:'#d8302c',c2:'#f4d040',nod:1},
+ mayapple:{k:'mayapple'},
+ springbeauty:{k:'polar',v:{k:5,p:.6,notch:0,c1:'#f5dbe6',c2:'#ffffff',center:'#f0c0d0',layers:1,stripe:'#d86a9a'},R:5},
+ wildgeranium:{k:'polar',v:{k:5,p:.7,notch:0,c1:'#c79bd6',c2:'#ecdcf2',center:'#f4ecf6',layers:1,stripe:'#a77ab8'},R:7},
+ blackeyedsusan:{k:'phyllo',v:'susan'},
+ neaster:{k:'phyllo',v:'aster'},
+ goldenrod:{k:'raceme',v:'goldenrod'},
+ coneflower:{k:'droop',ray:'#c45a9a',ray2:'#a8407e',cone:'#a8541e',coneH:.5},
+ fireweed:{k:'raceme',v:'fireweed'},
+ bunchberry:{k:'polar',v:{k:4,p:.45,notch:.2,c1:'#eee9dc',c2:'#ffffff',center:'#7a8a3a',layers:1},R:7,low:1},
+ twinflower:{k:'bells',c:'#f0a8c4',n:2,twin:1},
+ pricklyrose:{k:'polar',v:{k:5,p:.5,notch:.08,c1:'#e5739a',c2:'#f8c4d6',center:'#f0c64a',layers:1},R:9},
+ ladyslipper:{k:'slipper'},
+ pearly:{k:'cluster',c:'#f4f2ea',eye:'#e6c64a'},
+ marshmarigold:{k:'polar',v:{k:6,p:.45,notch:0,c1:'#f2c018',c2:'#ffe46a',center:'#e0a000',layers:1},R:7,low:1},
+ labradortea:{k:'cluster',c:'#fbfaf4',eye:'#f2ecd0',dome:1},
+ arcticlupine:{k:'raceme',v:'lupine'},
+ woodlily:{k:'polar',v:{k:6,p:.55,notch:0,c1:'#e2562a',c2:'#f49a3a',center:'#f2c040',layers:1,spots:'#4a1e10'},R:9},
+ harebell:{k:'bells',c:'#7d84d8',n:2},
+ scarletgilia:{k:'raceme',v:'gilia'},
+ paintbrush:{k:'raceme',v:'paintbrush'},
+ silverylupine:{k:'raceme',v:'silverlupine'},
+ blueflax:{k:'polar',v:{k:5,p:.6,notch:0,c1:'#7fa8e0',c2:'#c4d8f4',center:'#f0e08a',layers:1,stripe:'#5a80c8'},R:7},
+ rmiris:{k:'iris'},
+ bluecolumbine:{k:'columbine',c1:'#7d9ae0',c2:'#fbfaf4'},
+ goldeneye:{k:'phyllo',v:'goldeneye'},
+ globemallow:{k:'polar',v:{k:5,p:.5,notch:.05,c1:'#e2683a',c2:'#f3a36a',center:'#f0c66a',layers:1},R:6},
+ mexicanhat:{k:'droop',ray:'#c8402a',ray2:'#f2b62a',cone:'#5a3a22',coneH:1.4},
+ blanketflower:{k:'phyllo',v:'blanket'},
+ penstemon:{k:'raceme',v:'penstemon'},
+ bluebell:{k:'bells',c:'#5a5ad0',n:6,oneSide:1},
+ woodanemone:{k:'polar',v:{k:6,p:.55,notch:0,c1:'#f6eef0',c2:'#ffffff',center:'#e8d36a',layers:1},R:6},
+ primrose:{k:'polar',v:{k:5,p:.6,notch:.28,c1:'#f2e49a',c2:'#fbf3c8',center:'#e0a83a',layers:1},R:7,low:1},
+ celandine:{k:'polar',v:{k:8,p:.9,notch:0,c1:'#f6cc20',c2:'#ffe873',center:'#e0a800',layers:1},R:6,low:1},
+ foxglove:{k:'raceme',v:'foxglove'},
+ woodsorrel:{k:'polar',v:{k:5,p:.6,notch:.1,c1:'#f4eef6',c2:'#ffffff',center:'#f2e6a0',layers:1,stripe:'#b58ac8'},R:5,low:1},
+ heather:{k:'raceme',v:'heather'},
+ redcampion:{k:'polar',v:{k:5,p:.55,notch:.45,c1:'#d8487a',c2:'#ef8ab0',center:'#f2c6d6',layers:1},R:7},
+ wintergreen:{k:'polar',v:{k:5,p:.55,notch:0,c1:'#f4f2ec',c2:'#ffffff',center:'#b8c86a',layers:1},R:6,nod:1,low:1},
+ westerntrillium:{k:'polar',v:{k:3,p:.55,notch:0,c1:'#f3efe6',c2:'#ffffff',center:'#e8c84a',layers:1},R:9},
+ bleedingheart:{k:'hearts',c:'#e27aa6',tip:'#f8dfea',n:5},
+ dwarforegongrape:{k:'cluster',c:'#f2cf2a',eye:'#d8a000',dome:1},
+ westerncolumbine:{k:'columbine',c1:'#e2442a',c2:'#f6dc4a',nod:1},
+ tigerlily:{k:'polar',v:{k:6,p:.5,notch:0,c1:'#f07a22',c2:'#f9a84a',center:'#c8501a',layers:1,spots:'#5a1e0c'},R:9,nod:1},
+ fawnlily:{k:'polar',v:{k:6,p:.5,notch:0,c1:'#f6f2e6',c2:'#fff6d0',center:'#f0c840',layers:1},R:8,nod:1},
+ salmonberry:{k:'polar',v:{k:5,p:.55,notch:.05,c1:'#cf3a78',c2:'#ec7aa8',center:'#f2d06a',layers:1},R:8},
+ redcurrant:{k:'raceme',v:'currant'},
+ skunkcabbage:{k:'spathe'},
+ vanillaleaf:{k:'raceme',v:'vanilla',leaf3:1},
 };
-for(const id in FLW){const[name,sci,range,art]=FLW[id];FLW[id]={id,name,sci,range,art};}
+for(const id in FLW){const f=facts(SPECIES_DATA.flowers[id]);FLW[id]={id,name:f.name,sci:f.sci,range:f.range,art:FLW[id]};}
 Object.assign(PHYLLO,{goldeneye:{p:'#f2c21a',p2:'#d8a010',d:['#8a5a14','#b07a1a'],n:13,len:.95,wid:.3},blanket:{p:'#f2b62a',p2:'#c8402a',d:['#7a2a14','#a8401e'],n:13,len:1,wid:.36,tip:1}});
 Object.assign(RACEME,{fireweed:{c:['#c23a8a','#d85aa4','#f0a0cc'],shape:'spike4',n:14},gilia:{c:['#d8282c','#e8503a','#f39a6a'],shape:'trumpet',n:10},paintbrush:{c:['#d8402a','#e86a3a','#7a8a3a'],shape:'bract',n:12},
  silverlupine:{c:['#6a5ab8','#8a7ad0','#c8c0ec'],shape:'pea',n:14},vanilla:{c:['#e6e2cc','#f6f4e8','#d8d4bc'],shape:'spike4',n:16},currant:{c:['#c8305e','#de5a80','#f2a0bc'],shape:'trumpet',n:12},penstemon:{c:['#c8202a','#e0403a','#f08a6a'],shape:'trumpet',n:8,slim:1},heather:{c:['#b25aa8','#c97ac0','#e0b0d8'],shape:'spike4',n:16,small:1}});
@@ -1337,23 +1265,24 @@ Object.assign(COATS,{
  eured:{back:'#b35a2a',back2:'#8e4320',wash:'#c06a35',belly:'#f3ead9',tail:'#a8501f',tailEdge:'#c96a35',paw:'#6a3216',ring:'#f4e6d4',ear:'#b35a2a',nose:'#2a1408',tuft:7,tuftC:'#8e4320'},
  eudark:{back:'#4a3428',back2:'#33231a',wash:'#5a3f2f',belly:'#efe6d6',tail:'#3e2b20',tailEdge:'#6a4a36',paw:'#2a1d16',ring:'#d8ccbc',ear:'#4a3428',nose:'#120c08',tuft:7,tuftC:'#2a1d16'}});
 const SQUIRRELS={
- egray:{name:'Eastern gray squirrel',sci:'Sciurus carolinensis',coat:'gray',range:'Eastern North America; introduced to Britain, Ireland and Italy',fact:'Buries thousands of nuts each autumn; the forgotten ones grow into trees.'},
- eblack:{name:'Eastern gray squirrel (black form)',sci:'Sciurus carolinensis',coat:'black',range:'Eastern North America, most common in the north',fact:'Same species as the gray; one gene makes the coat black.'},
- efox:{name:'Eastern fox squirrel',sci:'Sciurus niger',coat:'fox',range:'Eastern and central North America',fact:'The largest tree squirrel in North America.'},
- amred:{name:'American red squirrel',sci:'Tamiasciurus hudsonicus',coat:'amred',range:'Canada, Alaska, the Rockies and the northern US',fact:'Piles spruce cone scales into middens that can be meters wide.'},
- abert:{name:"Abert's squirrel",sci:'Sciurus aberti',coat:'abert',range:'Ponderosa pine forests of the Southwest US and northern Mexico',fact:'Lives almost entirely in ponderosa pines and eats their inner bark in winter.'},
- kaibab:{name:'Kaibab squirrel',sci:'Sciurus aberti kaibabensis',coat:'kaibab',range:'Only the Kaibab Plateau, north of the Grand Canyon',fact:'A form of Abert\'s squirrel found nowhere else, with a black belly and white tail.'},
- eured:{name:'Eurasian red squirrel',sci:'Sciurus vulgaris',coat:'eured',range:'Europe and northern Asia, from Ireland to Japan',fact:'Its ear tufts grow longer in winter.'},
- egraywhite:{wiki:'Eastern_gray_squirrel',name:'Eastern gray squirrel (white form)',sci:'Sciurus carolinensis',coat:'egraywhite',range:'A few towns in the eastern US and Canada',fact:'White gray squirrels are rare; towns like Brevard, North Carolina, are famous for them. Their dark eyes show they are not albinos.'},
- efoxdark:{wiki:'Fox_squirrel',name:'Eastern fox squirrel (dark form)',sci:'Sciurus niger',coat:'efoxdark',range:'Pine and oak woods of the southeastern US',fact:'In the Southeast, fox squirrels often have a black mask with a white nose and white ear tips, and about a third are all black.'},
- sflying:{wiki:'Southern_flying_squirrel',name:'Southern flying squirrel',sci:'Glaucomys volans',coat:'sflying',range:'Eastern North America from southeastern Canada to Florida, plus highland patches in Mexico and Central America',fact:'Active at night, it can glide up to about 60 metres on a furry membrane stretched from wrist to ankle, though most glides are much shorter.'},
- nflying:{wiki:'Northern_flying_squirrel',name:'Northern flying squirrel',sci:'Glaucomys sabrinus',coat:'nflying',range:'Canada, Alaska and northern and mountain forests of the US',fact:'It digs up and eats truffles, spreading their spores and helping the trees those fungi live with.'},
- arizonagray:{wiki:'Arizona_gray_squirrel',name:'Arizona gray squirrel',sci:'Sciurus arizonensis',coat:'arizonagray',range:'Mountain canyons of central and southeastern Arizona, western New Mexico and northern Sonora, Mexico',fact:'It lives mostly in streamside canyon woods of sycamore, walnut, cottonwood and oak.'},
- abertblack:{wiki:'Abert%27s_squirrel',name:"Abert's squirrel (black form)",sci:'Sciurus aberti',coat:'abertblack',range:"Ponderosa pine forests of the southern Rockies; the black form lives mainly in Colorado's Front Range foothills",fact:"In some Colorado forests, many Abert's squirrels are entirely black."},
- douglas:{wiki:'Douglas_squirrel',name:'Douglas squirrel',sci:'Tamiasciurus douglasii',coat:'douglas',range:'Coastal, Cascade and Sierra Nevada forests from southwestern British Columbia to central California',fact:'Its loud chatter fills northwestern forests, and it stores conifer cones in piles like its red squirrel cousin.'},
- westerngray:{wiki:'Western_gray_squirrel',name:'Western gray squirrel',sci:'Sciurus griseus',coat:'westerngray',range:'Drier oak, pine and Douglas-fir woods from Washington to California',fact:'The largest tree squirrel native to the Pacific Northwest, with a long, bushy gray tail frosted white along its edges.'},
- humboldt:{wiki:'Humboldt%27s_flying_squirrel',name:"Humboldt's flying squirrel",sci:'Glaucomys oregonensis',coat:'humboldt',range:'Pacific coast from southern British Columbia to southern California',fact:'Recognised as its own species only in 2017; it glides between trees at night and eats truffles.'},
- eudark:{name:'Eurasian red squirrel (dark form)',sci:'Sciurus vulgaris',coat:'eudark',range:'Across its range, most often in conifer forests of continental Europe',fact:'Red squirrels range from fiery orange to nearly black.'}};
+ egray:{coat:'gray'},
+ eblack:{coat:'black'},
+ efox:{coat:'fox'},
+ amred:{coat:'amred'},
+ abert:{coat:'abert'},
+ kaibab:{coat:'kaibab'},
+ eured:{coat:'eured'},
+ egraywhite:{coat:'egraywhite'},
+ efoxdark:{coat:'efoxdark'},
+ sflying:{coat:'sflying'},
+ nflying:{coat:'nflying'},
+ arizonagray:{coat:'arizonagray'},
+ abertblack:{coat:'abertblack'},
+ douglas:{coat:'douglas'},
+ westerngray:{coat:'westerngray'},
+ humboldt:{coat:'humboldt'},
+ eudark:{coat:'eudark'}};
+for(const[id,r]of Object.entries(SPECIES_DATA.squirrels))Object.assign(SQUIRRELS[id],facts(r));
 
 /* ---- zones ---- */
 const ZN={

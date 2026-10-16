@@ -1,10 +1,10 @@
 # Squirrel Ranger
 
-A cozy treetop game in a single HTML5 file, for explorers aged 8 and up. You're a real squirrel in a real forest: run the branches, leap between trees, photograph the birds and wildflowers, and collect the nuts and cones. There's no score, no losing, and no wrong way to go.
+A cozy treetop game in one HTML5 page, for explorers aged 8 and up. You're a real squirrel in a real forest: run the branches, leap between trees, photograph the birds and wildflowers, and collect the nuts and cones. There's no score, no losing, and no wrong way to go.
 
 ## Play
 
-Open `index.html` in a browser. It works on phones (touch), with a keyboard, or with a game controller.
+Open `index.html` in a browser. It works on phones (touch), with a keyboard, or with a game controller. It needs no server or build: keep the `data/` folder beside it, since that's where the species facts live.
 
 ## Controls
 
@@ -59,6 +59,8 @@ Each forest also has 11 native wildflowers and 4 nuts or cones. To add a forest,
 ## Credits
 
 All the public sources behind the species, sounds and research are listed in [ATTRIBUTION.md](ATTRIBUTION.md).
+
+Every claim on a species card (name, scientific name, range, fact, field marks) cites its own sources in `data/*.js` and records when it was last checked. `node tools/check_facts.mjs` (Node 20 or later, no installs) verifies that every claim is sourced and that none has been edited since its last check; `--links` also confirms the source pages still load.
 
 
 Research behind the motion and trees:

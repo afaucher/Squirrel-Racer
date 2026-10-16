@@ -4,7 +4,7 @@ This is how the five current forests were researched and modelled. Follow the sa
 
 A forest is a list of real species plus a few colours. All the species art, calls and placement come from data, so adding a forest means **researching** the species, **writing their data**, then **checking it**. No new drawing code is needed unless a species has a shape the renderers can't draw yet.
 
-Everything lives in `index.html`. Search for the names in the right-hand column of each table.
+What each card **says** (names, scientific names, ranges, facts and field marks) lives in `data/*.js`, with a source for every claim. How each species **looks and sounds** (art, coats, calls) and which forest it lives in stay in `index.html`; search for the names in the headings below. The two are joined by the species id, and `node tools/check_facts.mjs` checks that they line up.
 
 ---
 
@@ -45,9 +45,18 @@ For every species, write down:
 - **Scientific name.** Use the current one; check that it hasn't been reclassified. For example, wood anemone is now *Anemonoides nemorosa*.
 - **Native range.** One short phrase, such as "Eastern and central North America".
 - **One fact.** About 20 words or fewer, true, and written for a curious kid. Facts linking to squirrels, seeds or the food web are best. Write it in your own words; never copy text.
-- **A reference link.** Use the species' Wikipedia page, and open it to confirm it exists and is the right species. It goes in `ATTRIBUTION.md`.
+- **Sources.** For every claim above, at least one page you opened yourself that states it; never a guessed URL. Prefer the authority for each kind, and use Wikipedia only when nothing better states the claim:
 
-For **birds**, also note the field marks from a field guide (All About Birds or the RSPB): colours of the back, belly, head, wings and tail, plus caps, masks, bars and crests. Note the bill shape and length, and draw the male where the sexes differ. Also note the call's rhythm and pitch as field guides describe it, like the cardinal's slurred "cheer cheer cheer" whistles.
+  | Kind | Good sources |
+  |---|---|
+  | Birds | [Audubon field guide](https://www.audubon.org/bird-guide), [Birds of the World](https://birdsoftheworld.org) (free overview pages), [All About Birds](https://www.allaboutbirds.org), [RSPB](https://www.rspb.org.uk/birds-and-wildlife/a-z) and [BTO BirdFacts](https://www.bto.org/understanding-birds/birdfacts) |
+  | Squirrels | [Animal Diversity Web](https://animaldiversity.org), state and provincial wildlife agencies, the National Park Service, peer-reviewed papers |
+  | Trees, nuts, cones | [FEIS](https://research.fs.usda.gov/feis), [The Gymnosperm Database](https://www.conifers.org), [Woodland Trust](https://www.woodlandtrust.org.uk), [EUFORGEN](https://www.euforgen.org) |
+  | Wildflowers | [Lady Bird Johnson Wildflower Center](https://www.wildflower.org), [Burke Herbarium](https://burkeherbarium.org), [Woodland Trust](https://www.woodlandtrust.org.uk), [Plantlife](https://www.plantlife.org.uk) |
+
+  Some sites (All About Birds, Kew's Plants of the World Online) block automated fetches, so agents may need the alternatives.
+
+For **birds**, also note the field marks from a field guide: colours of the back, belly, head, wings and tail, plus caps, masks, bars and crests. Note the bill shape and length, and draw the male where the sexes differ. When they differ, say so in the field marks too ("Male: … Female is browner."), since the card text should match the picture without being wrong about the other sex. Also note the call's rhythm and pitch as field guides describe it, like the cardinal's slurred "cheer cheer cheer" whistles.
 
 For **trees**, note bark colour and texture, leaf or needle colour, overall shape, and anything distinctive. Examples: white, marked bark (birch, aspen); orange plated bark (ponderosa, Scots pine); shaggy strips (shagbark hickory); spire versus round crown.
 
@@ -61,9 +70,35 @@ For **squirrels**, note coat colours, belly, tail and ear tufts.
 
 Add entries in this order. Copy a neighbour from the existing forests and adjust it; that's faster and safer than starting from scratch.
 
-### 2.1 Trees: `TREE_INFO` and `SPECIES`
+### 2.0 The facts: `data/*.js`
 
-`TREE_INFO.<id> = [common name, scientific name, range]`
+Each kind has its own file: `data/squirrels.js`, `data/birds.js`, `data/trees.js` (trees, then the nuts and cones they bear) and `data/flowers.js`. Inside, each species is a block of plain JSON, and every claim shown on its card is an object with its text and evidence:
+
+```js
+"varthrush": {
+ "name": {"text":"Varied thrush","src":["https://www.audubon.org/field-guide/bird/varied-thrush"],"checked":"2026-10","sig":"1f0c…"},
+ "sci": {"text":"Ixoreus naevius","src":["…"],"checked":"2026-10","sig":"…"},
+ "wiki": "Varied_thrush",
+ "range": {"text":"Alaska and western Canada to northern California …","src":["…"],"checked":"2026-10","sig":"…"},
+ "fact": {"text":"Its song is a long, eerie, buzzy whistle …","src":["…"],"checked":"2026-10","sig":"…"},
+ "marks": {"text":"Male: slate-blue back …","src":["…"],"checked":"2026-10","sig":"…","note":"optional nuance for the next checker"}
+},
+```
+
+| Kind | Claims (each `{text, src, checked, sig, note?}`) | Plain fields |
+|---|---|---|
+| squirrels | `name`, `sci`, `range`, `fact` | `wiki` (Wikipedia page name, when it isn't the scientific name) |
+| birds | `name`, `sci`, `range`, `fact`, `marks` | `wiki`, `pl` (an irregular plural: titmice, grouse) |
+| trees | `name`, `sci`, `range` | |
+| nuts | `tree` (the parent tree's id), `fact` | `name`; the scientific name and range come from the tree |
+| flowers | `name`, `sci`, `range` | `formerly` (an old scientific name) |
+
+- `src` lists the pages that state the claim (see **Sources** above).
+- `checked` is the month the claim was last verified against those sources, and `sig` fingerprints its text at that moment. Don't write them by hand: once a claim's sources are in, run `node tools/check_facts.mjs --mark-checked birds.varthrush.fact` (or `birds.varthrush` for every claim of one species).
+- If you change a claim's text later, its `sig` no longer matches and the check fails until it is re-verified and re-marked. That's deliberate: sources can't silently go stale.
+- `note` is for what the next checker should know: sources that disagree, a pending reclassification, a weak source.
+
+### 2.1 Trees: facts in `data/trees.js`, art in `SPECIES`
 
 Each tree's art is one of four base growth forms plus overrides, added in the `Object.assign(SPECIES, {...})` block:
 
@@ -91,14 +126,13 @@ whitespruce: mk('pine', {bark:'#5b4a3e', leaf:['#3d5f55','#4c6e63','#2f4a42'], w
 | `strips` | Colour of long peeling strips (shagbark hickory) |
 | `bloom` | Spring blossoms on twigs: `'dogwood'`, `'cherry'` or `null` |
 
-### 2.2 Nuts and cones: `NUTS`
+### 2.2 Nuts and cones: facts in `data/trees.js`, art in `NUTS`
 
 ```js
-douglascone: {name:'Douglas-fir cone', tree:'douglasfir', fact:'…',
-  art:{t:'cone', len:10.5, wid:4.6, col:'#9a6e44', hi:'#b88c5c', bract:'#c9b48a'}},
+douglascone: {art:{t:'cone', len:10.5, wid:4.6, col:'#9a6e44', hi:'#b88c5c', bract:'#c9b48a'}},
 ```
 
-`tree` must be an id from `TREE_INFO`. The scientific name and range are filled in from that tree.
+The nut's `name`, `tree` and `fact` go under `nuts` in `data/trees.js`. `tree` must be a tree id from the same file; the scientific name and range are filled in from that tree.
 
 | `art.t` | Parameters |
 |---|---|
@@ -110,9 +144,9 @@ douglascone: {name:'Douglas-fir cone', tree:'douglasfir', fact:'…',
 
 Hanging nuts are placed under their own tree's limbs (upright cones on top), and 1–2 lie fallen nearby.
 
-### 2.3 Wildflowers: `FLW`
+### 2.3 Wildflowers: facts in `data/flowers.js`, art in `FLW`
 
-`id: [common name, scientific name, range, art]`
+`id: art`, for example `bloodroot: {k:'polar', v:{k:8, p:.75, …}}`.
 
 | `art.k` | Shape | Parameters |
 |---|---|---|
@@ -129,13 +163,12 @@ Hanging nuts are placed under their own tree's limbs (upright cones on top), and
 
 If a flower needs a shape that doesn't exist, add a new `art.k` branch in `drawFlowerSp` and keep it to simple filled shapes.
 
-### 2.4 Birds: `BIRDS` (inside `BirdArt`), then range and fact
+### 2.4 Birds: facts in `data/birds.js`, art in `BIRDS` (inside `BirdArt`)
 
-Each bird is drawn from field marks on a shared body, facing right:
+Each bird is drawn from its field marks on a shared body, facing right:
 
 ```js
-{id:'stjay', zone:'sw', name:"Steller's jay", sci:'Cyanocitta stelleri', wiki:'Steller%27s_jay', pose:'perch', size:1.15, bw:1.08, bh:.95,
- marks:'Black crested head with pale forehead streaks, sooty back, deep blue wings, belly and tail.',
+{id:'stjay', zone:'sw', pose:'perch', size:1.15, bw:1.08, bh:.95,
  up:'#2f3a52', low:'#2b4f9e', head:'#16171b', wing:'#2a55b0',
  tail:{c:'#2a52a8', len:22, p:[['bars','#121a33']]}, crest:{len:9, c:'#16171b'},
  bill:{t:'jay', c:'#121316', len:5.4, d:2.8}, leg:'#1c1d21',
@@ -156,7 +189,7 @@ Each bird is drawn from field marks on a shared body, facing right:
 | `wp` (wing) | `bars edge panel patch spots tips wingbar wingbars2` |
 | `sp` (shoulder) | `shoulder` |
 
-Then add the text to the `Object.assign(BIRD_SP.<id>, {range, fact, pl?})` lines. `pl` is only needed for an irregular plural (titmice, grouse).
+The name, scientific name, range, fact and field marks go in `data/birds.js`.
 
 **Call.** Add a `CALLS.<id>` entry, a list of notes: `[start (s), start Hz, end Hz, length (s), wave, volume, wobble Hz?, width?]`, where `wave` is `sine`, `square`, `sawtooth`, `triangle` or `noise`. `width` only applies to `noise`: it is the filter's Q, 6 by default; lower it (1–2) for broad sounds like drumming or wingbeats, and raise the volume to match. `rep(n, gap, fn)` repeats a note and `rnd(lo, hi)` picks a random number. For example, the cardinal's four falling whistles:
 
@@ -166,7 +199,7 @@ cardinal: () => rep(4, .24, t => [[t, 3900, 1800, .17, 'sine', .9]]),
 
 Every time a call plays, the whole thing is shifted a little in pitch and speed, so you don't need to add that yourself. For birds whose song is different every time (the robin, the Pacific wren), build the phrase with `rnd` so each call is new. The forest's background birds are drawn from its `birds` list, so they come for free.
 
-### 2.5 Squirrels: `COATS` and `SQUIRRELS`
+### 2.5 Squirrels: facts in `data/squirrels.js`, art in `COATS` and `SQUIRRELS`
 
 ```js
 abert: {back:'#73767a', back2:'#55585c', wash:'#8a7a6c', belly:'#f4f2ec', tail:'#7a7d80', tailEdge:'#efeee9',
@@ -186,7 +219,7 @@ abert: {back:'#73767a', back2:'#55585c', wash:'#8a7a6c', belly:'#f4f2ec', tail:'
 | `tailR` | Tail fluffiness (0.75 for a flying squirrel's flat tail, 1.15 for the western gray's huge one) |
 | `glide: 1` | A flying squirrel: draws the furry membrane from wrist to ankle, and once a leap starts to fall, the squirrel glides (a slow, capped fall). The aim arc shows it. |
 
-`SQUIRRELS.<id> = {name, sci, coat, range, fact}`, where `coat` is the `COATS` key.
+`SQUIRRELS.<id> = {coat}`, where `coat` is the `COATS` key. The name, scientific name, range and fact go in `data/squirrels.js`.
 
 ### 2.6 The forest: `ZN` and `ZONE_IDS`
 
@@ -219,13 +252,20 @@ sw: {name:'Southwest Ponderosa Pine', where:'Arizona, New Mexico and Colorado',
    Compare each one with a photo. Check that the key field marks read at small size, and that the silhouettes are still recognisable (they become the mission outlines).
 2. **Walk the forest.** Play it on a phone-sized and a desktop window. Check that the trees look right together, birds sit on limbs and trunks properly, cones hang (or stand) correctly, and nothing blocks the controls.
 3. **Play each mission type** to the success screen, and check that the squirrel joins the collection.
-4. **Check the text.** Every name, scientific name, range and fact against your sources, and the plurals in mission titles.
+4. **Check the facts.** Read every claim against its sources, and check the plurals in mission titles. Then run:
+
+   ```sh
+   node tools/check_facts.mjs           # every claim sourced and checked, ids match the art, calls and forests
+   node tools/check_facts.mjs --links   # every source URL still loads (some sites block scripts; open those by hand)
+   ```
+
+   It exits with an error until every claim has a source and a current check, and it lists exactly which claims are missing.
 5. **Update the docs:**
    - Add the forest to the table in `README.md`.
-   - Add every new species with its reference link to `ATTRIBUTION.md`, plus any new general sources.
+   - Run `node tools/check_facts.mjs --write` to regenerate the species tables in `ATTRIBUTION.md` from the data. Add any new general sources to its list by hand.
 
 ---
 
 ## Workflow
 
-The game is also published as a Claude artifact for quick review. Update and review the artifact first, then push to GitHub once it's approved. `index.html` is the artifact's page wrapped in a standard `<!doctype html>` skeleton.
+The game is also published as a Claude artifact for quick review. Update and review the artifact first, then push to GitHub once it's approved. `index.html` is the artifact's page wrapped in a standard `<!doctype html>` skeleton, and the four `data/*.js` files are published alongside it at the same paths.
