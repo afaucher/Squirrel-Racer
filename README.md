@@ -58,6 +58,10 @@ A two-ended body: the shoulders lead and the hips trail, so the spine follows th
 - **Celebrations instead of a score:** a rainbow tail on long flights, and stars, fireflies and falling leaves for big branch landings.
 - **Forest audio:** a layered mixer whose canopy wind, birds, crickets and leaf rustle fade with height and speed, plus sounds for leaps, landings and celebrations. All synthesized in the browser; there are no audio files.
 
+## What's next
+
+Ideas under consideration (more kinds of life in each forest, a world map, a quiz, better forest building, a race mode and ranger-uniform rewards) are written up, with costs and a suggested order, in [docs/FUTURE-DIRECTIONS.md](docs/FUTURE-DIRECTIONS.md).
+
 ## Credits
 
 All the public sources behind the species, sounds and research are listed in [ATTRIBUTION.md](ATTRIBUTION.md).
