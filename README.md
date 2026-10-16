@@ -14,7 +14,8 @@ Open `index.html` in a browser. It works on phones (touch), with a keyboard, or 
 | **Leap** | Right thumb: pull back, release | Hold arrows, release | Right stick: pull back, release |
 | **Photo** | Hold the camera button (top right); the lens follows your finger; let go | Hold Space or Enter; the lens follows the mouse (or arrows aim); let go | Hold A or B, right stick aims, let go |
 | **Menu** | Acorn button (top left) | M or Esc | Start |
-| **Full screen** | Button at the bottom | F (Esc exits) | — |
+| **Full screen** | Full screen, at the bottom of the menu | F (Esc exits) | Menu, then Full screen |
+| **Mute** | Mute, at the bottom of the menu | Menu, then Mute | Menu, then Mute |
 
 - **Leap** is a wind-up: pull away from where you want to go and let go. Longer pulls jump farther. On the keyboard the direction is the average of the arrows you've held.
 - **Landing** latches onto whatever you touch: limb, trunk or ground.

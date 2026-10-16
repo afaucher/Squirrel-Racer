@@ -41,13 +41,9 @@ section.panel{padding-block:20px;display:grid;gap:18px}
 .label{font:500 11px/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
 .ctl{display:grid;gap:6px}
 .stage{position:relative;border-radius:12px}
-.fsbtn{position:absolute;bottom:12px;left:50%;transform:translateX(-50%);z-index:3;display:flex;align-items:center;gap:6px;border:0;border-radius:999px;padding:8px 12px;background:rgba(20,26,20,.55);color:#f3f1e8;font:700 13px/1 var(--body);cursor:pointer;-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px)}
-.fsbtn svg{width:16px;height:16px;display:block}
-.fsbtn:hover{background:rgba(20,26,20,.75)}
 .stage:fullscreen{width:100vw;height:100vh;background:#9fc0d3;border-radius:0}
 .stage.immersive{position:fixed;inset:0;z-index:50;width:100vw;height:100vh;height:100dvh;background:#9fc0d3;border-radius:0}
 .stage:fullscreen #play,.stage.immersive #play{height:100%;border-radius:0}
-.stage:fullscreen .fsbtn,.stage.immersive .fsbtn{bottom:calc(12px + env(safe-area-inset-bottom,0px))}
 /* game overlays: soft, rounded, never in the way of the two thumbs */
 .sr-round{position:absolute;z-index:4;width:48px;height:48px;border-radius:50%;border:0;display:grid;place-items:center;cursor:pointer;color:#fff8ea;background:rgba(20,26,20,.5);-webkit-backdrop-filter:blur(4px);backdrop-filter:blur(4px);box-shadow:0 2px 10px rgba(0,0,0,.18)}
 .sr-round svg{width:24px;height:24px}
@@ -101,6 +97,10 @@ figcaption em{font-style:normal;margin-top:4px}
 .sr-main button span{display:block;font:400 14px/1.35 var(--body);color:#596455;margin-top:2px}
 .sr-main button.primary,.sr-actions button:first-child{background:#b65c17;color:#fff}
 .sr-main button:hover,.sr-tile:hover{filter:brightness(.97)}
+.sr-toggles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.sr-toggles button{display:flex;align-items:center;justify-content:center;gap:8px;font:700 15px/1.2 var(--body);border:1px solid #d3dac6;border-radius:14px;padding:12px;background:transparent;color:#1b221c;cursor:pointer}
+.sr-toggles button:hover{background:#eef1e6}
+.sr-toggles svg{width:18px;height:18px;flex:none}
 .sr-head{display:flex;gap:12px;align-items:center;margin-bottom:12px;flex-wrap:wrap}
 .sr-head .back{font-size:15px;padding:9px 14px}
 .sr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,140px),1fr));gap:10px}
@@ -190,21 +190,19 @@ a{color:var(--accent)}
 </header>
 
 <section class="panel" id="panel-play">
-  <div class="stage" id="stage"><canvas id="play" aria-label="Squirrel Ranger"></canvas><button class="fsbtn" id="fs-btn" type="button" aria-label="Enter full screen"></button></div>
+  <div class="stage" id="stage"><canvas id="play" aria-label="Squirrel Ranger"></canvas></div>
   <ul class="howto">
     <li><b>Move</b>Left thumb, W A S D, or a controller's left stick. Steer anywhere within reach of a branch: the body glides in straight lines while the feet keep hold, so slipping between nearby branches, going under, or around a trunk just happens.</li>
     <li><b>Leap</b>Right thumb, the arrow keys, or a controller's right stick. Pull back away from where you want to go, then let go. Hold longer to wind up a bigger leap; on keys, the direction is the average of what you've held.</li>
     <li><b>Land anywhere</b>You latch onto whatever you touch: limb, trunk or ground. Thin branch tips bend and weaken your launch, so leap from closer to the trunk.</li>
     <li><b>Photo</b>Hold the camera (top right), Space, or a controller's A button to look through the lens. It opens under your finger or mouse pointer and follows it as you slide (on a keyboard or controller, the arrows or right stick aim it). Let go to take the photo. Only what's inside the circle counts, and what your mission is looking for is chosen first. Nuts and cones within reach are collected.</li>
-    <li><b>Menu</b>The acorn (top left), M or Start. Play any of six forests as one of its squirrels, take a mission (each is dealt its own forest and squirrel), or browse your collection.</li>
+    <li><b>Menu</b>The acorn (top left), M or Start. Play any of six forests as one of its squirrels, take a mission (each is dealt its own forest and squirrel), or browse your collection. Mute and full screen are at the bottom of the menu.</li>
     <li><b>Missions</b>Photograph three different birds, collect three different nuts or cones, or photograph three different wildflowers. Each mission shows its three in outline on the right, and each one fills in when you find it; tap a frame to see it again (and hear the call, for birds). Finish a mission and the squirrel you played joins your collection.</li>
     <li><b>Flying squirrels glide</b>Play as a southern, northern, Humboldt's or Japanese flying squirrel and, once a leap starts to fall, it spreads its gliding membrane and sails much farther.</li>
     <li><b>Big leaps</b>Long flights turn your tail into a rainbow. Land a long leap on a branch and you get stars, fireflies and falling leaves.</li>
-    <li><b>Full screen</b>Tap the button at the bottom of the play area, or press F. Esc exits.</li>
+    <li><b>Full screen</b>Tap Full screen at the bottom of the menu, or press F. Esc exits.</li>
   </ul>
   <div class="bar">
-    <div class="ctl"><span class="label">Forest sound</span>
-      <div class="chips" id="play-sound"><button data-v="on" aria-pressed="true">On</button><button data-v="off" aria-pressed="false">Off</button></div></div>
     <div class="ctl"><span class="label">World</span>
       <div class="chips"><button class="act" id="play-reset">Back to the ground</button><button class="act" id="play-new">New forest</button></div></div>
     <div class="ctl"><span class="label">Game controller</span><span id="pad-status" class="padstat">No controller yet. Pair one, then press any button.</span></div>
@@ -1059,6 +1057,8 @@ function renderMenu(html){UI.menuIn.innerHTML=html;UI.menu.hidden=false;PLAY.pau
 function closeMenu(){UI.menu.hidden=true;PLAY.paused=false;}
 UI.go=function(v){const[a,b,c]=v.split(':');
  if(a==='resume'){closeMenu();return;}
+ if(a==='sound'){setSound(!AMB.on);refreshToggles();return;}
+ if(a==='fullscreen'){toggleFull();return;}
  if(a==='play'&&b&&c){startGame({zone:b,squirrel:c});return;}
  if(a==='mission'){const m=UI.missions[+b];startGame({zone:m.zone,squirrel:m.squirrel,mission:{...m,got:[]}});return;}
  if(a==='call'){playCall(b);return;}
@@ -1083,7 +1083,7 @@ function infoView(k,id){const i=itemInfo(k,id),have=ALBUM.has[k+':'+id],zones=ZO
 function openMenu(view,arg){hideCard();let h='';
  if(view==='main'){h=`<div class="sr-title">${ICON.acorn}<div><h2>Squirrel Ranger</h2><p>Explore real forests as a real squirrel.</p></div></div><div class="sr-main">
   ${W&&PLAY.started?'<button type="button" data-go="resume" class="primary">Resume</button>':''}<button type="button" data-go="playz">Play<span>Explore freely. Pick a forest and a squirrel.</span></button>
-  <button type="button" data-go="missions">Missions<span>Find birds, nuts, cones and wildflowers.</span></button><button type="button" data-go="collection">Collection<span>Everything you've found, with names and ranges.</span></button></div>`;}
+  <button type="button" data-go="missions">Missions<span>Find birds, nuts, cones and wildflowers.</span></button><button type="button" data-go="collection">Collection<span>Everything you've found, with names and ranges.</span></button></div><div class="sr-toggles">${menuToggles()}</div>`;}
  if(view==='playz'||view==='missionz'){h=`<div class="sr-head"><button type="button" data-go="main" class="back">Back</button><h2>${view==='playz'?'Choose a forest':'Missions: choose a forest'}</h2></div><div class="sr-grid zones">`+ZONE_IDS.map(z=>{const Z=ZN[z];const tr=Z.trees[0][0];
    return`<button type="button" class="sr-tile" data-go="${view==='playz'?'plays':'missions'}:${z}"><div data-pic="t:${tr}" data-w="150" data-h="112"></div><b>${Z.name}</b><i>${Z.where}</i></button>`;}).join('')+'</div>';}
  if(view==='plays'){const Z=ZN[arg];h=`<div class="sr-head"><button type="button" data-go="playz" class="back">Back</button><h2>${Z.name}: choose your squirrel</h2></div><div class="sr-grid">`+Z.squirrels.map(s=>{const q=SQUIRRELS[s];return`<button type="button" class="sr-tile" data-go="play:${arg}:${s}"><div data-pic="sh:${s}"></div><b>${q.name}</b><i>${q.sci}</i><span>${q.range}</span></button>`;}).join('')+'</div>';}
@@ -1298,20 +1298,20 @@ function drawSticks(ctx,w,h){ctx.save();ctx.lineWidth=2;ctx.font='700 11px "JetB
 })();
 
 /* ================= UI ================= */
-function chipGroup(id,fn){const el=document.getElementById(id);el.addEventListener('click',e=>{const b=e.target.closest('button[data-v]');if(!b)return;for(const x of el.querySelectorAll('button[data-v]'))x.setAttribute('aria-pressed',x===b?'true':'false');fn(b.dataset.v);});}
-setPadStatus();chipGroup('play-sound',v=>setSound(v==='on'));
+setPadStatus();
 // full screen: the real Fullscreen API where allowed, otherwise an immersive window-filling mode
-const stage=document.getElementById('stage'),fsb=document.getElementById('fs-btn');
+const stage=document.getElementById('stage');
 const IC_FULL='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4"/></svg>',IC_EXIT='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 2v4H2M14 6h-4V2M10 14v-4h4M2 10h4v4"/></svg>';
+const IC_SOUND='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6h3l4-3v10l-4-3H2z"/><path d="M11.5 5.5a3.5 3.5 0 0 1 0 5"/></svg>',IC_MUTED='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6h3l4-3v10l-4-3H2z"/><path d="M11 6l4 4M15 6l-4 4"/></svg>';
 const isFull=()=>document.fullscreenElement===stage||stage.classList.contains('immersive');
-function fsLabel(){const f=isFull();fsb.innerHTML=(f?IC_EXIT:IC_FULL)+'<span>'+(f?'Exit':'Full screen')+'</span>';fsb.setAttribute('aria-label',f?'Exit full screen':'Enter full screen');}
+// the mute and full screen buttons at the bottom of the main menu
+function menuToggles(){const f=isFull();return`<button type="button" data-go="sound" aria-pressed="${!AMB.on}">${AMB.on?IC_SOUND+'Mute':IC_MUTED+'Unmute'}</button><button type="button" data-go="fullscreen">${f?IC_EXIT+'Exit full screen':IC_FULL+'Full screen'}</button>`;}
+function refreshToggles(){const t=UI.menuIn&&UI.menuIn.querySelector('.sr-toggles');if(t)t.innerHTML=menuToggles();}
 async function toggleFull(){if(isFull()){if(document.fullscreenElement){try{await document.exitFullscreen();}catch(e){}}stage.classList.remove('immersive');document.documentElement.style.overflow='';}
  else{let ok=false;try{if(stage.requestFullscreen){await stage.requestFullscreen({navigationUI:'hide'});ok=document.fullscreenElement===stage;}}catch(e){}
-  if(!ok){stage.classList.add('immersive');document.documentElement.style.overflow='hidden';}}fsLabel();if(AMB.on)startAudio();}
-fsb.addEventListener('click',e=>{e.stopPropagation();toggleFull();});
-document.addEventListener('fullscreenchange',fsLabel);
+  if(!ok){stage.classList.add('immersive');document.documentElement.style.overflow='hidden';}}refreshToggles();if(AMB.on)startAudio();}
+document.addEventListener('fullscreenchange',refreshToggles);
 window.addEventListener('keydown',e=>{if(e.code==='KeyF'&&!e.repeat&&!(e.target.closest&&e.target.closest('input,textarea'))){e.preventDefault();toggleFull();}else if(e.code==='Escape'){if(UI.menu&&!UI.menu.hidden){if(PLAY.started)closeMenu();}else if(stage.classList.contains('immersive'))toggleFull();else if(UI.card&&!UI.card.hidden)hideCard();else openMenu('main');}});
-fsLabel();
 document.getElementById('play-reset').addEventListener('click',resetSquirrel);
 document.getElementById('play-new').addEventListener('click',()=>{newWorld((Math.random()*1e6)|0);buildFrames();});
 const tab='play';
