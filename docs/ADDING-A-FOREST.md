@@ -210,7 +210,9 @@ Each mushroom's card claims are `name`, `sci`, `range`, `grows`, `fact` and `mar
 | `substrate` | `soil`, `leaf litter` or `moss` (on the ground near its host trees, or anywhere if it lists none); `buried` (a truffle, shown half dug up); `trunk base`; `living trunk` (brackets on standing trees); `dead wood` (fallen logs and stumps) |
 | `hosts` | Tree ids it grows on or with. Ground mushrooms appear only near these trees, trunk mushrooms only on them, and dead-wood mushrooms only on logs and stumps of these species. Wood-growers must list at least one, and every forest that lists the mushroom must have at least one of its hosts. |
 | `habit` | `single`, `scattered`, `cluster` (tufts from one base), `tiers` (overlapping shelves) or `ring` |
-| `cached` | `true` if squirrels are documented drying or caching it in trees; it can then also appear in the branches |
+| `cached` | `true` if squirrels are documented drying or caching it in trees; it can then also appear in the branches (never for truffles, which only turn up half dug in the soil) |
+
+Mushrooms compete for soil and wood, so density is capped: a slowly varying "richness" along the forest (a little higher on moist ground) gives each tree slot or clearing 0, 1 or at most 2 groups, never more than 8 fruit bodies, with ground groups kept apart and one group per log. A mission's mushrooms take the place of a random pick rather than adding to it.
 
 Fallen logs and stumps are drawn in the bark of their own tree species, mostly the tree next to them. A mission for a dead-wood mushroom makes logs of its host trees more likely.
 

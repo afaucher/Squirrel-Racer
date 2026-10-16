@@ -978,34 +978,49 @@ function populateTree(T,i,hsh){const Z=zone(),M=PLAY.mission,r=rng(hsh^0x5bd1e99
  const dwWant=left_m.filter(f=>f.substrate==='dead wood');
  if(r()<(dwWant.length?.75:.4)){let sp=T.key;const hs=dwWant.length?dwWant[(r()*dwWant.length)|0].hosts.filter(h=>ztrees.includes(h)):[];if(hs.length&&r()<.7)sp=hs[(r()*hs.length)|0];else if(r()<.25)sp=ztrees[(r()*ztrees.length)|0];
   const side=r()<.5?-1:1,stump=r()<.35;T.logs.push({sp,stump,x:T.x+side*(T.trunk.w0/2+46+r()*70),y:stump?12:14,L:60+r()*50,R:stump?11+r()*4:7.5+r()*3.5,H:14+r()*10,seed:(r()*99)|0});}
- // mushrooms, each only where it really grows: soil near its partner trees, on their trunks or trunk bases, or on their dead wood
- const fsites=f=>{const host=!f.hosts.length||f.hosts.includes(T.key),out=[];
+ // mushrooms, each only where it really grows, at a capped density
+ placeFungi(T,i,r,limbs);}
+// How many mushroom groups a slot gets: a "richness" that swells and fades slowly along the forest, a little higher on moist
+// ground, but never more than two groups and never more than FUNGUS_BODIES_MAX fruit bodies, because mushrooms compete for the
+// same soil and wood. Averages about one group per slot, from quiet stretches to rich ones.
+const FUNGUS_BODIES_MAX=8;
+function fungusCount(i,r){const rich=.45+.8*slotNoise(i,7,W.seed*11+421),lam=rich*(.85+.3*slotWet(i));return Math.min(2,Math.floor(lam+r()));}
+// how many fruit bodies a group draws (see drawFungus)
+function fungusBodies(f,habit){const a=f.art,sh=a.shape,shelf=sh==='shelf'||sh==='hoof'||sh==='oyster';if(shelf)return habit==='tiers'||habit==='cluster'?Math.max(2,a.n||3):1;
+ if(habit==='cluster')return a.n||5;if(habit==='scattered'||habit==='ring')return 3;return 1;}
+// Mushrooms on a tree slot (T has a trunk) or a clearing (no trunk), each only where it really grows: soil near its partner trees,
+// their trunks or trunk bases, logs and stumps of its host trees, or, for mushrooms red squirrels are known to dry, the branches.
+// Truffles grow underground, so they only ever turn up half dug in the soil.
+function placeFungi(T,i,r,limbs){T.fungi=T.fungi||[];const Z=zone(),M=PLAY.mission,tree=!!T.trunk,key=tree?T.key:null;
+ const left=M&&M.type==='m'&&!M.done?M.targets.filter(id=>!M.got.includes(id)).map(id=>FUNGI[id]):[];
+ const usedLogs=new Set();let trunkUsed=false;
+ const sites=f=>{const host=!f.hosts.length||(tree&&f.hosts.includes(key)),out=[];
   if(host&&(f.substrate==='soil'||f.substrate==='leaf litter'||f.substrate==='moss'||f.substrate==='buried'))out.push('ground');
-  if(host&&f.substrate==='trunk base')out.push('base');
-  if(host&&f.substrate==='living trunk')out.push('trunk');
-  if(f.substrate==='dead wood'&&T.logs.some(L=>f.hosts.includes(L.sp)))out.push('log');
-  // red squirrels dry some mushrooms in the branches to eat in winter
-  if(f.cached&&limbs.length)out.push('limb');
+  if(tree&&host&&f.substrate==='trunk base')out.push('base');
+  if(tree&&host&&f.substrate==='living trunk'&&!trunkUsed)out.push('trunk');
+  if(f.substrate==='dead wood'&&T.logs.some(L=>!usedLogs.has(L)&&f.hosts.includes(L.sp)))out.push('log');
+  if(f.cached&&f.substrate!=='buried'&&limbs.length)out.push('limb');
   return out;};
- // choose among the species that can grow at this tree, so a birch specialist shows up wherever there is birch;
- // drying in the branches alone only sometimes counts
- const here=(Z.fungi||[]).map(id=>FUNGI[id]).filter(f=>{const st=fsites(f);return st.some(x=>x!=='limb')||(st.length&&r()<.25);}),wantHere=left_m.filter(f=>here.includes(f));
- const nm=(r()<.75?1:0)+(r()<.45?1:0)+(wantHere.length&&r()<.6?1:0);
+ const here=(Z.fungi||[]).map(id=>FUNGI[id]).filter(f=>{const st=sites(f);return st.some(x=>x!=='limb')||(st.length&&r()<.25);});
+ const n=fungusCount(i,r);if(!n||!here.length)return;
  // truffles are mostly hidden underground, so they turn up half as often
- const wsum=here.reduce((a,f)=>a+(f.substrate==='buried'?.5:1),0),pickHere=()=>{let x=r()*wsum;for(const f of here)if((x-=f.substrate==='buried'?.5:1)<0)return f;return here[here.length-1];};
- // a fallen log or stump of the right tree nearly always has a wood-rotter on it
- const logFirst=T.logs.length&&r()<.85?here.filter(f=>f.substrate==='dead wood'&&T.logs.some(L=>f.hosts.includes(L.sp))):[];
- for(let k=0,tries=0;k<nm+(logFirst.length?1:0)&&here.length&&tries<12;tries++){const f=k===0&&logFirst.length?logFirst[(r()*logFirst.length)|0]:wantHere.length&&r()<.6?wantHere[(r()*wantHere.length)|0]:pickHere();let st=fsites(f);if(!st.length)continue;if(k===0&&logFirst.includes(f))st=['log'];
-  if(st.length>1&&st.includes('limb')&&r()<.75)st=st.filter(x=>x!=='limb');
-  const site=st[(r()*st.length)|0],o={id:i+':m'+k,sp:f.id,site,habit:f.habit,seed:(r()*999)|0,side:r()<.5?-1:1},sh=f.art.shape,shelf=sh==='shelf'||sh==='hoof'||sh==='oyster';
-  if(site==='ground'){o.x=T.x+o.side*(T.trunk.w0/2+16+r()*90);o.y=12+r()*8;}
+ const wt=f=>f.substrate==='buried'?.5:1,pick=list=>{let x=r()*list.reduce((a,f)=>a+wt(f),0);for(const f of list)if((x-=wt(f))<0)return f;return list[list.length-1];};
+ let bodies=0;const grounds=[];
+ for(let k=0,tries=0;k<n&&tries<10;tries++){
+  const want=left.filter(f=>here.includes(f)&&sites(f).length),logRot=here.filter(f=>f.substrate==='dead wood'&&sites(f).includes('log'));
+  const f=want.length&&r()<.6?want[(r()*want.length)|0]:k===0&&logRot.length&&r()<.6?pick(logRot):pick(here);
+  let st=sites(f);if(!st.length)continue;if(st.length>1&&st.includes('limb')&&r()<.75)st=st.filter(x=>x!=='limb');
+  let habit=f.habit,nb=fungusBodies(f,habit);if(bodies+nb>FUNGUS_BODIES_MAX){habit='single';nb=1;}if(bodies+nb>FUNGUS_BODIES_MAX)break;
+  const site=st[(r()*st.length)|0],o={id:i+':m'+k,sp:f.id,site,habit,seed:(r()*999)|0,side:r()<.5?-1:1},sh=f.art.shape,shelf=sh==='shelf'||sh==='hoof'||sh==='oyster';
+  if(site==='ground'){// keep groups apart: they compete for the same patch of soil
+   let x=0;for(let t=0;t<4;t++){x=tree?T.x+o.side*(T.trunk.w0/2+16+r()*90):T.x+(r()-.5)*SP*.8;if(grounds.every(g=>Math.abs(g-x)>55))break;}grounds.push(x);o.x=x;o.y=12+r()*8;}
   else if(site==='base'){o.x=T.x+o.side*T.trunk.w0*.42;o.y=3;}
-  else if(site==='trunk'){const P=T.trunk,s=P.len*(.05+r()*.28),q=pathAt(P,s),w=wAt(P,s)/2;Object.assign(o,{P,s,x:q.x+o.side*w*.9,y:q.y});}
-  else if(site==='log'){const L=T.logs.find(L=>f.hosts.includes(L.sp));o.log=L;
+  else if(site==='trunk'){trunkUsed=true;const P=T.trunk,s=P.len*(.05+r()*.28),q=pathAt(P,s),w=wAt(P,s)/2;Object.assign(o,{P,s,x:q.x+o.side*w*.9,y:q.y});}
+  else if(site==='log'){const L=T.logs.find(L=>!usedLogs.has(L)&&f.hosts.includes(L.sp));usedLogs.add(L);o.log=L;
    if(L.stump){if(shelf){o.x=L.x+o.side*L.R*.95;o.y=L.y-L.H*(.25+r()*.5);}else{o.x=L.x+(r()-.5)*L.R;o.y=L.y-L.H;}}
    else if(shelf){o.x=L.x+(r()-.5)*L.L*.5;o.y=L.y-L.R*(.6+r()*.9);}else{o.x=L.x+(r()-.6)*L.L*.6;o.y=L.y-L.R*2+1;}}
   else{const L=limbs[(r()*limbs.length)|0].path,s=L.len*(.3+r()*.45),q=pathAt(L,s),w=wAt(L,s)/2,nx=-Math.sin(q.ang),ny=Math.cos(q.ang),p1=[q.x+nx*w,q.y+ny*w],p2=[q.x-nx*w,q.y-ny*w],top=p1[1]<p2[1]?p1:p2;Object.assign(o,{P:L,s,x:top[0],y:top[1]+1,habit:'single',scale:.75});}
-  T.fungi.push(o);k++;}}
+  T.fungi.push(o);bodies+=nb;k++;}}
 // a wildflower where it really grows: shade-lovers under trees, sun-lovers in clearings, near the trees it grows with,
 // on stretches as wet or dry as it likes. A mission's flowers still turn up wherever they can grow.
 function flowerWeight(f,open,key,wet){let w=open?({sun:1.6,part:1,shade:.12}[f.light]||1):({shade:1,part:.75,sun:.06}[f.light]||.75);
@@ -1025,15 +1040,7 @@ function populateClearing(C,i,hsh){const Z=zone(),M=PLAY.mission,r=rng(hsh^0x2c1
  // sunlight lets the wildflowers crowd in
  const nf=13+((r()*7)|0);for(let k=0;k<nf;k++){const fx=C.x+(r()-.5)*SP*.95;C.flowers.push({id:i+':f'+k,sp:pickFlower(Z,r,true,null,slotWet(i)),x:fx,h:26+r()*26,seed:(r()*99)|0,y:Math.abs(Math.round(fx*7))%10});}
  // mushrooms: wood-rotters on the fallen tree, and ground mushrooms that need no partner tree
- const left=M&&M.type==='m'&&!M.done?M.targets.filter(id=>!M.got.includes(id)):[];
- const fits=(Z.fungi||[]).map(id=>FUNGI[id]).filter(f=>f.substrate==='dead wood'?f.hosts.includes(sp):!f.hosts.length&&f.substrate!=='trunk base'&&f.substrate!=='living trunk'),want=fits.filter(f=>left.includes(f.id));
- const nm=fits.length?1+(r()<.5?1:0)+(want.length?1:0):0;
- for(let k=0;k<nm;k++){const f=want.length&&r()<.6?want[(r()*want.length)|0]:fits[(r()*fits.length)|0],sh=f.art.shape,shelf=sh==='shelf'||sh==='hoof'||sh==='oyster',o={id:i+':m'+k,sp:f.id,habit:f.habit,seed:(r()*999)|0,side:r()<.5?-1:1};
-  if(f.substrate==='dead wood'){const Lg=C.logs[shelf||r()<.6?1:0];o.site='log';o.log=Lg;
-   if(Lg.stump){if(shelf){o.x=Lg.x+o.side*Lg.R*.95;o.y=Lg.y-Lg.H*(.25+r()*.5);}else{o.x=Lg.x+(r()-.5)*Lg.R;o.y=Lg.y-Lg.H;}}
-   else if(shelf){o.x=Lg.x+(r()-.5)*Lg.L*.5;o.y=Lg.y-Lg.R*(.6+r()*.9);}else{o.x=Lg.x+(r()-.6)*Lg.L*.6;o.y=Lg.y-Lg.R*2+1;}}
-  else{o.site='ground';o.x=C.x+(r()-.5)*SP*.8;o.y=12+r()*8;}
-  C.fungi.push(o);}}
+ placeFungi(C,i,r,[]);}
 // a shaft of sunlight falling into a clearing, behind the trees and onto the floor
 function drawSunGap(ctx,C){const x=C.x,g=ctx.createLinearGradient(0,-900,0,30);g.addColorStop(0,'rgba(255,250,228,0)');g.addColorStop(.7,'rgba(255,246,214,.22)');g.addColorStop(1,'rgba(255,242,200,.32)');
  ctx.save();ctx.fillStyle=g;ctx.beginPath();ctx.moveTo(x-90,-900);ctx.lineTo(x+60,-900);ctx.lineTo(x+200,30);ctx.lineTo(x-170,30);ctx.closePath();ctx.fill();
