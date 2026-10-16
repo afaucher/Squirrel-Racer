@@ -4,7 +4,7 @@ This is how the five current forests were researched and modelled. Follow the sa
 
 A forest is a list of real species plus a few colours. All the species art, calls and placement come from data, so adding a forest means **researching** the species, **writing their data**, then **checking it**. No new drawing code is needed unless a species has a shape the renderers can't draw yet.
 
-What each card **says** (names, scientific names, ranges, facts and field marks) lives in `data/*.js`, with a source for every claim. How each species **looks and sounds** (art, coats, calls) and which forest it lives in are code: bird artwork is in `art/birds.js`, everything else in `index.html`. Search for the names in the headings below. The two are joined by the species id, and `node tools/check_facts.mjs` checks that they line up.
+What each card **says** (names, scientific names, ranges, facts and field marks) lives in `data/*.js`, with a source for every claim. How each species **looks and sounds** (art, coats, calls) and which forest it lives in are code: bird artwork is in `art/birds.js`, flower, nut and cone artwork in `art/plants.js`, and everything else in `index.html`. Search for the names in the headings below. The two are joined by the species id, and `node tools/check_facts.mjs` checks that they line up.
 
 ---
 
@@ -126,7 +126,7 @@ whitespruce: mk('pine', {bark:'#5b4a3e', leaf:['#3d5f55','#4c6e63','#2f4a42'], w
 | `strips` | Colour of long peeling strips (shagbark hickory) |
 | `bloom` | Spring blossoms on twigs: `'dogwood'`, `'cherry'` or `null` |
 
-### 2.2 Nuts and cones: facts in `data/trees.js`, art in `NUTS`
+### 2.2 Nuts and cones: facts in `data/trees.js`, art in `NUTS` (`art/plants.js`)
 
 ```js
 douglascone: {art:{t:'cone', len:10.5, wid:4.6, col:'#9a6e44', hi:'#b88c5c', bract:'#c9b48a'}},
@@ -144,7 +144,7 @@ The nut's `name`, `tree` and `fact` go under `nuts` in `data/trees.js`. `tree` m
 
 Hanging nuts are placed under their own tree's limbs (upright cones on top), and 1–2 lie fallen nearby.
 
-### 2.3 Wildflowers: facts in `data/flowers.js`, art in `FLW`
+### 2.3 Wildflowers: facts in `data/flowers.js`, art in `FLW` (`art/plants.js`)
 
 `id: art`, for example `bloodroot: {k:'polar', v:{k:8, p:.75, …}}`.
 
@@ -161,7 +161,7 @@ Hanging nuts are placed under their own tree's limbs (upright cones on top), and
 | `spathe` | Big leaves around a hooded spathe (skunk cabbage) | None |
 | `mayapple`, `slipper`, `iris` | One-off shapes | None |
 
-If a flower needs a shape that doesn't exist, add a new `art.k` branch in `drawFlowerSp` and keep it to simple filled shapes.
+If a flower needs a shape that doesn't exist, add a new `art.k` branch in `drawFlowerSp` (in `art/plants.js`) and keep it to simple filled shapes.
 
 ### 2.4 Birds: facts in `data/birds.js`, art in `BIRDS` (inside `BirdArt`, in `art/birds.js`)
 
