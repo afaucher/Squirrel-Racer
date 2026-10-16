@@ -1586,8 +1586,10 @@ function populateTree(T,i,hsh){const Z=zone(),M=PLAY.mission,r=rng(hsh^0x5bd1e99
 function birdPos(b){if(b.kind==='limb')return[b.x,b.y+sagAt(b.P,b.s)];return[b.x,b.y];}
 function nutPos(n){return n.ground?[n.x,n.y]:[n.x,n.y+sagAt(n.P,n.s)];}
 const BIRD_SCALE=.62;
-function drawTreeCritters(ctx,T,t){for(const n of T.nuts){if(n.ground)continue;const[x,y]=nutPos(n);ctx.save();ctx.translate(x,y);ctx.rotate(n.rot);drawNutArt(ctx,n.sp);ctx.restore();}
- for(const b of T.birds){if(b.kind==='ground')continue;drawOneBird(ctx,b,t);}}
+// birds and nuts sit on a trunk (depth 0) or a limb (behind -1, front 1); pass z to draw only those on that layer
+const perchDepth=o=>o.P?(o.P.depth||0):0;
+function drawTreeCritters(ctx,T,t,z){for(const n of T.nuts){if(n.ground||(z!=null&&perchDepth(n)!==z))continue;const[x,y]=nutPos(n);ctx.save();ctx.translate(x,y);ctx.rotate(n.rot);drawNutArt(ctx,n.sp);ctx.restore();}
+ for(const b of T.birds){if(b.kind==='ground'||(z!=null&&perchDepth(b)!==z))continue;drawOneBird(ctx,b,t);}}
 function drawGroundCritters(ctx,T,t){for(const n of T.nuts){if(!n.ground)continue;ctx.save();ctx.translate(n.x,n.y);ctx.rotate(n.rot);drawNutArt(ctx,n.sp);ctx.restore();}for(const b of T.birds)if(b.kind==='ground')drawOneBird(ctx,b,t);}
 function drawOneBird(ctx,b,t){const sp=BIRD_SP[b.sp],[x,y]=birdPos(b);const st=BirdArt.idle(sp,RM?0:t,b.seed);ctx.save();ctx.translate(x,y);if(b.kind!=='trunk'&&b.face<0)ctx.scale(-1,1);if(b.lean)ctx.rotate(b.lean*b.face*.5);BirdArt.drawBird(ctx,sp,0,0,BIRD_SCALE,st);ctx.restore();}
 
@@ -1873,18 +1875,19 @@ function drawPlay(t,dt){
  for(const T of trees)drawBack(ctx,T);
  for(const T of trees)drawLeaves(ctx,T.leaves,null,.9);
  for(const T of trees){drawSegs(ctx,T.twigs,T.sp);for(const b of T.blooms)if(!b.front)drawBloomSprite(ctx,b.v,b.x,b.y+ownSag(b),6,b.rot);}
- for(const T of trees)drawTreeBody(ctx,T,S.path,sagFn);
- for(const T of trees)drawTreeCritters(ctx,T,t);
- for(const T of trees)drawTreeBase(ctx,T);
- grassBand(ctx,vx0,vx1,t,{seed:23,step:2.2,yMin:1,yMax:9,hMin:6,hMax:17,bw:3,wind:1,boost:.9,cols:GRASS_FRONT},trunks);
- for(const T of trees){for(const f of T.flowers){if(f.x<vx0-60||f.x>vx1+60)continue;drawFlowerSp(ctx,f.sp,f.x,f.y,f.h,t,f.seed);}drawGroundCritters(ctx,T,t);}
- grassBand(ctx,vx0,vx1,t,{seed:37,step:2.4,yMin:9,yMax:24,hMin:7,hMax:19,bw:3.4,wind:1,boost:1.1,cols:GRASS_FRONT},trunks);
- // aim arc
+ // the ground in front of the trunks: tree bases, front grass, flowers, and the birds and nuts on the ground
+ const groundFront=()=>{for(const T of trees)drawTreeBase(ctx,T);
+  grassBand(ctx,vx0,vx1,t,{seed:23,step:2.2,yMin:1,yMax:9,hMin:6,hMax:17,bw:3,wind:1,boost:.9,cols:GRASS_FRONT},trunks);
+  for(const T of trees){for(const f of T.flowers){if(f.x<vx0-60||f.x>vx1+60)continue;drawFlowerSp(ctx,f.sp,f.x,f.y,f.h,t,f.seed);}drawGroundCritters(ctx,T,t);}
+  grassBand(ctx,vx0,vx1,t,{seed:37,step:2.4,yMin:9,yMax:24,hMin:7,hMax:19,bw:3.4,wind:1,boost:1.1,cols:GRASS_FRONT},trunks);};
+ // aim: the dotted flight path, and the power ring that goes with the squirrel
  let mode,ph=S.phase;const aimA=curAim(w,h),aiming=!!aimA;
- if(aimA){const a=aimA;{const p=surfacePos();let x=p.x,y=p.y,vx=a.vx,vy=a.vy;for(let i=1;i<=64;i++){const st=.03;vy+=G*st;vy=glideVy(vy,st);x+=vx*st;y+=vy*st;if(y>0)break;if(i%3===0){ctx.globalAlpha=1-i/66;ctx.fillStyle='#fff8e8';ctx.beginPath();ctx.arc(x,y,3.2/cam.zoom+1,0,TAU);ctx.fill();}}ctx.globalAlpha=1;const sp=surfacePos();ctx.strokeStyle='#e58b44';ctx.lineWidth=3;ctx.beginPath();ctx.arc(sp.x+sp.nx*12*SQS,sp.y+sp.ny*12*SQS,22,-Math.PI/2,-Math.PI/2+TAU*a.pw);ctx.stroke();}}
+ const drawAimPath=()=>{if(!aimA)return;const a=aimA,p=surfacePos();let x=p.x,y=p.y,vx=a.vx,vy=a.vy;for(let i=1;i<=64;i++){const st=.03;vy+=G*st;vy=glideVy(vy,st);x+=vx*st;y+=vy*st;if(y>0)break;if(i%3===0){ctx.globalAlpha=1-i/66;ctx.fillStyle='#fff8e8';ctx.beginPath();ctx.arc(x,y,3.2/cam.zoom+1,0,TAU);ctx.fill();}}ctx.globalAlpha=1;};
+ // the squirrel, with its aim ring, rainbow trail and glow
+ const drawSquirrelNow=()=>{
+ if(aimA){const sp=surfacePos();ctx.strokeStyle='#e58b44';ctx.lineWidth=3;ctx.beginPath();ctx.arc(sp.x+sp.nx*12*SQS,sp.y+sp.ny*12*SQS,22,-Math.PI/2,-Math.PI/2+TAU*aimA.pw);ctx.stroke();}
  drawTrail(ctx);
  if(FX.aura>0){const p=S.flying?{x:S.x,y:S.y,nx:0,ny:-1}:surfacePos();const a=Math.min(1,FX.aura)*.18;ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=a*(.75+.25*Math.sin(t*9));ctx.drawImage(glowSprite('#ffd84a'),p.x+p.nx*14-46,p.y+p.ny*14-46,92,92);ctx.restore();}
- // squirrel
  const C=COATS[PLAY.coat],rig=S.rig;ctx.save();
  let ikFn=null;
  if(S.flying){mode=(C.glide&&S.vy>-80)?'glide':'leap';ph=clamp(S.air/.8,0,1);ctx.translate(S.x,S.y);if(S.vx<0)ctx.scale(-1,1);ctx.rotate(Math.atan2(S.vy,Math.abs(S.vx))*.7);ctx.scale(SQS,SQS);if(PLAY.motion==='nimble')ctx.translate(0,19);}
@@ -1909,10 +1912,13 @@ function drawPlay(t,dt){
   if(aiming)mode='crouch';else if(S.landT>0){mode='land';ph=1-S.landT/.35;}
   else if(S.speed>12)mode=S.side===1&&!steep?'cling':down?'descend':'bound';
   else{if(S.side===1&&!steep){mode='cling';ph=.25;}else if(steep){mode=down?'descend':'bound';ph=.75;}else mode=(S.idle%9)>5?'alert':'sit';}}
-  TAILFX.amt=FX.rb;TAILFX.t=t;if(PLAY.motion==='nimble'&&!S.flying&&S.dorsalDraw)drawDorsal(ctx,C,S.dorsalDraw.belly,t,S.dorsalDraw.paws,S.speed>15,S.phase);else drawSquirrel(ctx,PLAY.rig,rig,mode,ph,t,dt,C,ikFn);TAILFX.amt=0;ctx.restore();
- // depth: redraw any branch layer that sits in front of the squirrel, only around the squirrel
- {const zs=squirrelDepth();if(zs<1.5){const p=surfacePos(),cx=p.x+p.nx*14,cy=p.y+p.ny*14;ctx.save();ctx.beginPath();ctx.arc(cx,cy,72,0,TAU);ctx.clip();
-   for(const z of[-1,0,1])if(z>zs)for(const T of trees)drawTreeLayer(ctx,T,z,S.path,sagFn);ctx.restore();}}
+  TAILFX.amt=FX.rb;TAILFX.t=t;if(PLAY.motion==='nimble'&&!S.flying&&S.dorsalDraw)drawDorsal(ctx,C,S.dorsalDraw.belly,t,S.dorsalDraw.paws,S.speed>15,S.phase);else drawSquirrel(ctx,PLAY.rig,rig,mode,ph,t,dt,C,ikFn);TAILFX.amt=0;ctx.restore();};
+ // trees back to front (behind limbs, trunks, front limbs), each layer followed by the birds and nuts on it, and the
+ // ground after the trunks. The squirrel goes in at its own depth, so whatever is in front of it is simply drawn later.
+ // Behind a trunk, the flight path waits until the end so trunks can't hide it.
+ {const zs=squirrelDepth();let done=false;const sq=()=>{if(done)return;done=true;if(zs>=0)drawAimPath();drawSquirrelNow();};
+  for(const z of[-1,0,1]){if(zs<z)sq();for(const T of trees)drawTreeLayer(ctx,T,z,S.path,sagFn);for(const T of trees)drawTreeCritters(ctx,T,t,z);if(z===0)groundFront();}
+  if(zs<0)drawAimPath();sq();}
  {const sp0=S.flying?{x:S.x,y:S.y}:surfacePos();for(const T of trees){drawSegs(ctx,T.twigsF,T.sp);for(const L of T.leavesF){const d=Math.hypot(L.x-sp0.x,L.y+ownSag(L)-sp0.y+10);drawLeaves(ctx,[L],null,d<42?.45+.5*clamp((d-20)/22,0,1):.95);}for(const b of T.blooms)if(b.front)drawBloomSprite(ctx,b.v,b.x,b.y+ownSag(b),6,b.rot);}}
  grassBand(ctx,vx0,vx1,t,{seed:53,step:7,yMin:25,yMax:34,hMin:6,hMax:15,bw:3.2,wind:1.1,boost:.5,cols:GRASS_FRINGE},trunks);
  drawFX(ctx);ctx.restore();
