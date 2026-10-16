@@ -282,7 +282,7 @@ sw: {name:'Southwest Ponderosa Pine', where:'Arizona, New Mexico and Colorado',
   fungi:[…5 ids…]},
 ```
 
-- `trees` are `[id, weight]`.
+- `trees` are `[id, weight]`. The weight sets how common a species is across the whole forest; trees then grow in stands, so each species dominates some stretches and is scarce in others. About one slot in sixteen is a clearing instead: a fallen tree of the surrounding stand (stump and log), a shaft of sunlight and a crowd of wildflowers.
 - `sky`, `hills`, `far` and `farLeaf` set the backdrop. Keep them hazy and low-contrast, and give them a tint that suggests the place: cooler blue-gray for boreal, warm dust for the Southwest. `farCrowns` (optional) picks the shapes of the faraway trees, three of `round`, `tall`, `wide` and `umbrella` (the flat tops of an araucaria skyline).
 - Add the id to `ZONE_IDS` (its position sets the order in the menus). The menus, missions and collection all pick the new forest up from there.
 

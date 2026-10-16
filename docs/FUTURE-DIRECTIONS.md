@@ -59,6 +59,8 @@ It needs no new art, and it scales automatically as species are added.
 
 ## 4. Better forest building
 
+**Started (after `v1.0`):** trees now grow in stands (each species' abundance swells and fades along the forest), and clearings open where a tree has fallen, with its stump and log, sunlight and more wildflowers. Fallen logs and stumps came with mushrooms. Still to do: wildflowers tied to their own habitat (sun or shade, which trees), birds near their trees, and snags.
+
 Make forests look and behave more like the real places:
 - **Stands:** a run of beech, then a stand of hemlock, instead of an even mix.
 - **Clearings:** with the sun-loving flowers that grow there, such as fireweed.

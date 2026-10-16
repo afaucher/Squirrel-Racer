@@ -929,7 +929,11 @@ function worldBirdCall(){if(!W)return false;let best=[];for(const T of W.trees.v
  const b=best[(Math.random()*best.length)|0],d=Math.hypot(b.x-cam.x,b.y-cam.y);playCall(b.sp,{world:1,pan:(b.x-cam.x)/600,vol:clamp(1.2-d/700,.15,1)});return true;}
 
 /* ---- populate trees with birds, nuts and flowers ---- */
-function pickTreeKey(hsh){const Z=zone(),M=PLAY.mission;let tot=0;const ws=Z.trees.map(([k,w])=>{const boost=(M&&!M.done&&M.targets.some(id=>!M.got.includes(id)&&(M.type==='n'?NUTS[id].tree===k:M.type==='m'&&FUNGI[id].hosts.includes(k))))?3:1;tot+=w*boost;return[k,w*boost];});let r=(hsh%1000)/1000*tot;for(const[k,w]of ws){if((r-=w)<0)return k;}return ws[0][0];}
+// smooth noise over tree slots: neighbouring slots get similar values (L = how many slots a swell spans)
+function slotNoise(i,L,s){const f=i/L,k=Math.floor(f),t=f-k,u=t*t*(3-2*t),a=(hash(k,s)%1000)/1000,b=(hash(k+1,s)%1000)/1000;return a+(b-a)*u;}
+// trees grow in stands: each species' abundance swells and fades along the forest, so a patch of beech gives way to a patch of
+// hemlock, mixed where they meet. The forest's weights still set how common each species is overall.
+function pickTreeKey(i,hsh){const Z=zone(),M=PLAY.mission;let tot=0;const ws=Z.trees.map(([k,w],n)=>{const stand=Math.exp(9*slotNoise(i,6,W.seed*7+n*131+11));w*=stand;const boost=(M&&!M.done&&M.targets.some(id=>!M.got.includes(id)&&(M.type==='n'?NUTS[id].tree===k:M.type==='m'&&FUNGI[id].hosts.includes(k))))?3:1;tot+=w*boost;return[k,w*boost];});let r=(hsh%1000)/1000*tot;for(const[k,w]of ws){if((r-=w)<0)return k;}return ws[0][0];}
 function populateTree(T,i,hsh){const Z=zone(),M=PLAY.mission,r=rng(hsh^0x5bd1e995),taken=W.taken;T.birds=[];T.nuts=[];T.flowers=[];
  const limbs=T.limbs.filter(l=>!l.behind&&l.path.len>60);
  // birds
@@ -978,6 +982,29 @@ function populateTree(T,i,hsh){const Z=zone(),M=PLAY.mission,r=rng(hsh^0x5bd1e99
    else if(shelf){o.x=L.x+(r()-.5)*L.L*.5;o.y=L.y-L.R*(.6+r()*.9);}else{o.x=L.x+(r()-.6)*L.L*.6;o.y=L.y-L.R*2+1;}}
   else{const L=limbs[(r()*limbs.length)|0].path,s=L.len*(.3+r()*.45),q=pathAt(L,s),w=wAt(L,s)/2,nx=-Math.sin(q.ang),ny=Math.cos(q.ang),p1=[q.x+nx*w,q.y+ny*w],p2=[q.x-nx*w,q.y-ny*w],top=p1[1]<p2[1]?p1:p2;Object.assign(o,{P:L,s,x:top[0],y:top[1]+1,habit:'single',scale:.75});}
   T.fungi.push(o);k++;}}
+// clearings: now and then a gap where a tree has fallen, so sunlight reaches the floor. Never right where the squirrel starts.
+function isClearing(i){return Math.abs(i)>2&&slotNoise(i,5,W.seed*3+977)>.88;}
+function populateClearing(C,i,hsh){const Z=zone(),M=PLAY.mission,r=rng(hsh^0x2c1b3c6d);C.birds=[];C.nuts=[];C.flowers=[];C.logs=[];C.fungi=[];
+ // the tree that fell here, from the stand around it: its stump, and its trunk lying beside it
+ const sp=pickTreeKey(i,hsh),side=r()<.5?-1:1,L=120+r()*70;
+ C.logs.push({sp,stump:true,x:C.x-side*(L*.5+26),y:12,R:12+r()*4,H:12+r()*8,seed:(r()*99)|0});
+ C.logs.push({sp,stump:false,x:C.x+side*10,y:15,L,R:9+r()*3.5,seed:(r()*99)|0});
+ // sunlight lets the wildflowers crowd in
+ const nf=13+((r()*7)|0);for(let k=0;k<nf;k++){const fx=C.x+(r()-.5)*SP*.95;C.flowers.push({id:i+':f'+k,sp:Z.flowers[(r()*Z.flowers.length)|0],x:fx,h:26+r()*26,seed:(r()*99)|0,y:Math.abs(Math.round(fx*7))%10});}
+ // mushrooms: wood-rotters on the fallen tree, and ground mushrooms that need no partner tree
+ const left=M&&M.type==='m'&&!M.done?M.targets.filter(id=>!M.got.includes(id)):[];
+ const fits=(Z.fungi||[]).map(id=>FUNGI[id]).filter(f=>f.substrate==='dead wood'?f.hosts.includes(sp):!f.hosts.length&&f.substrate!=='trunk base'&&f.substrate!=='living trunk'),want=fits.filter(f=>left.includes(f.id));
+ const nm=fits.length?1+(r()<.5?1:0)+(want.length?1:0):0;
+ for(let k=0;k<nm;k++){const f=want.length&&r()<.6?want[(r()*want.length)|0]:fits[(r()*fits.length)|0],sh=f.art.shape,shelf=sh==='shelf'||sh==='hoof'||sh==='oyster',o={id:i+':m'+k,sp:f.id,habit:f.habit,seed:(r()*999)|0,side:r()<.5?-1:1};
+  if(f.substrate==='dead wood'){const Lg=C.logs[shelf||r()<.6?1:0];o.site='log';o.log=Lg;
+   if(Lg.stump){if(shelf){o.x=Lg.x+o.side*Lg.R*.95;o.y=Lg.y-Lg.H*(.25+r()*.5);}else{o.x=Lg.x+(r()-.5)*Lg.R;o.y=Lg.y-Lg.H;}}
+   else if(shelf){o.x=Lg.x+(r()-.5)*Lg.L*.5;o.y=Lg.y-Lg.R*(.6+r()*.9);}else{o.x=Lg.x+(r()-.6)*Lg.L*.6;o.y=Lg.y-Lg.R*2+1;}}
+  else{o.site='ground';o.x=C.x+(r()-.5)*SP*.8;o.y=12+r()*8;}
+  C.fungi.push(o);}}
+// a shaft of sunlight falling into a clearing, behind the trees and onto the floor
+function drawSunGap(ctx,C){const x=C.x,g=ctx.createLinearGradient(0,-900,0,30);g.addColorStop(0,'rgba(255,250,228,0)');g.addColorStop(.7,'rgba(255,246,214,.22)');g.addColorStop(1,'rgba(255,242,200,.32)');
+ ctx.save();ctx.fillStyle=g;ctx.beginPath();ctx.moveTo(x-90,-900);ctx.lineTo(x+60,-900);ctx.lineTo(x+200,30);ctx.lineTo(x-170,30);ctx.closePath();ctx.fill();
+ const p=ctx.createRadialGradient(x+15,8,0,x+15,8,SP*.5);p.addColorStop(0,'rgba(255,240,190,.3)');p.addColorStop(1,'rgba(255,240,190,0)');ctx.fillStyle=p;ctx.beginPath();ctx.ellipse(x+15,8,SP*.5,40,0,0,TAU);ctx.fill();ctx.restore();}
 function birdPos(b){if(b.kind==='limb')return[b.x,b.y+sagAt(b.P,b.s)];return[b.x,b.y];}
 function nutPos(n){return n.ground?[n.x,n.y]:[n.x,n.y+sagAt(n.P,n.s)];}
 // mushrooms and dead wood are drawn a little larger than life so they read at squirrel scale
@@ -1038,7 +1065,7 @@ function toScreen(x,y,w,h){const z=cam.zoom*(1+FX.punch);return[(x-cam.x)*z+w/2,
 // everything whose middle is inside the lens; what the mission wants comes first, then whatever is nearest the middle
 function lensPick(w,h){const M=PLAY.mission,taken=W.taken,r=lensR(w,h),z=cam.zoom*(1+FX.punch),c0=[];
  const add=(kind,id,inst,x,y,sz)=>{const[sx,sy]=toScreen(x,y,w,h),dl=Math.hypot(sx-LENS.cx,sy-LENS.cy);if(dl<r+sz*z*.5)c0.push({kind,id,inst,x,y,sx,sy,dl,sz:sz*z});};
- for(const T of W.trees.values()){for(const b of T.birds){const[x,y]=birdPos(b);add('b',b.sp,b,x,y-8,22);}
+ for(const T of [...W.trees.values(),...W.clear.values()]){for(const b of T.birds){const[x,y]=birdPos(b);add('b',b.sp,b,x,y-8,22);}
   for(const n of T.nuts){const[x,y]=nutPos(n);add('n',n.sp,n,x,y+5,12);}
   for(const f of T.flowers){add('f',f.sp,f,f.x,f.y-f.h,14);}
   for(const o of T.fungi||[]){const[x,y]=fungusPos(o),a=FUNGI[o.sp].art,sh=a.shape,shelf=sh==='shelf'||sh==='hoof'||sh==='oyster';add('m',o.sp,o,x+(shelf?o.side*a.s*.5*FUNGUS_SCALE:0),y-(shelf?0:a.s*.6*FUNGUS_SCALE),a.s*1.5*FUNGUS_SCALE);}}
@@ -1186,7 +1213,7 @@ let W,S;
 function pickCoat(){const r=Math.random();PLAY.coat=r<.42?'gray':r<.68?'fox':r<.88?'red':'black';}
 function newWorld(seed){if(PLAY.squirrel&&typeof SQUIRRELS!=='undefined')PLAY.coat=SQUIRRELS[PLAY.squirrel].coat;else pickCoat();
  const ground=makePath([[-OFF,0],[OFF,0]],0,0,{kind:'ground',noFlip:true,sp:SPECIES.oak,depth:0});
- W={seed,ground,paths:[ground],trees:new Map(),flowers:[],far:[],mid:[],pool:{far:[],mid:[],queue:[]},taken:new Set()};
+ W={seed,ground,paths:[ground],trees:new Map(),clear:new Map(),flowers:[],far:[],mid:[],pool:{far:[],mid:[],queue:[]},taken:new Set()};
  for(let i=0;i<5;i++)W.pool.queue.push({k:'far',i});for(let i=0;i<8;i++)W.pool.queue.push({k:'mid',i});
  S={path:ground,s:OFF-60,side:-1,dir:1,flying:false,x:0,y:0,vx:0,vy:0,air:0,from:null,landT:0,phase:0,idle:0,speed:0,sag:0,sagV:0,rig:makeRig()};S.x=-60;S.y=-NIM.stand;S.ta=0;S.nfx=1;S.nfy=1;S.fxA=1;S.fyA=1;S.held=ground;
  cam.x=60;cam.y=-60;cam.zoom=1.3;cam.lx=1;cam.ly=0;
@@ -1194,11 +1221,12 @@ function newWorld(seed){if(PLAY.squirrel&&typeof SQUIRRELS!=='undefined')PLAY.co
 const cam={x:0,y:-200,zoom:1.3,lx:1,ly:0,vx:0};
 function hash(i,s){let x=(i*374761393+s*668265263)|0;x=(x^(x>>>13))*1274126177|0;return(x^(x>>>16))>>>0;}
 function ensureTrees(x0,x1){const i0=Math.floor(x0/SP),i1=Math.ceil(x1/SP);
- for(let i=i0;i<=i1;i++){if(W.trees.has(i))continue;const hsh=hash(i,W.seed);const key=pickTreeKey(hsh);const x=i*SP+((hsh>>>4)%80)-40;const big=!SPECIES[key].whorl&&!SPECIES[key].form&&SPECIES[key].trunk>=19&&((hsh>>>12)%3!==0);const T=genSplineTree(key,(hsh>>>8)%100000,x,0,big?1.22:1);T.i=i;
+ for(let i=i0;i<=i1;i++){if(W.trees.has(i)||W.clear.has(i))continue;const hsh=hash(i,W.seed);if(isClearing(i)){const C={i,x:i*SP+((hsh>>>4)%80)-40,clearing:1};populateClearing(C,i,hsh);W.clear.set(i,C);continue;}const key=pickTreeKey(i,hsh);const x=i*SP+((hsh>>>4)%80)-40;const big=!SPECIES[key].whorl&&!SPECIES[key].form&&SPECIES[key].trunk>=19&&((hsh>>>12)%3!==0);const T=genSplineTree(key,(hsh>>>8)%100000,x,0,big?1.22:1);T.i=i;
   W.paths.push(T.trunk);for(const lb of T.limbs){const par=lb.parent||T.trunk;W.paths.push(lb.path);par.junctions.push({s:lb.at,to:lb.path,s2:0});lb.path.junctions.push({s:0,to:par,s2:lb.at});}
   W.ground.junctions.push({s:x+OFF,to:T.trunk,s2:0,tree:i});T.trunk.junctions.push({s:0,to:W.ground,s2:x+OFF});
   T.key=key;populateTree(T,i,hsh);W.trees.set(i,T);}
  // prune
+ for(const i of W.clear.keys())if(i<i0-4||i>i1+4)W.clear.delete(i);
  for(const[i,T]of W.trees){if(i<i0-4||i>i1+4){if(S.path===T.trunk||T.limbs.some(l=>l.path===S.path))continue;const set=new Set([T.trunk,...T.limbs.map(l=>l.path)]);W.paths=W.paths.filter(p=>!set.has(p));W.ground.junctions=W.ground.junctions.filter(j=>j.tree!==i);W.trees.delete(i);}}
 }
 // trunks dissolve into the haze toward their base instead of ending in a hard square cut
@@ -1257,20 +1285,23 @@ function drawPlay(t,dt){
  drawSoil(ctx,vx0,vx1);
  const sagFn=s=>sagAt(S.path,s);
  const trees=[...W.trees.values()].filter(T=>T.x>vx0-300&&T.x<vx1+300);const trunks=trees.map(T=>({x:T.trunk.pts[0][0],w:T.trunk.w0}));
+ // clearings share the ground layer with the trees: flowers, fallen logs and mushrooms
+ const clears=[...W.clear.values()].filter(C=>C.x>vx0-300&&C.x<vx1+300),grounds=[...trees,...clears];
  drawMeadowBack(ctx,vx0,vx1);
  grassBand(ctx,vx0,vx1,t,{seed:11,step:2.4,yMin:-8,yMax:1,hMin:7,hMax:19,bw:3.4,wind:.8,boost:.4,cols:GRASS_BACK},trunks);
+ for(const C of clears)drawSunGap(ctx,C);
  for(const T of trees)drawBack(ctx,T);
  for(const T of trees)drawLeaves(ctx,T.leaves,null,.9);
  for(const T of trees){drawSegs(ctx,T.twigs,T.sp);for(const b of T.blooms)if(!b.front)drawBloomSprite(ctx,b.v,b.x,b.y+ownSag(b),6,b.rot);}
  // the ground in front of the trunks: tree bases, front grass, flowers, and the birds and nuts on the ground
  const groundFront=()=>{for(const T of trees)drawTreeBase(ctx,T);
   grassBand(ctx,vx0,vx1,t,{seed:23,step:2.2,yMin:1,yMax:9,hMin:6,hMax:17,bw:3,wind:1,boost:.9,cols:GRASS_FRONT},trunks);
-  for(const T of trees){for(const f of T.flowers){if(f.x<vx0-60||f.x>vx1+60)continue;drawFlowerSp(ctx,f.sp,f.x,f.y,f.h,t,f.seed);}drawGroundCritters(ctx,T,t);}
+  for(const T of grounds){for(const f of T.flowers){if(f.x<vx0-60||f.x>vx1+60)continue;drawFlowerSp(ctx,f.sp,f.x,f.y,f.h,t,f.seed);}drawGroundCritters(ctx,T,t);}
   // fallen logs and stumps, with the mushrooms growing on them, half in the grass
-  for(const T of trees)for(const L of T.logs||[]){const sp=SPECIES[L.sp];if(L.stump)drawStump(ctx,sp,L.x,L.y,L.R,L.H,L.seed);else drawLog(ctx,sp,L.x,L.y,L.L,L.R,L.seed);for(const o of T.fungi)if(o.log===L)drawFungusInst(ctx,o);}
+  for(const T of grounds)for(const L of T.logs||[]){const sp=SPECIES[L.sp];if(L.stump)drawStump(ctx,sp,L.x,L.y,L.R,L.H,L.seed);else drawLog(ctx,sp,L.x,L.y,L.L,L.R,L.seed);for(const o of T.fungi)if(o.log===L)drawFungusInst(ctx,o);}
   grassBand(ctx,vx0,vx1,t,{seed:37,step:2.4,yMin:9,yMax:24,hMin:7,hMax:19,bw:3.4,wind:1,boost:1.1,cols:GRASS_FRONT},trunks);
   // mushrooms on the ground and at trunk bases stand in front of the grass, so they can be seen
-  for(const T of trees)for(const o of T.fungi||[])if(o.site==='ground'||o.site==='base')drawFungusInst(ctx,o);};
+  for(const T of grounds)for(const o of T.fungi||[])if(o.site==='ground'||o.site==='base')drawFungusInst(ctx,o);};
  // aim: the dotted flight path, and the power ring that goes with the squirrel
  let mode,ph=S.phase;const aimA=curAim(),aiming=!!aimA;
  const drawAimPath=()=>{if(!aimA)return;const a=aimA,p=surfacePos();let x=p.x,y=p.y,vx=a.vx,vy=a.vy;for(let i=1;i<=64;i++){const st=.03;vy+=G*st;vy=glideVy(vy,st);x+=vx*st;y+=vy*st;if(y>0)break;if(i%3===0){ctx.globalAlpha=1-i/66;ctx.fillStyle='#fff8e8';ctx.beginPath();ctx.arc(x,y,3.2/cam.zoom+1,0,TAU);ctx.fill();}}ctx.globalAlpha=1;};
