@@ -59,7 +59,7 @@ It needs no new art, and it scales automatically as species are added.
 
 ## 4. Better forest building
 
-**Started (after `v1.0`):** trees now grow in stands (each species' abundance swells and fades along the forest), and clearings open where a tree has fallen, with its stump and log, sunlight and more wildflowers. Fallen logs and stumps came with mushrooms. Still to do: wildflowers tied to their own habitat (sun or shade, which trees), birds near their trees, and snags.
+**Largely done (after `v1.0`):** each forest's tree mix, every tree's clumping, site moisture, pioneer habit and storey, and every wildflower's light, moisture, openings and trees are sourced (`data/forests.js`, `data/trees.js`, `data/flowers.js`) and drive the layout: stands, a wet-to-dry floor, understory trees drawn beneath the canopy, and clearings with fallen trees and sun-loving flowers. Fallen logs and stumps came with mushrooms. The layout is an approximation; still to do: birds near their trees, snags, and terrain such as streams or slopes.
 
 Make forests look and behave more like the real places:
 - **Stands:** a run of beech, then a stand of hemlock, instead of an even mix.

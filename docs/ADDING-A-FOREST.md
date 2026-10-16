@@ -107,6 +107,16 @@ Each kind has its own file: `data/squirrels.js`, `data/birds.js`, `data/trees.js
 
 ### 2.1 Trees: facts in `data/trees.js`, art in `SPECIES`
 
+Besides `name`, `sci` and `range`, each tree has three sourced claims that lay the forest out. Each comes with plain fields the game reads:
+
+| Claim | Its fields | Used for |
+|---|---|---|
+| `stands`: how it grows together | `clump`: `clonal` (root-sprouting groves of one clone), `clumped` (pure or near-pure stands), `mixed`, `scattered` | How pure its stands are |
+| `site`: where it grows | `moisture`: `wet`, `moist`, `mesic`, `dry` or `any`; `pioneer`: `true` if it colonises after fire or in openings | Which stretches of floor it favours; pioneers crowd in beside clearings |
+| `height`: its size and storey | `storey`: `canopy`, `subcanopy` or `understory` | Subcanopy trees are drawn at 85% size, understory trees at about 60%, beneath the canopy |
+
+These make the forest an **approximation** of the real one: the sources set the tendencies, but slope, soil, fire history and much else are not modelled. Pick the defensible value when sources disagree, and add a `note` to the claim when a value is an estimate.
+
 Each tree's art is one of four base growth forms plus overrides, added in the `Object.assign(SPECIES, {...})` block:
 
 ```js
@@ -171,6 +181,8 @@ The nut's `name`, `tree` and `fact` go under `nuts` in `data/trees.js`. `tree` i
 Hanging nuts are placed under their own tree's limbs (upright cones on top), and 1–2 lie fallen nearby.
 
 ### 2.3 Wildflowers: facts in `data/flowers.js`, art in `FLW` (`art/plants.js`)
+
+Each flower has a sourced `habitat` claim with plain fields that place it: `light` (`shade`, `part` or `sun`), `moisture` (as for trees), `openings` (`true` if it favours clearings, burns, edges or meadows), `with` (tree ids it grows under) and `epiphyte` (`true` if it mostly grows on trees or rocks, so it turns up only rarely on the ground). Shade flowers grow under trees and sun flowers in clearings; a flower with a `with` list prefers those trees. A flower in several forests needs habitat wording that is true in all of them.
 
 `id: art`, for example `bloodroot: {k:'polar', v:{k:8, p:.75, …}}`.
 
@@ -269,12 +281,20 @@ abert: {back:'#73767a', back2:'#55585c', wash:'#8a7a6c', belly:'#f4f2ec', tail:'
 
 `SQUIRRELS.<id> = {coat}`, where `coat` is the `COATS` key. The name, scientific name, range and fact go in `data/squirrels.js`.
 
-### 2.6 The forest: `ZN` and `ZONE_IDS`
+### 2.6 The forest: `data/forests.js`, `ZN` and `ZONE_IDS`
+
+Which trees make up the forest, and how common each is, lives in `data/forests.js`: a sourced `composition` claim describing the mix, and `weights`, whole numbers 1–8 per tree id. Weights are usually estimates from the sources' "dominant", "common" and "minor" wording or from survey importance values; say so in the claim's `note`.
+
+```js
+"sw": {"composition": {"text": "Ponderosa pine makes up the canopy, with Gambel oak as a tall shrub layer underneath. …", "src": [...], "note": "The weights are estimates …"},
+       "weights": {"ponderosa": 8, "gambeloak": 3, "douglasfir": 2, "aspen": 2, "pinyon": 2}}
+```
+
+Everything else about the forest is in `ZN` in `index.html`:
 
 ```js
 sw: {name:'Southwest Ponderosa Pine', where:'Arizona, New Mexico and Colorado',
   sky:['#8fbbe0','#efe7d4'], hills:'#c9bba3', far:'#a5a59a', farLeaf:['#a8ae96','#b3b8a0'],
-  trees:[['ponderosa',6],['gambeloak',3],['douglasfir',2],['aspen',1],['pinyon',2]],
   squirrels:['abert','kaibab'],
   birds:['stjay','pygnut','mtnchick','acornwp','wbluebird','rfwarbler'],
   nuts:['ponderosacone','gambelacorn','douglascone','pinyonnut'],
@@ -282,7 +302,7 @@ sw: {name:'Southwest Ponderosa Pine', where:'Arizona, New Mexico and Colorado',
   fungi:[…5 ids…]},
 ```
 
-- `trees` are `[id, weight]`. The weight sets how common a species is across the whole forest; trees then grow in stands, so each species dominates some stretches and is scarce in others. About one slot in sixteen is a clearing instead: a fallen tree of the surrounding stand (stump and log), a shaft of sunlight and a crowd of wildflowers.
+- The trees come from `data/forests.js`. The weights set how common each species is across the whole forest. Trees then grow in stands, as pure as each species' `clump` says. The floor gets wetter and drier along the way, and wet-ground species gather on wet stretches. About one slot in sixteen is a clearing: a fallen tree of the surrounding stand (stump and log), a shaft of sunlight, and the sun-loving wildflowers.
 - `sky`, `hills`, `far` and `farLeaf` set the backdrop. Keep them hazy and low-contrast, and give them a tint that suggests the place: cooler blue-gray for boreal, warm dust for the Southwest. `farCrowns` (optional) picks the shapes of the faraway trees, three of `round`, `tall`, `wide` and `umbrella` (the flat tops of an araucaria skyline).
 - Add the id to `ZONE_IDS` (its position sets the order in the menus). The menus, missions and collection all pick the new forest up from there.
 

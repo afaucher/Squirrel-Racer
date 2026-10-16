@@ -12,7 +12,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { CLAIMS, PLAIN, FILES, SUBSTRATES, HABITS, readData, writeDataFiles, sig } from './species_data.mjs';
+import { CLAIMS, PLAIN, FILES, SUBSTRATES, HABITS, CLUMPS, MOISTURES, STOREYS, LIGHTS, readData, writeDataFiles, sig } from './species_data.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const ATTR = path.join(ROOT, 'ATTRIBUTION.md');
@@ -50,6 +50,9 @@ const wikiURL = r => 'https://en.wikipedia.org/wiki/' + (r.wiki || r.sci.text.re
 function attributionTables(data) {
   const kinds = { squirrels: 'Squirrels', birds: 'Birds', trees: 'Trees', nuts: 'Nuts and cones', flowers: 'Wildflowers', fungi: 'Mushrooms' };
   let md = '\nGenerated from `data/*.js` by `node tools/check_facts.mjs --write`; edit the data files, not these tables. Each card claim\'s own sources are listed beside it in the data files.\n\n';
+  md += '### Forests\n\nWhich trees make up each forest, and how common each is. The game lays trees out from these, as an approximation of the real forest.\n\n| Forest | Sources |\n|---|---|\n';
+  for (const [zid, f] of Object.entries(data.forests)) md += `| ${zid} | ${f.composition.src.map(u => `[${host(u)}](${u})`).join(' · ')} |\n`;
+  md += '\n';
   for (const [kind, title] of Object.entries(kinds)) {
     md += `### ${title}\n\n`;
     md += kind === 'nuts' ? '| Nut or cone | From the tree | Sources |\n|---|---|---|\n' : '| Species | Scientific name | Sources |\n|---|---|---|\n';
@@ -147,12 +150,34 @@ async function main() {
   const calls = [...literalText(html, 'const CALLS=').matchAll(/(?:^|\n)\s*(\w+):\(\)=>/g)].map(m => m[1]);
   for (const id of Object.keys(data.birds)) if (!calls.includes(id)) warns.push(`birds.${id}: no CALLS entry, so it plays the cardinal's call`);
   const ZN = literal(html, 'const ZN=');
+  // each forest's trees and their weights live in data/forests.js
+  for (const [zid, Z] of Object.entries(ZN)) { const F = data.forests[zid]; if (!F) { errors.push(`forest ${zid}: no entry in data/forests.js`); continue; } Z.trees = Object.entries(F.weights || {}); }
+  for (const zid of Object.keys(data.forests)) if (!ZN[zid]) errors.push(`forests.${zid}: not a forest in the game (ZN)`);
   const used = { squirrels: new Set(), birds: new Set(), trees: new Set(Object.values(data.nuts).map(n => n.tree.text)), nuts: new Set(), flowers: new Set(), fungi: new Set() };
   for (const [zid, Z] of Object.entries(ZN)) for (const kind of Object.keys(used)) for (const id of kind === 'trees' ? Z.trees.map(t => t[0]) : Z[kind] || []) {
     used[kind].add(id);
     if (!data[kind][id]) errors.push(`forest ${zid}: ${kind} "${id}" has no facts in data/`);
   }
   for (const kind of Object.keys(used)) for (const id of Object.keys(data[kind])) if (!used[kind].has(id)) warns.push(`${kind}.${id}: not in any forest`);
+
+  // 2a. the habitat fields that place trees and flowers use known values; a flower's trees grow in one of its forests
+  for (const [zid, F] of Object.entries(data.forests)) for (const [k, w] of Object.entries(F.weights || {})) {
+    if (!data.trees[k]) errors.push(`forests.${zid}.weights: "${k}" is not a tree in data/trees.js`);
+    if (!Number.isInteger(w) || w < 1 || w > 8) errors.push(`forests.${zid}.weights.${k}: ${w} is not a whole number 1-8`);
+  }
+  for (const [id, r] of Object.entries(data.trees)) {
+    if (!CLUMPS.includes(r.clump)) errors.push(`trees.${id}.clump: "${r.clump}" is not one of ${CLUMPS.join(', ')}`);
+    if (!MOISTURES.includes(r.moisture)) errors.push(`trees.${id}.moisture: "${r.moisture}" is not one of ${MOISTURES.join(', ')}`);
+    if (typeof r.pioneer !== 'boolean') errors.push(`trees.${id}.pioneer: not true or false`);
+    if (!STOREYS.includes(r.storey)) errors.push(`trees.${id}.storey: "${r.storey}" is not one of ${STOREYS.join(', ')}`);
+  }
+  for (const [id, r] of Object.entries(data.flowers)) {
+    if (!LIGHTS.includes(r.light)) errors.push(`flowers.${id}.light: "${r.light}" is not one of ${LIGHTS.join(', ')}`);
+    if (!MOISTURES.includes(r.moisture)) errors.push(`flowers.${id}.moisture: "${r.moisture}" is not one of ${MOISTURES.join(', ')}`);
+    if (typeof r.openings !== 'boolean') errors.push(`flowers.${id}.openings: not true or false`);
+    const forests = Object.entries(ZN).filter(([, Z]) => (Z.flowers || []).includes(id)), there = new Set(forests.flatMap(([, Z]) => Z.trees.map(t => t[0])));
+    for (const k of r.with || []) if (!data.trees[k]) errors.push(`flowers.${id}.with: "${k}" is not a tree in data/trees.js`); else if (!there.has(k)) warns.push(`flowers.${id}.with: "${k}" grows in none of its forests`);
+  }
 
   // 2b. a mushroom grows only where its data says: a known substrate and habit, real host trees, and in each of its forests
   //     at least one of its host trees, or the game can never place it there
@@ -178,7 +203,7 @@ async function main() {
     const urls = new Set();
     for (const kind of Object.keys(CLAIMS)) for (const r of Object.values(data[kind])) {
       for (const c of CLAIMS[kind]) for (const u of r[c]?.src || []) urls.add(u);
-      if (kind !== 'nuts') urls.add(wikiURL(r));
+      if (kind !== 'nuts' && kind !== 'forests') urls.add(wikiURL(r));
     }
     console.log(`fetching ${urls.size} links...`);
     for (const b of await deadLinks(urls)) warns.push('link did not load: ' + b);

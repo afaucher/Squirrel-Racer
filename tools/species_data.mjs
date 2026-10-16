@@ -10,18 +10,29 @@ import crypto from 'node:crypto';
 export const CLAIMS = {
   squirrels: ['name', 'sci', 'range', 'fact'],
   birds: ['name', 'sci', 'range', 'fact', 'marks'],
-  trees: ['name', 'sci', 'range'],
+  trees: ['name', 'sci', 'range', 'stands', 'site', 'height'],
   nuts: ['tree', 'fact'],
-  flowers: ['name', 'sci', 'range'],
+  flowers: ['name', 'sci', 'range', 'habitat'],
   fungi: ['name', 'sci', 'range', 'grows', 'fact', 'marks'],
+  forests: ['composition'],
 };
 // Plain fields that are not claims: wiki (page name), pl (irregular plural), formerly (old scientific name), a nut's display name,
 // and for a mushroom the details of its "grows" claim that place it in the game: substrate, hosts (tree ids), habit and cached.
-export const PLAIN = ['wiki', 'pl', 'formerly', 'substrate', 'hosts', 'habit', 'cached'];
+export const PLAIN = ['wiki', 'pl', 'formerly', 'substrate', 'hosts', 'habit', 'cached',
+  // a tree's stands, site and height claims place it: how it clumps, how wet it likes it, whether it pioneers openings, its storey
+  'clump', 'moisture', 'pioneer', 'storey',
+  // a wildflower's habitat claim places it: light, moisture, whether it favours openings, the trees it grows with, epiphyte
+  'light', 'openings', 'with', 'epiphyte',
+  // a forest's composition claim comes with each tree's relative abundance
+  'weights'];
+export const CLUMPS = ['clonal', 'clumped', 'mixed', 'scattered'];
+export const MOISTURES = ['wet', 'moist', 'mesic', 'dry', 'any'];
+export const STOREYS = ['canopy', 'subcanopy', 'understory'];
+export const LIGHTS = ['shade', 'part', 'sun'];
 // Where a mushroom can grow, and how it grows there
 export const SUBSTRATES = ['soil', 'leaf litter', 'moss', 'buried', 'trunk base', 'living trunk', 'dead wood'];
 export const HABITS = ['single', 'scattered', 'cluster', 'tiers', 'ring'];
-const ORDER = ['name', 'sci', 'formerly', 'wiki', 'pl', 'tree', 'range', 'grows', 'substrate', 'hosts', 'habit', 'cached', 'fact', 'marks'];
+const ORDER = ['name', 'sci', 'formerly', 'wiki', 'pl', 'tree', 'range', 'stands', 'clump', 'site', 'moisture', 'pioneer', 'height', 'storey', 'habitat', 'light', 'openings', 'with', 'epiphyte', 'grows', 'substrate', 'hosts', 'habit', 'cached', 'fact', 'marks', 'composition', 'weights'];
 const CLAIM_ORDER = ['text', 'src', 'checked', 'sig', 'note'];
 
 export const FILES = {
@@ -30,6 +41,7 @@ export const FILES = {
   'trees.js': { kinds: ['trees', 'nuts'], title: 'Trees, and the nuts and cones they bear' },
   'flowers.js': { kinds: ['flowers'], title: 'Wildflowers' },
   'fungi.js': { kinds: ['fungi'], title: 'Mushrooms' },
+  'forests.js': { kinds: ['forests'], title: 'Forests: which trees make up each one' },
 };
 
 const HEADER = title => `// Squirrel Ranger species facts: ${title}.
