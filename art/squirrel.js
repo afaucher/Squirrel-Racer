@@ -85,39 +85,6 @@ function drawB(ctx,sk,C,tail){
  limb(ctx,sk.fN,[5,3.8],C.back);paw(ctx,sk.fN[2],2.1,C.paw);
  headB(ctx,sk.head,C,sk.P);
 }
-function drawA(ctx,sk,C,tail){
- const OL='#241c16';ctx.lineJoin='round';ctx.lineCap='round';
- for(const[col,extra]of[[OL,2.4],[C.tail,0]]){ctx.strokeStyle=col;for(let i=0;i<tail.length-1;i++){const u=i/(tail.length-1);ctx.lineWidth=4+11*Math.pow(u,.6)+extra;ctx.beginPath();ctx.moveTo(tail[i][0],tail[i][1]);ctx.lineTo(tail[i+1][0],tail[i+1][1]);ctx.stroke();}}
- rainbowOverlay(ctx,tail,u=>(4+11*Math.pow(u,.6))/2);
- const leg=(p,col)=>{limb(ctx,p,p.map(()=>6.5),OL);limb(ctx,p,p.map(()=>4),col);};
- leg(sk.hF,C.back2);leg(sk.fF,C.back2);
- const cx=(sk.hip[0]+sk.sh[0])/2,cy=(sk.hip[1]+sk.sh[1])/2,rx=Math.hypot(sk.sh[0]-sk.hip[0],sk.sh[1]-sk.hip[1])/2+9;
- ctx.fillStyle=C.back;ctx.strokeStyle=OL;ctx.lineWidth=1.4;ctx.beginPath();ctx.ellipse(cx,cy,rx,9.5,sk.ba,0,TAU);ctx.fill();ctx.stroke();
- ctx.fillStyle=C.belly;ctx.beginPath();ctx.ellipse(cx-sk.up[0]*5,cy-sk.up[1]*5,rx*.75,3.8,sk.ba,0,TAU);ctx.fill();
- leg(sk.hN,C.back);leg(sk.fN,C.back);
- const h=sk.head;ctx.save();ctx.translate(h.x,h.y);ctx.rotate(h.ang);ctx.fillStyle=C.back;ctx.strokeStyle=OL;ctx.lineWidth=1.4;
- ctx.beginPath();ctx.moveTo(-4,-5);ctx.lineTo(-2,-14);ctx.lineTo(2,-5);ctx.closePath();ctx.fill();ctx.stroke();
- ctx.beginPath();ctx.arc(0,0,7.5,0,TAU);ctx.fill();ctx.stroke();ctx.beginPath();ctx.ellipse(7,1.8,5,4,0,0,TAU);ctx.fill();ctx.stroke();
- ctx.fillStyle=OL;ctx.beginPath();ctx.arc(2.6,-1.6,1.8,0,TAU);ctx.fill();ctx.beginPath();ctx.arc(11.8,1.4,1.3,0,TAU);ctx.fill();ctx.restore();
-}
-function drawC(ctx,sk,C,tail){
- ctx.lineCap='round';
- for(const[col,k]of[[C.tailEdge,1],[C.tail,.72]]){ctx.fillStyle=col;for(let i=1;i<tail.length;i++){const u=i/(tail.length-1);ctx.beginPath();ctx.arc(tail[i][0],tail[i][1],(4+10*Math.pow(u,.5))*k,0,TAU);ctx.fill();}}
- rainbowOverlay(ctx,tail,u=>(4+10*Math.pow(u,.5))*.85);
- const stub=(p,col)=>{const o=p[0];const d=[p[1][0]-o[0],p[1][1]-o[1]];const e=[o[0]+d[0]*.9,o[1]+d[1]*.9+3];ctx.strokeStyle=col;ctx.lineWidth=6.5;ctx.beginPath();ctx.moveTo(o[0],o[1]+2);ctx.lineTo(e[0],e[1]);ctx.stroke();paw(ctx,e,3.2,col);};
- stub(sk.hF,C.back2);stub(sk.fF,C.back2);
- const cx=(sk.hip[0]+sk.sh[0])/2,cy=(sk.hip[1]+sk.sh[1])/2+3;ctx.fillStyle=C.back;ctx.beginPath();ctx.ellipse(cx,cy,13+2.5*sk.P.flex,11-1.5*sk.P.flex,sk.ba,0,TAU);ctx.fill();
- ctx.fillStyle=C.belly;ctx.beginPath();ctx.ellipse(cx+sk.dir[0]*3-sk.up[0]*4,cy+sk.dir[1]*3-sk.up[1]*4,8,6,sk.ba,0,TAU);ctx.fill();
- stub(sk.hN,C.back);stub(sk.fN,C.back);
- const h=sk.head;ctx.save();ctx.translate(h.x+sk.up[0]*3,h.y+sk.up[1]*3-3);ctx.rotate(h.ang*.6);
- ctx.fillStyle=C.ear;ctx.beginPath();ctx.ellipse(-4,-11,3.4,5.5,-.3,0,TAU);ctx.fill();
- ctx.fillStyle=C.back;ctx.beginPath();ctx.arc(0,0,11.5,0,TAU);ctx.fill();ctx.fillStyle=C.belly;ctx.beginPath();ctx.ellipse(5,4.5,6.5,4.5,0,0,TAU);ctx.fill();
- ctx.fillStyle='#120f0d';ctx.beginPath();ctx.ellipse(4,-2,3.6,4,0,0,TAU);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(5.2,-3.5,1.4,0,TAU);ctx.fill();ctx.beginPath();ctx.arc(3,-.4,.6,0,TAU);ctx.fill();
- ctx.fillStyle='#e7a0a0';ctx.beginPath();ctx.ellipse(1,3.5,2.2,1.2,0,0,TAU);ctx.fill();
- ctx.fillStyle=C.nose;ctx.beginPath();ctx.arc(11.3,2,1.5,0,TAU);ctx.fill();ctx.restore();
-}
-
-/* Back / belly view used mid-roll: no squashing; legs splay out and grip both edges of the branch. */
 function drawDorsal(ctx,C,belly,t,paws,moving,ph){
  const tail=[];for(let i=0;i<=10;i++){const u=i/10;tail.push([-13-u*44,Math.sin(u*2.6+t*3)*4*u]);}
  // tail (behind body)
@@ -140,9 +107,8 @@ function drawDorsal(ctx,C,belly,t,paws,moving,ph){
   ctx.fillStyle=C.back2;ctx.beginPath();ctx.ellipse(16,0,6,1.6,0,0,TAU);ctx.fill();}
  ctx.fillStyle='#120f0d';ctx.beginPath();ctx.arc(19.5,5.6,1.5,0,TAU);ctx.arc(19.5,-5.6,1.5,0,TAU);ctx.fill();
  ctx.fillStyle=C.nose;ctx.beginPath();ctx.arc(29.5,0,1.4,0,TAU);ctx.fill();}
-const RENDER={A:drawA,B:drawB,C:drawC};
 let SQ_MODE='';
-function drawSquirrel(ctx,kind,rig,mode,ph,t,dt,C,ik){SQ_MODE=mode;const P=pose(mode,ph,t),PF=pose(mode,ph-(P.far||0),t);updateTail(rig,P,t,dt);springHead(rig,P,dt);const sk=skel(P,PF);if(ik)ik(sk);RENDER[kind](ctx,sk,C,tailPts(rig,sk.tailRoot,kind==='C'?5.5:5));}
+function drawSquirrel(ctx,rig,mode,ph,t,dt,C,ik){SQ_MODE=mode;const P=pose(mode,ph,t),PF=pose(mode,ph-(P.far||0),t);updateTail(rig,P,t,dt);springHead(rig,P,dt);const sk=skel(P,PF);if(ik)ik(sk);drawB(ctx,sk,C,tailPts(rig,sk.tailRoot,5));}
 
 
 /* ---- squirrels ---- */

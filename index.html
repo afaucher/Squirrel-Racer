@@ -825,8 +825,8 @@ function pictureOf(kind,id,W,H){W=W||160;H=H||120;
  if(kind==='b')return artCanvas('b'+id,W,H,g=>{const sp=BIRD_SP[id];BirdArt.drawBird(g,sp,0,10,1.6,{t:0});});
  if(kind==='n')return artCanvas('n'+id,W,H,g=>{g.scale(5,5);g.translate(0,-6);drawNutArt(g,id);});
  if(kind==='t')return artCanvas('t'+id,W,H,g=>{const T=genRecursive(SPECIES[id],77+id.length*13,0,40,.32);drawSegs(g,T.segs,SPECIES[id]);drawLeaves(g,T.leaves,null,.95);});
- if(kind==='s')return artCanvas('s'+id,W,H,g=>{const C=COATS[SQUIRRELS[id].coat];g.scale(1.2,1.2);drawSquirrel(g,'B',makeRig(),'alert',0,1,0,C);});
- if(kind==='sh')return artCanvas('sh'+id,W,H,g=>{const C=COATS[SQUIRRELS[id].coat];g.scale(1.6,1.6);drawSquirrel(g,'B',makeRig(),'alert',0,1,0,C);},SHCROP);
+ if(kind==='s')return artCanvas('s'+id,W,H,g=>{const C=COATS[SQUIRRELS[id].coat];g.scale(1.2,1.2);drawSquirrel(g,makeRig(),'alert',0,1,0,C);});
+ if(kind==='sh')return artCanvas('sh'+id,W,H,g=>{const C=COATS[SQUIRRELS[id].coat];g.scale(1.6,1.6);drawSquirrel(g,makeRig(),'alert',0,1,0,C);},SHCROP);
  return artCanvas('f'+id,W,H,g=>{g.scale(2.6,2.6);drawFlowerSp(g,id,0,18,34,0,3);});}
 function outlineOf(kind,id,W,H){const k='o'+kind+id+W+'x'+H;let c=ART.get(k);if(c)return c;const src=pictureOf(kind,id,W,H);
  const a=document.createElement('canvas');a.width=src.width;a.height=src.height;const ag=a.getContext('2d');ag.drawImage(src,0,0);ag.globalCompositeOperation='source-in';ag.fillStyle='#fff';ag.fillRect(0,0,a.width,a.height);
@@ -1105,7 +1105,7 @@ function openMenu(view,arg){hideCard();let h='';
 function startGame(cfg){PLAY.zone=cfg.zone;PLAY.squirrel=cfg.squirrel;PLAY.mission=cfg.mission||null;PLAY.started=1;newWorld((Math.random()*1e6)|0);buildFrames();closeMenu();input.seen=false;}
 
 /* ================= PLAY SANDBOX ================= */
-const PLAY={rig:'B',coat:'gray',scheme:'dual',motion:'nimble',zone:'east',squirrel:null,mission:null,paused:false,started:0};
+const PLAY={coat:'gray',scheme:'dual',motion:'nimble',zone:'east',squirrel:null,mission:null,paused:false,started:0};
 const G=980,VMAX=880,RUN=250,SP=470,SQS=.85,OFF=1e5;
 let W,S;
 function pickCoat(){const r=Math.random();PLAY.coat=r<.42?'gray':r<.68?'fox':r<.88?'red':'black';}
@@ -1241,7 +1241,7 @@ function drawPlay(t,dt){
   if(aiming)mode='crouch';else if(S.landT>0){mode='land';ph=1-S.landT/.35;}
   else if(S.speed>12)mode=S.side===1&&!steep?'cling':down?'descend':'bound';
   else{if(S.side===1&&!steep){mode='cling';ph=.25;}else if(steep){mode=down?'descend':'bound';ph=.75;}else mode=(S.idle%9)>5?'alert':'sit';}}
-  TAILFX.amt=FX.rb;TAILFX.t=t;if(PLAY.motion==='nimble'&&!S.flying&&S.dorsalDraw)drawDorsal(ctx,C,S.dorsalDraw.belly,t,S.dorsalDraw.paws,S.speed>15,S.phase);else drawSquirrel(ctx,PLAY.rig,rig,mode,ph,t,dt,C,ikFn);TAILFX.amt=0;ctx.restore();};
+  TAILFX.amt=FX.rb;TAILFX.t=t;if(PLAY.motion==='nimble'&&!S.flying&&S.dorsalDraw)drawDorsal(ctx,C,S.dorsalDraw.belly,t,S.dorsalDraw.paws,S.speed>15,S.phase);else drawSquirrel(ctx,rig,mode,ph,t,dt,C,ikFn);TAILFX.amt=0;ctx.restore();};
  // trees back to front (behind limbs, trunks, front limbs), each layer followed by the birds and nuts on it, and the
  // ground after the trunks. The squirrel goes in at its own depth, so whatever is in front of it is simply drawn later.
  // Behind a trunk, the flight path waits until the end so trunks can't hide it.
