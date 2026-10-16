@@ -129,6 +129,7 @@ Object.assign(COATS,{
  eured:{back:'#b35a2a',back2:'#8e4320',wash:'#c06a35',belly:'#f3ead9',tail:'#a8501f',tailEdge:'#c96a35',paw:'#6a3216',ring:'#f4e6d4',ear:'#b35a2a',nose:'#2a1408',tuft:7,tuftC:'#8e4320'},
  jsquirrel:{back:'#9a5a32',back2:'#6e3e22',wash:'#c9803f',belly:'#f8f6f1',tail:'#8e5230',tailEdge:'#c9a27a',paw:'#b06a36',ring:'#f3efe6',ear:'#8e5230',nose:'#2a1a10'},
  jgiantfly:{back:'#7a5236',back2:'#4f3322',wash:'#8c7a66',belly:'#efe6d4',tail:'#7a5236',tailEdge:'#9a8670',paw:'#3e2a1d',ring:'#2a1f18',ear:'#6b4630',nose:'#20160f',cheek:'#f4f1ea',eye:1.3,glide:1,tailR:1},
+ serelepe:{back:'#6b5a3a',back2:'#4a3d28',wash:'#8c7148',belly:'#d09a5c',tail:'#8a5230',tailEdge:'#d9a066',paw:'#8a6a45',ring:'#d8c08a',ear:'#9a7350',nose:'#2a1f14'},
  jdwarffly:{back:'#8a7d6e',back2:'#6b6054',wash:'#a9a094',belly:'#f4f1ea',tail:'#85786a',tailEdge:'#5e544a',paw:'#b9a79a',ring:'#3a322b',ear:'#7a6e61',nose:'#2a221c',eye:1.5,glide:1,tailR:.7},
  eudark:{back:'#4a3428',back2:'#33231a',wash:'#5a3f2f',belly:'#efe6d6',tail:'#3e2b20',tailEdge:'#6a4a36',paw:'#2a1d16',ring:'#d8ccbc',ear:'#4a3428',nose:'#120c08',tuft:7,tuftC:'#2a1d16'}});
 const SQUIRRELS={
@@ -151,4 +152,5 @@ const SQUIRRELS={
  eudark:{coat:'eudark'},
  jsquirrel:{coat:'jsquirrel'},
  jgiantfly:{coat:'jgiantfly'},
- jdwarffly:{coat:'jdwarffly'}};
+ jdwarffly:{coat:'jdwarffly'},
+ serelepe:{coat:'serelepe'}};

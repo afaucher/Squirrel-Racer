@@ -233,6 +233,7 @@ const SPECIES={
 function leafBlob(r,sp,x,y,size,out){const blobs=[];const n=3+Math.floor(r()*4);for(let i=0;i<n;i++)blobs.push({dx:(r()-.5)*size*1.6,dy:(r()-.5)*size*1.2-size*.2,rx:size*(.45+r()*.5),ry:size*(.35+r()*.4),rot:r()*TAU,c:sp.leaf[Math.floor(r()*sp.leaf.length)]});out.push({x,y,blobs});}
 
 function genRecursive(sp,seed,x,y,s){
+ if(sp.form)return formSegs(TREE_FORMS[sp.form](sp,seed,x,y,s*(TREE_FORMS[sp.form].flat||1)));
  const r=rng(seed),segs=[],leaves=[];
  if(sp.whorl){
   const H=400*s,n=16,T=sp.trunk*s;let px=x,py=y;
@@ -262,13 +263,12 @@ function genRecursive(sp,seed,x,y,s){
 }
 function drawSegs(ctx,segs,sp,flat){
  if(segs.some(g=>g.own&&ownSag(g)))segs=segs.map(g=>{const oy=g.own?ownSag(g):0;return oy?{...g,y1:g.y1+oy,y2:g.y2+oy}:g;});
- ctx.fillStyle=flat||sp.bark;
  for(const g of segs){const dx=g.x2-g.x1,dy=g.y2-g.y1,l=Math.hypot(dx,dy)||1,nx=-dy/l,ny=dx/l;
-  ctx.beginPath();ctx.moveTo(g.x1+nx*g.w1/2,g.y1+ny*g.w1/2);ctx.lineTo(g.x2+nx*g.w2/2,g.y2+ny*g.w2/2);ctx.lineTo(g.x2-nx*g.w2/2,g.y2-ny*g.w2/2);ctx.lineTo(g.x1-nx*g.w1/2,g.y1-ny*g.w1/2);ctx.closePath();ctx.fill();
+  ctx.fillStyle=flat||g.c||sp.bark;ctx.beginPath();ctx.moveTo(g.x1+nx*g.w1/2,g.y1+ny*g.w1/2);ctx.lineTo(g.x2+nx*g.w2/2,g.y2+ny*g.w2/2);ctx.lineTo(g.x2-nx*g.w2/2,g.y2-ny*g.w2/2);ctx.lineTo(g.x1-nx*g.w1/2,g.y1-ny*g.w1/2);ctx.closePath();ctx.fill();
   ctx.beginPath();ctx.arc(g.x2,g.y2,g.w2/2,0,TAU);ctx.fill();}
  if(flat)return;
  ctx.lineCap='round';
- for(const g of segs){if(g.w1<4)continue;const dx=g.x2-g.x1,dy=g.y2-g.y1,l=Math.hypot(dx,dy)||1,nx=-dy/l,ny=dx/l;
+ for(const g of segs){if(g.w1<4||g.c)continue;const dx=g.x2-g.x1,dy=g.y2-g.y1,l=Math.hypot(dx,dy)||1,nx=-dy/l,ny=dx/l;
   ctx.strokeStyle=sp.barkLo;ctx.lineWidth=g.w1*.26;ctx.beginPath();ctx.moveTo(g.x1+nx*g.w1*.32,g.y1+ny*g.w1*.32);ctx.lineTo(g.x2+nx*g.w2*.32,g.y2+ny*g.w2*.32);ctx.stroke();
   ctx.globalAlpha=.55;ctx.strokeStyle=sp.barkHi;ctx.lineWidth=Math.max(1,g.w1*.1);ctx.beginPath();ctx.moveTo(g.x1-nx*g.w1*.22,g.y1-ny*g.w1*.22);ctx.lineTo(g.x2-nx*g.w2*.22,g.y2-ny*g.w2*.22);ctx.stroke();ctx.globalAlpha=1;
   if(sp.mark){ctx.strokeStyle=sp.mark;ctx.lineWidth=1.2;const n=Math.floor(l/8);for(let i=0;i<n;i++){const t=(i+.5)/n,px=lerp(g.x1,g.x2,t),py=lerp(g.y1,g.y2,t),w=lerp(g.w1,g.w2,t)*(.25+((i*37)%5)/12),o=((i*53)%7-3)/10*w;ctx.beginPath();ctx.moveTo(px+nx*(o-w/2),py+ny*(o-w/2));ctx.lineTo(px+nx*(o+w/2),py+ny*(o+w/2));ctx.stroke();}}
@@ -277,7 +277,7 @@ function drawSegs(ctx,segs,sp,flat){
 function ownSag(o){return o.own?sagAt(o.own,o.os):0;}
 function drawLeaves(ctx,leaves,flat,alpha){ctx.globalAlpha=alpha==null?1:alpha;for(const L of leaves){const oy=L.own?ownSag(L):0;for(const b of L.blobs){ctx.fillStyle=flat||b.c;ctx.beginPath();ctx.ellipse(L.x+b.dx,L.y+b.dy+oy,b.rx,b.ry,b.rot,0,TAU);ctx.fill();}}ctx.globalAlpha=1;}
 
-const CROWNS={round:{rx:150,ry:120,cy:260},tall:{rx:95,ry:175,cy:290},wide:{rx:205,ry:95,cy:235}};
+const CROWNS={round:{rx:150,ry:120,cy:260},tall:{rx:95,ry:175,cy:290},wide:{rx:205,ry:95,cy:235},umbrella:{rx:175,ry:45,cy:340}};
 function genSpaceCol(seed,x,y,s,crown,N){
  const r=rng(seed),C=CROWNS[crown||'round'];const cx=x,cy=y-C.cy*s,rx=C.rx*s,ry=C.ry*s;const attr=[];
  for(let i=0;i<(N||240);i++){const a=r()*TAU,d=Math.sqrt(r());attr.push([cx+Math.cos(a)*rx*d,cy+Math.sin(a)*ry*d]);}
@@ -316,7 +316,8 @@ function pathAt(P,s){s=clamp(s,0,P.len);const c=P.cum;let lo=0,hi=c.length-1;whi
 function pathProject(P,x,y){let best={d:1e9,s:0,side:-1};const p=P.pts;for(let i=0;i<p.length-1;i++){const ax=p[i][0],ay=p[i][1],dx=p[i+1][0]-ax,dy=p[i+1][1]-ay,l2=dx*dx+dy*dy||1;let t=((x-ax)*dx+(y-ay)*dy)/l2;t=clamp(t,0,1);const qx=ax+dx*t,qy=ay+dy*t,d=Math.hypot(x-qx,y-qy);if(d<best.d){const cr=dx*(y-qy)-dy*(x-qx);best={d,s:P.cum[i]+t*Math.sqrt(l2),side:cr<0?-1:1};}}return best;}
 
 function genSplineTree(key,seed,x,gy,s){
- const sp=SPECIES[key],r=rng(seed);const H=(sp.whorl?440:380+r()*80)*s*1.22*(sp.H||1);
+ const sp=SPECIES[key];if(sp.form){const T=TREE_FORMS[sp.form](sp,seed,x,gy,s);T.trunk.depth=0;for(const lb of T.limbs){lb.path.depth=lb.behind?-1:1;lb.path.lb=lb;}return Object.assign(T,{key});}
+ const r=rng(seed);const H=(sp.whorl?440:380+r()*80)*s*1.22*(sp.H||1);
  const tc=[];for(let i=0;i<=5;i++){const t=i/5;tc.push([x+(i?(r()-.5)*(sp.whorl?8:26)*s:0)+(sp.wavy?Math.sin(t*3)*10*s:0),gy-H*t]);}
  const trunk=makePath(tc,sp.trunk*1.25*s+6*s,(sp.whorl?1.4:2.6)*s,{kind:'trunk',sp,taper:1.4});
  const limbs=[];const n=sp.whorl?(sp.whorlN?sp.whorlN-1+Math.floor(r()*2):5+Math.floor(r()*2)):3+Math.floor(r()*3);let side=r()<.5?-1:1;
@@ -382,6 +383,8 @@ function drawPath(ctx,P,sp,sag,outline,opt){
  ctx.strokeStyle=sp.barkHi;ctx.lineWidth=Math.max(.8,P.w0*.08);ctx.globalAlpha=.6;ctx.beginPath();
  for(let i=0;i<Rp.length;i++){const x=lerp(p[i][0],Rp[i][0],.5),y=lerp(p[i][1]+(sag?sag(cum[i]):0),Rp[i][1],.5);i?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();ctx.globalAlpha=1;
  if(sp.mark){ctx.strokeStyle=sp.mark;ctx.lineWidth=1.3;for(let i=2;i<p.length-1;i+=2){const f=((i*37)%5)/5;const a=Lp[i],b=Rp[i];const t0=.15+f*.4,t1=t0+.25;ctx.beginPath();ctx.moveTo(lerp(a[0],b[0],t0),lerp(a[1],b[1],t0));ctx.lineTo(lerp(a[0],b[0],t1),lerp(a[1],b[1],t1));ctx.stroke();}}
+ if(sp.shaft&&P.kind==='trunk'){const i0=Math.floor(Lp.length*(1-sp.shaft[1]));ctx.fillStyle=sp.shaft[0];ctx.beginPath();for(let i=i0;i<Lp.length;i++)ctx.lineTo(Lp[i][0],Lp[i][1]);for(let i=Rp.length-1;i>=i0;i--)ctx.lineTo(Rp[i][0],Rp[i][1]);ctx.closePath();ctx.fill();}
+ if(sp.rings&&P.kind==='trunk'){ctx.strokeStyle=sp.rings;ctx.lineWidth=1.1;const i1=sp.shaft?Math.floor(Lp.length*(1-sp.shaft[1])):Lp.length;for(let i=1;i<i1;i++){ctx.globalAlpha=.35+.3*((i*37)%5)/4;ctx.beginPath();ctx.moveTo(Lp[i][0],Lp[i][1]);ctx.lineTo(Rp[i][0],Rp[i][1]);ctx.stroke();}ctx.globalAlpha=1;}
  if(sp.strips&&P.kind==='trunk'){ctx.strokeStyle=sp.strips;ctx.lineWidth=1.6;ctx.globalAlpha=.75;for(const o of[.2,.38,.56,.74]){for(let i0=((o*40)|0)%3;i0<p.length-4;i0+=6){ctx.beginPath();for(let i=i0;i<i0+4;i++){const a=Lp[i],b=Rp[i];const x=lerp(a[0],b[0],o),y=lerp(a[1],b[1],o);i>i0?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();}}ctx.globalAlpha=1;}
  return{Lp,Rp,k0};
 }
@@ -399,8 +402,8 @@ function drawFoot(ctx,lb,par,sp){const P=lb.path,fl=P.w0*1.3,s0=trimS(P,par);con
 function drawTreeLayer(ctx,T,z,sagFor,sag){
  if(z===0){drawPath(ctx,T.trunk,T.sp,null,true);return;}
  for(const lb of T.limbs){if((lb.behind?-1:1)!==z)continue;const sg=(sagLoad(lb.path)||(lb.parent&&sagAt(lb.path,0)))?(c=>sagAt(lb.path,c)):null;
-  if(lb.behind){const g=drawPath(ctx,lb.path,T.sp,sg,true);ctx.save();ctx.globalAlpha=.16;ctx.fillStyle='#120c06';ctx.beginPath();g.Lp.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]));for(let i=g.Rp.length-1;i>=0;i--)ctx.lineTo(g.Rp[i][0],g.Rp[i][1]);ctx.closePath();ctx.fill();ctx.restore();}
-  else{const par=lb.parent||T.trunk,fy=lb.parent?sagAt(lb.path,0):0;if(fy){ctx.save();ctx.translate(0,fy);}drawFoot(ctx,lb,par,T.sp);if(fy)ctx.restore();drawPath(ctx,lb.path,T.sp,sg,true,{flare:lb.path.w0*1.3,parent:par});}}}
+  const lsp=lb.path.sp||T.sp;if(lb.behind){const g=drawPath(ctx,lb.path,lsp,sg,true);ctx.save();ctx.globalAlpha=.16;ctx.fillStyle='#120c06';ctx.beginPath();g.Lp.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]));for(let i=g.Rp.length-1;i>=0;i--)ctx.lineTo(g.Rp[i][0],g.Rp[i][1]);ctx.closePath();ctx.fill();ctx.restore();}
+  else{const par=lb.parent||T.trunk,fy=lb.parent?sagAt(lb.path,0):0;if(fy){ctx.save();ctx.translate(0,fy);}drawFoot(ctx,lb,par,lsp);if(fy)ctx.restore();drawPath(ctx,lb.path,lsp,sg,true,{flare:lb.path.w0*1.3,parent:par});}}}
 
 /* ---- scenery flowers, flower shapes and the sprite cache: art/plants.js ---- */
 
@@ -470,7 +473,7 @@ function bakeBack(T){
  if(!T.back.length){T.backImg={c:null};return;}
  const pad=12,R=1.5;x0-=pad;y0-=pad;x1+=pad;y1+=pad;const c=document.createElement('canvas');c.width=Math.ceil((x1-x0)*R);c.height=Math.ceil((y1-y0)*R);const g=c.getContext('2d');g.scale(R,R);g.translate(-x0,-y0);
  if(FILTER_OK)g.filter='blur(2.4px)';
- drawLeaves(g,T.backLv,null,.95);drawSegs(g,T.backTw,T.sp);for(const P of T.back)drawPath(g,P,T.sp,null,false);
+ drawLeaves(g,T.backLv,null,.95);drawSegs(g,T.backTw,T.sp);for(const P of T.back)drawPath(g,P,P.sp||T.sp,null,false);
  g.filter='none';g.setTransform(1,0,0,1,0,0);g.globalCompositeOperation='source-atop';g.fillStyle='rgba(190,210,214,.34)';g.fillRect(0,0,c.width,c.height);
  T.backImg={c,x:x0,y:y0,w:x1-x0,h:y1-y0};
 }
@@ -739,6 +742,15 @@ const TREE_INFO={};for(const[id,r]of Object.entries(SPECIES_DATA.trees)){const t
  itaya:mk('maple',{bark:'#8a8a84',barkHi:'#a8a8a2',barkLo:'#62625d',leaf:['#5f9138','#6fa040','#4f8030','#7fb048'],trunk:17,H:.85,bloom:null}),
  hoonoki:mk('maple',{bark:'#8e9290',barkHi:'#b0b4b2',barkLo:'#626664',leaf:['#4f8a34','#5f9a3c','#3f7a2c','#c9d2c0'],leafR:16,trunk:16,H:.9,bloom:null})});})();
 
+// Atlantic Forest (araucaria moist forest) trees; the Paraná pine and queen palm use the growth forms in art/plants.js
+(function(){const mk=(base,o)=>Object.assign({},SPECIES[base],o);Object.assign(SPECIES,{
+ paranapine:mk('pine',{form:'araucaria',whorl:false,H:1.12,bark:'#6b4a45',barkHi:'#8c6a62',barkLo:'#4a3230',mark:'#3e2a26',leaf:['#2f4f32','#3b5a3a','#26402a','#466b44'],trunk:20,leafR:9,nutAt:[.72,.98]}),
+ yerbamate:mk('maple',{bark:'#9a968c',barkHi:'#bab6ac',barkLo:'#6e6a62',leaf:['#2e5a34','#3a6a3e','#244a2a','#4f7a48'],trunk:14,H:.72,spread:.62,droop:.1,bloom:null}),
+ imbuia:mk('oak',{bark:'#8c8a84',barkHi:'#aaa8a2',barkLo:'#5e5a52',leaf:['#8fb074','#7ea064','#9cbc82','#6e8f5c'],trunk:21,bloom:null}),
+ pinheirobravo:mk('pine',{bark:'#7a6450',barkHi:'#9a8470',barkLo:'#54402f',mark:'#5e4a38',leaf:['#4f6b4a','#5d7a56','#41593d'],whorlN:7,wL:.7,wDroop:.1,H:.75,trunk:15}),
+ queenpalm:mk('maple',{form:'palm',bark:'#a39e94',barkHi:'#c4bfb5',barkLo:'#77726a',rings:'#77726a',trunk:9,H:.95,rachis:['#7a8a4a','#9aa866','#56622e'],leaf:['#5e8a4a','#6e9a52','#4e7a3e','#7aa45a'],leaflet:30,plume:1,hang:.45,nutAt:[.03,.15],bloom:null}),
+ argcedar:mk('maple',{bark:'#6e5a4a',barkHi:'#8e7a68',barkLo:'#4a3a30',strips:'#45362c',leaf:['#5f8f45','#6f9f50','#4f7f3a'],trunk:19,spread:.75,H:1.05,leafR:10,bloom:null})});})();
+
 /* ---- nuts and cones: art in art/plants.js (NUTS), facts merged in from data/trees.js ---- */
 for(const[id,r]of Object.entries(SPECIES_DATA.nuts))Object.assign(NUTS[id],facts(r));
 for(const[id,n]of Object.entries(NUTS)){const ti=TREE_INFO[n.tree];n.id=id;n.sci=ti[1];n.range=ti[2];n.treeName=ti[0];}
@@ -774,8 +786,12 @@ const ZN={
  jp:{name:'Japanese Beech Forest',where:'Mountains of northern Honshu, Japan',sky:['#b4c6d0','#e6eae6'],hills:'#a9bcb2',far:'#8ea39c',farLeaf:['#93a993','#9fb49d'],
   trees:[['buna',7],['mizunara',2],['itaya',2],['hoonoki',2],['tochi',1],['jwalnut',1]],squirrels:['jsquirrel','jgiantfly','jdwarffly'],
   birds:['eujay','varitit','eunut','jgreenwp','narcfly','jrobin'],nuts:['bunanut','mizunaraacorn','jwalnutnut','tochinut'],
-  flowers:['katakuri','nirinso','shiraneaoi','mizubasho','enreiso','cobralily','goldenlily','sankayou','yamaajisai','toadlily','marshmarigold']}};
-const ZONE_IDS=['east','boreal','sw','pnw','cal','jp'];
+  flowers:['katakuri','nirinso','shiraneaoi','mizubasho','enreiso','cobralily','goldenlily','sankayou','yamaajisai','toadlily','marshmarigold']},
+ atl:{name:'Atlantic Forest',where:'Araucaria forest of the southern Brazil uplands',sky:['#bccdd7','#e4e7df'],hills:'#a3b4ae',far:'#7f968c',farLeaf:['#6f8a7a','#80998a'],farCrowns:['umbrella','round','umbrella'],
+  trees:[['paranapine',7],['yerbamate',4],['imbuia',3],['pinheirobravo',3],['queenpalm',3],['argcedar',2]],squirrels:['serelepe'],
+  birds:['rbtoucan','azjay','wspwood','arauctit','diadtan','rbthrush'],nuts:['pinhao','palmnut','podoseed','cedarpod'],
+  flowers:['royalfuchsia','anisesage','flowerofsouls','palacelily','pinksorrel','brazilplume','wildbanana','woollybegonia','smallspiderwort','mossverbena','tropmilkweed']}};
+const ZONE_IDS=['east','boreal','sw','pnw','cal','jp','atl'];
 function zone(){return ZN[PLAY.zone||'east'];}
 function itemInfo(kind,id){if(kind==='s'){const q=SQUIRRELS[id];return{kind,id,name:q.name,sci:q.sci,range:q.range,fact:q.fact};}
  if(kind==='b'){const b=BIRD_SP[id];return{kind,id,name:b.name,sci:b.sci,range:b.range,fact:b.fact,pl:b.pl};}
@@ -866,6 +882,19 @@ const CALLS={
   t+=rnd(.08,.16);}return a;},
  // "hin-karararara": one sharp ringing note, then a fast rattling trill that fades, like a horse whinnying
  jrobin:()=>{const f=rnd(4200,5200),g=rnd(3200,4000),dt=rnd(.045,.06),n=10+(Math.random()*6|0),a=[[0,f,f*1.05,.22,'sine',.8]];let t=.3;for(let i=0;i<n;i++){a.push([t,g,g*.85,dt*.6,'sine',.7*(1-i/n*.7)]);t+=dt;}return a;},
+ // slow, gruff, far-carrying croaks: "reenh... reenh..."
+ rbtoucan:()=>{const f=rnd(480,650);return rep(3+(Math.random()*3|0),rnd(.9,1.3),t=>[[t,f*1.1,f*.85,.32,'sawtooth',.35,rnd(25,40)]]);},
+ // shrill, harsh "kiaahh-kiaahh-kiaahh"
+ azjay:()=>{const f=rnd(1600,2200);return rep(3+(Math.random()*3|0),rnd(.45,.55),t=>[[t,f*1.2,f*.8,.3,'sawtooth',.28,rnd(50,80)],[t,f*2.4,f*1.6,.28,'noise',.6,0,3]]);},
+ // "chee-kit" and a fast rattle, or soft taps in twos to fours
+ wspwood:()=>{const a=[];let t=0;if(Math.random()<.35){for(let g=0;g<2+(Math.random()*2|0);g++){for(let i=0;i<2+(Math.random()*3|0);i++){a.push([t,800,650,.03,'noise',3.5,0,2]);t+=.09;}t+=rnd(.4,.7);}return a;}
+  const f=rnd(3600,4400),n=8+(Math.random()*5|0);a.push([0,f,f*1.15,.09,'sine',.6],[.13,f*1.1,f*.9,.06,'sine',.55]);t=.35;for(let i=0;i<n;i++){a.push([t,f*.95,f*.85,.04,'sine',.55*(1-i/n*.4)]);t+=.085;}return a;},
+ // very high, thin notes that switch between a trill and a slower rattle
+ arauctit:()=>{const a=[];let t=0,f=rnd(6000,7500);for(let s=0;s<3;s++){const dt=Math.random()<.5?.05:rnd(.09,.12),n=6+(Math.random()*8|0);for(let i=0;i<n;i++){a.push([t,f,f*.92,dt*.55,'sine',.45]);t+=dt;}f*=rnd(.9,1.08);}return a;},
+ // a rich run of warbled whistles ending in a drawn-out rising note
+ diadtan:()=>{const a=[];let t=0;const n=6+(Math.random()*5|0);for(let i=0;i<n;i++){const f=rnd(2200,3800),d=rnd(.08,.15);a.push([t,f,f*rnd(.8,1.25),d,'sine',.6]);t+=d+rnd(.03,.07);}a.push([t+.05,3000,4600,.35,'sine',.65]);return a;},
+ // fluty, melodious phrases, each one different
+ rbthrush:()=>{const a=[];let t=0;for(let p=0;p<2;p++){const n=3+(Math.random()*4|0);for(let i=0;i<n;i++){const f=rnd(1600,3400),d=rnd(.12,.25);a.push([t,f,f*rnd(.85,1.2),d,'sine',.7,Math.random()<.3?rnd(20,40):0]);t+=d+rnd(.02,.06);}t+=rnd(.5,.9);}return a;},
  chaffinch:()=>{const a=[];let t=0,dt=.13;for(let i=0;i<12;i++){a.push([t,5200-i*130,5000-i*130,.05,'sine',.65]);t+=dt;dt=Math.max(.055,dt*.9);}a.push([t+.08,3200,5200,.12,'sine',.7],[t+.22,5200,2800,.14,'sine',.7]);return a;}};
 function playCall(id,o){o=o||{};if(!AMB.on)return;startAudio();if(!AMB.ctx)return;const ctx=AMB.ctx,dest=o.world?AMB.L.birds.gain:AMB.fx,t0=ctx.currentTime+.03,vol=o.vol==null?1:o.vol;
  const out=ctx.createGain();out.gain.value=vol*(o.world?.35:.55);let node=out;if(ctx.createStereoPanner){const p=ctx.createStereoPanner();p.pan.value=clamp(o.pan||0,-1,1);out.connect(p);node=p;}node.connect(dest);
@@ -893,7 +922,7 @@ function populateTree(T,i,hsh){const Z=zone(),M=PLAY.mission,r=rng(hsh^0x5bd1e99
   else if(limbs.length){const L=limbs[(r()*limbs.length)|0].path,s=L.len*(.35+r()*.5),q=pathAt(L,s),w=wAt(L,s)/2,nx=-Math.sin(q.ang),ny=Math.cos(q.ang);const p1=[q.x+nx*w,q.y+ny*w],p2=[q.x-nx*w,q.y-ny*w],top=p1[1]<p2[1]?p1:p2;b={kind:'limb',P:L,s,x:top[0],y:top[1]+1,lean:clamp(Math.atan2(Math.sin(q.ang),Math.cos(q.ang)),-.4,.4)};}
   if(b){Object.assign(b,{id,sp:bid,seed:r()*10,face:r()<.5?-1:1});T.birds.push(b);}});
  // nuts and cones on the tree that bears them, plus a few fallen ones
- const nut=Object.keys(NUTS).find(n=>NUTS[n].tree===T.key);if(nut){const n=3+((r()*3)|0);for(let k=0;k<n&&limbs.length;k++){const L=limbs[(r()*limbs.length)|0].path,s=L.len*(.4+r()*.55),q=pathAt(L,s),w=wAt(L,s)/2,nx=-Math.sin(q.ang),ny=Math.cos(q.ang);const p1=[q.x+nx*w,q.y+ny*w],p2=[q.x-nx*w,q.y-ny*w];const up=NUTS[nut].art.upright;const p=up?(p1[1]<p2[1]?p1:p2):(p1[1]>p2[1]?p1:p2);
+ const nut=Object.keys(NUTS).find(n=>NUTS[n].tree===T.key);if(nut){const n=3+((r()*3)|0),na=T.sp.nutAt||[.4,.95];for(let k=0;k<n&&limbs.length;k++){const L=limbs[(r()*limbs.length)|0].path,s=L.len*(na[0]+r()*(na[1]-na[0])),q=pathAt(L,s),w=wAt(L,s)/2,nx=-Math.sin(q.ang),ny=Math.cos(q.ang);const p1=[q.x+nx*w,q.y+ny*w],p2=[q.x-nx*w,q.y-ny*w];const up=NUTS[nut].art.upright;const p=up?(p1[1]<p2[1]?p1:p2):(p1[1]>p2[1]?p1:p2);
    const id=i+':n'+k;if(!taken.has(id))T.nuts.push({id,sp:nut,P:L,s,x:p[0],y:p[1],rot:(r()-.5)*.4});}
   const ng=1+((r()*2)|0);for(let k=0;k<ng;k++){const id=i+':g'+k;if(!taken.has(id))T.nuts.push({id,sp:nut,x:T.x+(r()<.5?-1:1)*(22+r()*70),y:6,ground:1,rot:Math.PI/2*(r()<.5?1:-1)+(r()-.5)*.6});}}
  // wildflowers
@@ -903,7 +932,7 @@ function nutPos(n){return n.ground?[n.x,n.y]:[n.x,n.y+sagAt(n.P,n.s)];}
 const BIRD_SCALE=.62;
 // birds and nuts sit on a trunk (depth 0) or a limb (behind -1, front 1); pass z to draw only those on that layer
 const perchDepth=o=>o.P?(o.P.depth||0):0;
-function drawTreeCritters(ctx,T,t,z){for(const n of T.nuts){if(n.ground||(z!=null&&perchDepth(n)!==z))continue;const[x,y]=nutPos(n);ctx.save();ctx.translate(x,y);ctx.rotate(n.rot);drawNutArt(ctx,n.sp);ctx.restore();}
+function drawTreeCritters(ctx,T,t,z){for(const n of T.nuts){if(n.ground||(z!=null&&perchDepth(n)!==z))continue;const[x,y]=nutPos(n);ctx.save();ctx.translate(x,y);ctx.rotate(n.rot);drawNutArt(ctx,n.sp,1);ctx.restore();}
  for(const b of T.birds){if(b.kind==='ground'||(z!=null&&perchDepth(b)!==z))continue;drawOneBird(ctx,b,t);}}
 function drawGroundCritters(ctx,T,t){for(const n of T.nuts){if(!n.ground)continue;ctx.save();ctx.translate(n.x,n.y);ctx.rotate(n.rot);drawNutArt(ctx,n.sp);ctx.restore();}for(const b of T.birds)if(b.kind==='ground')drawOneBird(ctx,b,t);}
 function drawOneBird(ctx,b,t){const sp=BIRD_SP[b.sp],[x,y]=birdPos(b);const st=BirdArt.idle(sp,RM?0:t,b.seed);ctx.save();ctx.translate(x,y);if(b.kind!=='trunk'&&b.face<0)ctx.scale(-1,1);if(b.lean)ctx.rotate(b.lean*b.face*.5);BirdArt.drawBird(ctx,sp,0,0,BIRD_SCALE,st);ctx.restore();}
@@ -1106,7 +1135,7 @@ function newWorld(seed){if(PLAY.squirrel&&typeof SQUIRRELS!=='undefined')PLAY.co
 const cam={x:0,y:-200,zoom:1.3,lx:1,ly:0,vx:0};
 function hash(i,s){let x=(i*374761393+s*668265263)|0;x=(x^(x>>>13))*1274126177|0;return(x^(x>>>16))>>>0;}
 function ensureTrees(x0,x1){const i0=Math.floor(x0/SP),i1=Math.ceil(x1/SP);
- for(let i=i0;i<=i1;i++){if(W.trees.has(i))continue;const hsh=hash(i,W.seed);const key=pickTreeKey(hsh);const x=i*SP+((hsh>>>4)%80)-40;const big=!SPECIES[key].whorl&&SPECIES[key].trunk>=19&&((hsh>>>12)%3!==0);const T=genSplineTree(key,(hsh>>>8)%100000,x,0,big?1.22:1);T.i=i;
+ for(let i=i0;i<=i1;i++){if(W.trees.has(i))continue;const hsh=hash(i,W.seed);const key=pickTreeKey(hsh);const x=i*SP+((hsh>>>4)%80)-40;const big=!SPECIES[key].whorl&&!SPECIES[key].form&&SPECIES[key].trunk>=19&&((hsh>>>12)%3!==0);const T=genSplineTree(key,(hsh>>>8)%100000,x,0,big?1.22:1);T.i=i;
   W.paths.push(T.trunk);for(const lb of T.limbs){const par=lb.parent||T.trunk;W.paths.push(lb.path);par.junctions.push({s:lb.at,to:lb.path,s2:0});lb.path.junctions.push({s:0,to:par,s2:lb.at});}
   W.ground.junctions.push({s:x+OFF,to:T.trunk,s2:0,tree:i});T.trunk.junctions.push({s:0,to:W.ground,s2:x+OFF});
   T.key=key;populateTree(T,i,hsh);W.trees.set(i,T);}
@@ -1116,7 +1145,7 @@ function ensureTrees(x0,x1){const i0=Math.floor(x0/SP),i1=Math.ceil(x1/SP);
 // trunks dissolve into the haze toward their base instead of ending in a hard square cut
 function fadeBase(g,len){g.save();g.globalCompositeOperation='destination-out';const gr=g.createLinearGradient(0,-len,0,8);gr.addColorStop(0,'rgba(0,0,0,0)');gr.addColorStop(.55,'rgba(0,0,0,.55)');gr.addColorStop(1,'rgba(0,0,0,1)');g.fillStyle=gr;g.fillRect(-260,-len,520,len+12);g.restore();}
 function bakePool(){const q=W.pool.queue.shift();if(!q)return;
- if(q.k==='far'){const crown=['round','tall','wide'][q.i%3];const T=genSpaceCol(900+q.i*31,0,0,1,crown,170);const c=document.createElement('canvas');c.width=520;c.height=480;const g=c.getContext('2d');g.translate(260,470);drawSpaceCol(g,T,zone().far,zone().farLeaf,1);fadeBase(g,200);W.pool.far.push(c);}
+ if(q.k==='far'){const crown=(zone().farCrowns||['round','tall','wide'])[q.i%3];const T=genSpaceCol(900+q.i*31,0,0,1,crown,170);const c=document.createElement('canvas');c.width=520;c.height=480;const g=c.getContext('2d');g.translate(260,470);drawSpaceCol(g,T,zone().far,zone().farLeaf,1);fadeBase(g,200);W.pool.far.push(c);}
  else{const zt=zone().trees;const key=zt[q.i%zt.length][0];const T=genRecursive(SPECIES[key],300+q.i*17,0,0,.85);const c=document.createElement('canvas');c.width=520;c.height=480;const g=c.getContext('2d');g.translate(260,470);g.globalAlpha=1;drawSegs(g,T.segs,null,'#6f7c6a');drawLeaves(g,T.leaves,null,.9);g.globalCompositeOperation='source-atop';g.fillStyle='rgba(180,200,207,.7)';g.fillRect(-260,-470,520,480);g.globalCompositeOperation='source-over';fadeBase(g,170);W.pool.mid.push(c);}
 }
 function surfacePos(){if(!S.flying)return{x:S.x,y:S.y+sagAt(S.path,S.s),ang:S.ta||0,nx:0,ny:0,w:0};const a=pathAt(S.path,S.s);const nx=-S.side*Math.sin(a.ang),ny=S.side*Math.cos(a.ang);const sag=sagAt(S.path,S.s);return{x:a.x+nx*a.w/2,y:a.y+ny*a.w/2+sag,ang:a.ang,nx,ny,w:a.w};}

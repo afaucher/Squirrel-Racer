@@ -58,7 +58,7 @@ For every species, write down:
 
   Some sites (All About Birds, Kew's Plants of the World Online, the IUCN Red List) block automated fetches, so agents may need the alternatives.
 
-  Outside North America and Britain, use the region's own authorities. For the Japanese Beech Forest these were the Ministry of the Environment (env.go.jp, biodic.go.jp), the Forestry Agency's regional pages (rinya.maff.go.jp), prefectural Red Data Books, Hokkaido University's plant pages, Kotobank's encyclopedia entries, and the [IOC World Bird List](https://www.worldbirdnames.org) for bird names. RHS, GBIF and World Flora Online stand in for Kew. Where sources disagree on a scientific name, use the current accepted one and record the other in the claim's `note`.
+  Outside North America and Britain, use the region's own authorities. For the Japanese Beech Forest these were the Ministry of the Environment (env.go.jp, biodic.go.jp), the Forestry Agency's regional pages (rinya.maff.go.jp), prefectural Red Data Books, Hokkaido University's plant pages, Kotobank's encyclopedia entries, and the [IOC World Bird List](https://www.worldbirdnames.org) for bird names. RHS, GBIF and World Flora Online stand in for Kew. For the Atlantic Forest they were Embrapa's tree volumes, Paraná's environment agency (IAT), Brazil's official mammal list, the WWF-Brasil bird guide and SciELO papers. Flora e Funga do Brasil blocks scripts, but its official checklist can be read through GBIF (api.gbif.org). WikiAves and xeno-canto also block scripts. Where sources disagree on a scientific name, use the current accepted one and record the other in the claim's `note`.
 
   **Splitting the research.** Four agents can research in parallel: birds; the forest itself plus trees and nuts; squirrels; and wildflowers. Give them one shared brief with the rules above. Ask each to return JSON in the `data/*.js` shape, with `src` lists they actually opened, plus free-text drawing notes (colours, shapes, the call). Then review the results yourself: shorten the text to card length, swap any species whose habitat evidence is weak, and check for id clashes before merging.
 
@@ -131,6 +131,19 @@ whitespruce: mk('pine', {bark:'#5b4a3e', leaf:['#3d5f55','#4c6e63','#2f4a42'], w
 | `mark` | Colour of short dark bark marks (birch lenticels, ponderosa plates) |
 | `strips` | Colour of long peeling strips (shagbark hickory) |
 | `bloom` | Spring blossoms on twigs: `'dogwood'`, `'cherry'` or `null` |
+| `nutAt` | Where along a limb its nuts hang, as `[from, to]` fractions of the limb (default `[.4, .95]`). The queen palm's fruit hangs at the base of its fronds, `[.03, .15]`, and the Paraná pine's cones sit near the limb tips, `[.72, .98]`. |
+
+Trees that none of the four bases can draw use a **growth form** from `TREE_FORMS` in `art/plants.js`. Set `form` on a base, and the form builds the trunk, the climbable limbs and the leaves in the same layers as the other trees:
+
+```js
+queenpalm: mk('maple', {form:'palm', bark:'#a39e94', rings:'#77726a', trunk:9, rachis:['#7a8a4a','#9aa866','#56622e'], leaf:[…], leaflet:30, plume:1, hang:.45, nutAt:[.03,.15]}),
+paranapine: mk('pine', {form:'araucaria', whorl:false, H:1.12, bark:'#6b4a45', mark:'#3e2a26', leaf:[…], trunk:20, leafR:9, nutAt:[.72,.98]}),
+```
+
+| `form` | Shape | Overrides |
+|---|---|---|
+| `palm` | An unbranched, ringed trunk under a crown of arching feather-leaved fronds. Each frond is a limb the squirrel can run along. | `rachis` (3 colours for the frond stalks: base, highlight, shadow), `fronds` (how many, 10), `frondL` (length), `arch` (how much they bend down), `leaflet`, `leafletW` (leaflet length and width), `hang` (0 stiff, 1 limp), `plume: 1` (leaflets in several planes, for a feathery frond like the queen palm's), `rings` (ring-scar colour), `shaft: [colour, fraction]` (a smooth crownshaft at the top, like the juçara's), `lean`, `taper` |
+| `araucaria` | A tall bare trunk, then whorls of limbs that run out and curve up to one flat, umbrella-like top, with brushy tufts toward the tips | `whorlN` (limbs, 8), `wStart` (where the crown starts up the trunk, .64), `wL` (limb reach), `leafR` (tuft size) |
 
 ### 2.2 Nuts and cones: facts in `data/trees.js`, art in `NUTS` (`art/plants.js`)
 
@@ -149,6 +162,10 @@ The nut's `name`, `tree` and `fact` go under `nuts` in `data/trees.js`. `tree` i
 | `hazel` | A nut in a frilled husk. `beak: 1` gives the long bristly husk of the beaked hazel. |
 | `walnut` | `col` (shell), `husk`: a pointed, wrinkled walnut between the two halves of its split green husk |
 | `conker` | `col` (seed), `hilum` (the pale scar), `husk` and `inner`: a glossy horse chestnut in its three-part husk |
+| `pinhao` | `col` and `tip` (the seed), `cone` and `hi` (the cone), `R` (cone size): a round, spiky pinha cone sitting on the limb, which shows as three loose pinhão seeds on the ground, on cards and in mission outlines |
+| `drupes` | `col`, `hi`, `stalk`; `n` (strands), `r` (fruit size), `egg` (oval fruit): a hanging bunch of round fruit, like palm nuts |
+| `podocarp` | `col` (the juicy stalk), `seed`, `bloom` (the waxy seed coat): a seed on a swollen fleshy stalk |
+| `capsule` | `col`, `dots` (pale specks), `wing` (seed wings): a woody pod split into five valves, with winged seeds |
 
 Hanging nuts are placed under their own tree's limbs (upright cones on top), and 1–2 lie fallen nearby.
 
@@ -191,8 +208,8 @@ Each bird is drawn from its field marks on a shared body, facing right:
 | `up`, `low`, `head`, `wing`, `leg` | Base colours: back, belly, head, wing, legs |
 | `tail` | `{c, len, p}`. Tail patterns are `outer` (white outer feathers), `bars` and `tip`. |
 | `crest` | `{len, c}` |
-| `bill` | `t`: `cone` (finches, cardinal), `short` (tits), `thin` (warblers, nuthatches; `up:1` turns it up), `jay`, `chisel` (woodpeckers), `cross` (crossbills) or `grouse`. Plus `c`, `len` and depth `d`. |
-| `hp` (head) | `[kind, colour, offset?]`, where kind is `bib brow cap capback capback2 ccurve cheek chin clown collar comb crown eyeline face forehead fstreaks helmet hood mask moustache moustache3 nape napered napespot necklace streakcrown` |
+| `bill` | `t`: `cone` (finches, cardinal), `short` (tits), `thin` (warblers, nuthatches; `up:1` turns it up), `jay`, `chisel` (woodpeckers), `cross` (crossbills), `grouse` or `toucan`. Plus `c`, `len` and depth `d`. The big curved `toucan` bill also takes a colour pattern: `ridge` (a stripe along the top), `low` (lower mandible), `tip` and `base` (a band where it meets the face). Hornbills can reuse it. |
+| `hp` (head) | `[kind, colour, offset?]`, where kind is `bib brow cap capback capback2 ccurve cheek chin clown collar comb crown eyeline face forehead fstreaks helmet hood mask moustache moustache3 nape napered napespot necklace streakcrown eyeskin` (`eyeskin` is the bare skin round a toucan's eye) |
 | `bp` (body) | `backbars belly breast breastband breastedge flank rump scallop spots streaks vent wash` |
 | `wp` (wing) | `bars edge panel patch spots tips wingbar wingbars2` |
 | `sp` (shoulder) | `shoulder` |
@@ -243,7 +260,7 @@ sw: {name:'Southwest Ponderosa Pine', where:'Arizona, New Mexico and Colorado',
 ```
 
 - `trees` are `[id, weight]`.
-- `sky`, `hills`, `far` and `farLeaf` set the backdrop. Keep them hazy and low-contrast, and give them a tint that suggests the place: cooler blue-gray for boreal, warm dust for the Southwest.
+- `sky`, `hills`, `far` and `farLeaf` set the backdrop. Keep them hazy and low-contrast, and give them a tint that suggests the place: cooler blue-gray for boreal, warm dust for the Southwest. `farCrowns` (optional) picks the shapes of the faraway trees, three of `round`, `tall`, `wide` and `umbrella` (the flat tops of an araucaria skyline).
 - Add the id to `ZONE_IDS` (its position sets the order in the menus). The menus, missions and collection all pick the new forest up from there.
 
 ---
@@ -276,7 +293,7 @@ sw: {name:'Southwest Ponderosa Pine', where:'Arizona, New Mexico and Colorado',
    for (let i = 0; i < 40 && !PLAY.mission.done; i++) { const t = targets()[0]; if (t) await shoot(t); else await walk('KeyD', 1500); }
    ```
 
-   Nuts must also be within reach: walk to a fallen one (`n.ground`) before you shoot, or climb to a hanging one.
+   Nuts must also be within reach: walk to a fallen one (`n.ground`) before you shoot, or climb to a hanging one. The lens can't reach the edge of the screen, so skip targets closer to it than `lensR(w, h)`, or the loop keeps shooting one it can never hit. If the page was loaded while hidden, the game loop may never start: call `requestAnimationFrame(frame)` once after the first line.
 4. **Check the facts.** Read every claim against its sources, and check the plurals in mission titles. Then run:
 
    ```sh

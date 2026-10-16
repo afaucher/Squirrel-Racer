@@ -105,6 +105,25 @@ const BIRDS=[
  {id:'jrobin',zone:'jp',sex:1,pose:'ground',size:.7,bw:.95,bh:1.1,
   up:'#7a5638',low:'#f2f1ec',head:'#7a5638',wing:'#6e4e34',tail:{c:'#b5562a',len:12},bill:{t:'thin',c:'#151515',len:3.4,d:1.8},leg:'#d9a08f',
   hp:[['face','#e0662a']],bp:[['flank','#8e9399'],['breast','#e0662a'],['breastedge','#3a3534']]},
+
+ {id:'rbtoucan',zone:'atl',pose:'perch',size:1.6,bw:1.05,bh:1.05,
+  up:'#141414',low:'#141414',head:'#141414',wing:'#171717',tail:{c:'#121212',len:20},bill:{t:'toucan',c:'#a9c94b',ridge:'#8db43a',base:'#111111',len:18,d:9},leg:'#5c7c9a',
+  hp:[['chin','#f6d24a'],['eyeskin','#d8312e']],bp:[['breast','#f6c43a',1],['breastband','#f59a1f'],['belly','#d3262c'],['vent','#d3262c'],['rump','#d3262c']]},
+ {id:'azjay',zone:'atl',pose:'perch',size:1.5,bw:1.08,bh:.95,
+  up:'#1f6fd0',low:'#2e86e0',head:'#101010',wing:'#1b5fbf',tail:{c:'#2373d2',len:24},bill:{t:'jay',c:'#111111',len:6,d:3.2},leg:'#1a1a1a',
+  bp:[['breast','#101010',.8]],wp:[['edge','#164e9e']]},
+ {id:'wspwood',zone:'atl',sex:1,pose:'cling',size:.8,
+  up:'#6b7838',low:'#56602f',head:'#3a3125',wing:'#5f6b33',tail:{c:'#3b3a26',len:13},bill:{t:'chisel',c:'#4a4a47',len:5.5,d:2},leg:'#6d725e',
+  hp:[['crown','#c9312a'],['brow','#f2efe0'],['moustache','#f2efe0']],bp:[['spots','#e4e0b0'],['backbars','#c8c58c']],wp:[['spots','#d8d59c']]},
+ {id:'arauctit',zone:'atl',pose:'horiz',size:.6,bh:.92,
+  up:'#9c5a33',low:'#d8b07a',head:'#2a2420',wing:'#b4622c',tail:{c:'#a65b2d',len:24},crest:{len:4,c:'#2a2420',streak:'#e8e2d4'},bill:{t:'thin',c:'#333333',len:3,d:1.4},leg:'#6b6b6b',
+  hp:[['streakcrown','#2a2420'],['brow','#f1ecdf'],['chin','#f1ecdf']],bp:[['breast','#f1ecdf',.7],['streaks','#2a2422']]},
+ {id:'diadtan',zone:'atl',pose:'horiz',size:.9,
+  up:'#3a47a6',low:'#4256b5',head:'#3a47a6',wing:'#16182b',tail:{c:'#1a1e3a',len:15},bill:{t:'cone',c:'#121212',len:4.2,d:3.8},leg:'#3a3a3e',
+  hp:[['face','#0e0e14'],['crown','#f5f5f2'],['forehead','#d21f2b']],wp:[['edge','#3e58b8']]},
+ {id:'rbthrush',zone:'atl',pose:'ground',size:1.1,
+  up:'#7a6a4e',low:'#d8742a',head:'#7a6a4e',wing:'#6e5f45',tail:{c:'#6e5f45',len:16},bill:{t:'thin',c:'#c8ae48',len:4.6,d:2.2},leg:'#8a847d',
+  hp:[['chin','#ede5d3'],['iris','#e6b43a']],bp:[['breast','#b8946a',.8]]},
 ];
 
 /* ---------- renderer: canonical frame, bird faces +x, belly toward +y ---------- */
@@ -123,6 +142,7 @@ function headPattern(g,[k,c,o]){g.fillStyle=c;switch(k){
  case'bib':E(g,3,5.4,3.9*(o||1),2.7*(o||1));g.fill();break;
  case'cheek':E(g,.6,1.7,4.4,2.5);g.fill();break;
  case'face':E(g,2.2,1.4,5.6,4.7);g.fill();break;
+ case'eyeskin':E(g,2.5,-1.1,3.3*(o||1),2.9*(o||1));g.fill();break;
  case'eyeline':strokePts(g,[[6.2,-.6],[2.4,-1.1],[-5.6,-.3]],1.2,c);break;
  case'brow':curve(g,[[5.4,-3.1],[1,-3.6],[-4.8,-2.5]],1.2,c);break;
  case'forehead':E(g,5.3,-3,2.3,1.8);g.fill();break;
@@ -174,8 +194,16 @@ function billPath(g,b,open){const x=5.7;g.beginPath();switch(b.t){
  case'chisel':g.moveTo(x,-b.d*.5);g.lineTo(x+b.len,-.15);g.lineTo(x+b.len,.35);g.lineTo(x,b.d*.5);break;
  case'jay':g.moveTo(x,-b.d*.5);g.quadraticCurveTo(x+b.len*.7,-b.d*.5,x+b.len,.5);g.quadraticCurveTo(x+b.len*.6,b.d*.45,x,b.d*.5);break;
  case'grouse':g.moveTo(x,-b.d*.5);g.quadraticCurveTo(x+b.len,-b.d*.5,x+b.len,.9);g.quadraticCurveTo(x+b.len*.4,b.d*.5,x,b.d*.5);break;
+ case'toucan':g.moveTo(x-.4,-b.d*.55);g.bezierCurveTo(x+b.len*.35,-b.d*.9,x+b.len*.85,-b.d*.5,x+b.len,b.d*.28);g.bezierCurveTo(x+b.len*.8,b.d*.5,x+b.len*.4,b.d*.62,x-.4,b.d*.52);break;
  case'cross':g.moveTo(x,-b.d*.5);g.quadraticCurveTo(x+b.len*.8,-b.d*.6,x+b.len,1.6);g.quadraticCurveTo(x+b.len*.5,-.2,x,.2);g.moveTo(x,.1);g.quadraticCurveTo(x+b.len*.8,b.d*.6,x+b.len*.85,-1.4);g.quadraticCurveTo(x+b.len*.5,.6,x,b.d*.5);break;}
  g.closePath();}
+// the colour pattern of a big bill: lower mandible, a stripe along the ridge, a tip, a band at the base and the serrated edge
+function bigBill(g,b){const x=5.7;g.save();billPath(g,b);g.clip();
+ if(b.low){g.fillStyle=b.low;g.beginPath();g.moveTo(x-1,b.d*.08);g.quadraticCurveTo(x+b.len*.55,b.d*.1,x+b.len+1,b.d*.3);g.lineTo(x+b.len+1,b.d);g.lineTo(x-1,b.d);g.fill();}
+ if(b.ridge){g.strokeStyle=b.ridge;g.lineWidth=b.d*.22;g.beginPath();g.moveTo(x,-b.d*.62);g.bezierCurveTo(x+b.len*.35,-b.d*.94,x+b.len*.85,-b.d*.54,x+b.len,b.d*.24);g.stroke();}
+ if(b.tip){g.fillStyle=b.tip;g.beginPath();g.ellipse(x+b.len,b.d*.2,b.len*.16,b.d,0,0,TAU);g.fill();}
+ if(b.base){g.fillStyle=b.base;g.fillRect(x-1,-b.d,1.2+b.len*.05,b.d*2);}
+ g.restore();g.strokeStyle='rgba(0,0,0,.22)';g.lineWidth=.3;g.beginPath();for(let i=0;i<=12;i++){const u=i/12;g.lineTo(x+b.len*u*.97,b.d*(.08+.2*u*u)+(i%2?.25:-.15));}g.stroke();}
 function drawHead(g,sp,st){const hs=sp.hs||1;g.save();g.scale(hs,hs);
  const cr=sp.crest;if(cr){const L=cr.len*(st.crest||1);g.save();g.beginPath();g.moveTo(3.2,-5.4);g.quadraticCurveTo(.6,-6.6-L*.5,-2.6-L*.55,-5.6-L*.85);g.quadraticCurveTo(-3.2-L*.2,-5.2-L*.3,-5.6,-3.2);g.lineTo(-2,-5.2);g.closePath();g.fillStyle=cr.c;g.fill();
   if(cr.barred){g.clip();g.strokeStyle=cr.barred;g.lineWidth=.7;for(let i=0;i<9;i++){g.beginPath();g.moveTo(-8+i*1.4,-14);g.lineTo(-6+i*1.4,-2);g.stroke();}}
@@ -183,7 +211,7 @@ function drawHead(g,sp,st){const hs=sp.hs||1;g.save();g.scale(hs,hs);
  g.fillStyle=sp.head;E(g,0,0,6.6,6.6);g.fill();
  g.save();E(g,0,0,6.6,6.6);g.clip();for(const p of sp.hp||[])if(p[0]!=='iris')headPattern(g,p);g.restore();
  // bill
- g.fillStyle=sp.bill.c;billPath(g,sp.bill);g.fill();g.strokeStyle='rgba(0,0,0,.25)';g.lineWidth=.35;g.beginPath();g.moveTo(5.8,.3);g.lineTo(5.8+sp.bill.len*.85,.3);g.stroke();
+ g.fillStyle=sp.bill.c;billPath(g,sp.bill);g.fill();if(sp.bill.t==='toucan')bigBill(g,sp.bill);g.strokeStyle='rgba(0,0,0,.25)';g.lineWidth=.35;g.beginPath();g.moveTo(5.8,.3);g.lineTo(5.8+sp.bill.len*.85,.3);g.stroke();
  // eye
  const iris=(sp.hp||[]).find(p=>p[0]==='iris');const ex=2.5,ey=-1.1;
  if(st.blink){g.strokeStyle='#121214';g.lineWidth=.8;g.beginPath();g.arc(ex,ey-.2,1.3,.2,Math.PI-.2);g.stroke();}

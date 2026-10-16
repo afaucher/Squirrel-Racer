@@ -67,7 +67,11 @@ const NUTS={
  bunanut:{art:{t:'beech',col:'#8b5a2b'}},
  mizunaraacorn:{art:{t:'acorn',nut:'#9c6b33',cap:'#7e6a50',capD:.36,w:5,h:9.4,warty:1}},
  jwalnutnut:{art:{t:'walnut',col:'#7b5a3c',husk:'#7fa046'}},
- tochinut:{art:{t:'conker',col:'#5c3317',hilum:'#b8a57e',husk:'#8a7350',inner:'#e2d6b8'}}
+ tochinut:{art:{t:'conker',col:'#5c3317',hilum:'#b8a57e',husk:'#8a7350',inner:'#e2d6b8'}},
+ pinhao:{art:{t:'pinhao',col:'#8b3a2b',tip:'#e8c9b0',cone:'#86683e',hi:'#b8955e',R:8}},
+ palmnut:{art:{t:'drupes',col:'#e6a23c',hi:'#f8d68a',stalk:'#a08a50',n:5,r:2.3,egg:1}},
+ podoseed:{art:{t:'podocarp',col:'#5e1a46',seed:'#6f8a4a',bloom:'#b4c4a8'}},
+ cedarpod:{art:{t:'capsule',col:'#4e3426',dots:'#c8b49a',wing:'#c9a57a'}}
 };
 
 /* ---- wildflowers ---- */
@@ -134,14 +138,50 @@ const FLW={
  sankayou:{k:'cluster',c:'#ffffff',eye:'#e8e0a0'},
  yamaajisai:{k:'cluster',c:'#7fa6e0',eye:'#4f6fc4'},
  toadlily:{k:'polar',v:{k:6,p:.5,notch:0,c1:'#f0c93a',c2:'#f8e07a',center:'#6b3a5a',layers:1,spots:'#6b3a5a'},R:6},
+ royalfuchsia:{k:'fuchsia',c1:'#d7263d',c2:'#6b2d8f',st:'#a3204f',n:3},
+ anisesage:{k:'raceme',v:'sage'},
+ flowerofsouls:{k:'cluster',c:'#f6c324',eye:'#e09a12'},
+ palacelily:{k:'polar',v:{k:6,p:.55,notch:0,c1:'#c8102e',c2:'#9cc84a',center:'#8cc63f',layers:1},R:10},
+ pinksorrel:{k:'polar',v:{k:5,p:.75,notch:0,c1:'#e06aae',c2:'#f6c2de',center:'#cfe07a',layers:1},R:5,low:1},
+ brazilplume:{k:'raceme',v:'justicia'},
+ wildbanana:{k:'bromeliad',c:'#4f7d3a',c2:'#d62828',wool:'#f1ede4',fl:'#7a2b6e'},
+ woollybegonia:{k:'polar',v:{k:4,p:.9,notch:0,c1:'#e58fa6',c2:'#fbeef2',center:'#f2d04b',layers:1},R:5,low:1},
+ smallspiderwort:{k:'polar',v:{k:3,p:.7,notch:0,c1:'#ecece8',c2:'#ffffff',center:'#f5d33a',layers:1},R:5,low:1},
+ mossverbena:{k:'cluster',c:'#9b5fc0',eye:'#f3eaf7',dome:1},
+ tropmilkweed:{k:'cluster',c:'#e2402b',eye:'#f7a41d',dome:1},
 };
 
 Object.assign(PHYLLO,{goldeneye:{p:'#f2c21a',p2:'#d8a010',d:['#8a5a14','#b07a1a'],n:13,len:.95,wid:.3},blanket:{p:'#f2b62a',p2:'#c8402a',d:['#7a2a14','#a8401e'],n:13,len:1,wid:.36,tip:1}});
 Object.assign(RACEME,{fireweed:{c:['#c23a8a','#d85aa4','#f0a0cc'],shape:'spike4',n:14},gilia:{c:['#d8282c','#e8503a','#f39a6a'],shape:'trumpet',n:10},paintbrush:{c:['#d8402a','#e86a3a','#7a8a3a'],shape:'bract',n:12},
- silverlupine:{c:['#6a5ab8','#8a7ad0','#c8c0ec'],shape:'pea',n:14},vanilla:{c:['#e6e2cc','#f6f4e8','#d8d4bc'],shape:'spike4',n:16},currant:{c:['#c8305e','#de5a80','#f2a0bc'],shape:'trumpet',n:12},penstemon:{c:['#c8202a','#e0403a','#f08a6a'],shape:'trumpet',n:8,slim:1},heather:{c:['#b25aa8','#c97ac0','#e0b0d8'],shape:'spike4',n:16,small:1}});
+ silverlupine:{c:['#6a5ab8','#8a7ad0','#c8c0ec'],shape:'pea',n:14},vanilla:{c:['#e6e2cc','#f6f4e8','#d8d4bc'],shape:'spike4',n:16},currant:{c:['#c8305e','#de5a80','#f2a0bc'],shape:'trumpet',n:12},penstemon:{c:['#c8202a','#e0403a','#f08a6a'],shape:'trumpet',n:8,slim:1},heather:{c:['#b25aa8','#c97ac0','#e0b0d8'],shape:'spike4',n:16,small:1},
+ sage:{c:['#2a36a8','#3442c4','#5a72e0'],shape:'pea',n:12},justicia:{c:['#d9437a','#f06a9f','#f8a8c8'],shape:'spike4',n:18}});
 
 /* ---- nut and cone artwork: attach point at (0,0), hanging toward +y ---- */
-function drawNutArt(g,id){const a=NUTS[id].art;g.lineCap='round';g.lineJoin='round';
+const shadeHex=(h,k)=>{const n=parseInt(h.slice(1),16),f=k<0?0:255,a=Math.abs(k),m=v=>Math.round(v+(f-v)*a);return'rgb('+m(n>>16)+','+m(n>>8&255)+','+m(n&255)+')';};
+// onTree: the nut is drawn where it grows (only the pinhão differs: a whole pinha cone on the branch, loose seeds elsewhere)
+function drawNutArt(g,id,onTree){const a=NUTS[id].art;g.lineCap='round';g.lineJoin='round';
+ if(a.t==='pinhao'){if(onTree){const R=a.R||8;g.fillStyle='#5a4a32';g.fillRect(-.8,-1.6,1.6,2);g.fillStyle=a.cone;g.beginPath();g.arc(0,-R,R,0,TAU);g.fill();
+   g.fillStyle=a.cone;for(let k=0;k<22;k++){const an=k/22*TAU;g.beginPath();g.moveTo(Math.cos(an-.13)*R*.92,-R+Math.sin(an-.13)*R*.92);g.lineTo(Math.cos(an)*R*1.22,-R+Math.sin(an)*R*1.22);g.lineTo(Math.cos(an+.13)*R*.92,-R+Math.sin(an+.13)*R*.92);g.fill();}
+   g.fillStyle=a.hi;const N=46;for(let k=3;k<N;k++){const an=k*2.39996,rr=R*.9*Math.sqrt(k/N),px=Math.cos(an)*rr,py=-R+Math.sin(an)*rr,o=an;g.beginPath();g.moveTo(px-Math.sin(o)*.55,py+Math.cos(o)*.55);g.lineTo(px+Math.cos(o)*1.4,py+Math.sin(o)*1.4);g.lineTo(px+Math.sin(o)*.55,py-Math.cos(o)*.55);g.fill();}
+   g.fillStyle='rgba(255,255,255,.14)';g.beginPath();g.arc(-R*.35,-R*1.35,R*.35,0,TAU);g.fill();return;}
+  g.strokeStyle='#5a4a32';g.lineWidth=.8;g.beginPath();g.moveTo(0,0);g.lineTo(0,1.2);g.stroke();
+  for(const an of[.62,-.62,0]){g.save();g.translate(0,1);g.rotate(an);const sd=()=>{g.beginPath();g.moveTo(0,.6);g.quadraticCurveTo(1.9,2,1.7,6.6);g.quadraticCurveTo(1.4,9.8,0,10.4);g.quadraticCurveTo(-1.4,9.8,-1.7,6.6);g.quadraticCurveTo(-1.9,2,0,.6);};
+   g.fillStyle=a.col;sd();g.fill();g.save();sd();g.clip();g.fillStyle=a.tip;g.beginPath();g.ellipse(0,10.2,2,1.8,0,0,TAU);g.fill();g.restore();
+   g.strokeStyle='rgba(50,20,10,.55)';g.lineWidth=.35;sd();g.stroke();g.fillStyle='rgba(255,235,210,.3)';g.beginPath();g.ellipse(-.6,5,.4,2.4,.05,0,TAU);g.fill();g.restore();}return;}
+ if(a.t==='podocarp'){g.strokeStyle='#5a6a3a';g.lineWidth=.7;g.beginPath();g.moveTo(0,0);g.quadraticCurveTo(.6,2,0,3.6);g.stroke();
+  g.fillStyle=a.col;g.beginPath();g.ellipse(0,6.6,2.7,3.4,0,0,TAU);g.fill();g.fillStyle='rgba(255,200,230,.25)';g.beginPath();g.ellipse(-.9,5.6,.7,1.4,.2,0,TAU);g.fill();
+  g.fillStyle=a.seed;g.beginPath();g.arc(0,11.4,2.2,0,TAU);g.fill();g.fillStyle=a.bloom;g.globalAlpha=.55;g.beginPath();g.arc(-.6,10.8,1.1,0,TAU);g.fill();g.globalAlpha=1;return;}
+ if(a.t==='capsule'){g.strokeStyle='#5a4a32';g.lineWidth=.9;g.beginPath();g.moveTo(0,0);g.lineTo(0,2.6);g.stroke();
+  g.fillStyle=a.wing;for(const s of[-1,1]){g.save();g.translate(s*1.2,7);g.rotate(s*.25);g.beginPath();g.ellipse(0,3.6,1.3,3.6,0,0,TAU);g.fill();g.fillStyle='#8a5a3a';g.beginPath();g.ellipse(0,.6,1,1.2,0,0,TAU);g.fill();g.fillStyle=a.wing;g.restore();}
+  g.fillStyle='#d8c8a8';g.fillRect(-.6,2.6,1.2,7.4);
+  const valve=(an,dk)=>{g.save();g.translate(0,3);g.rotate(an);g.fillStyle=dk?shadeHex(a.col,-.25):a.col;g.beginPath();g.moveTo(-1.6,0);g.quadraticCurveTo(-2.6,5,-.2,9.6);g.quadraticCurveTo(.8,9.8,1.4,8.6);g.quadraticCurveTo(2.4,4.6,1.6,0);g.closePath();g.fill();
+   g.fillStyle=a.dots;for(let k=0;k<3;k++){g.beginPath();g.arc((k%2?.5:-.5),2.4+k*2.2,.32,0,TAU);g.fill();}g.restore();};
+  valve(-.95,1);valve(.95,1);g.fillStyle='#d8c8a8';g.fillRect(-.7,2.6,1.4,8);valve(-.4,0);valve(.4,0);
+  g.fillStyle='rgba(255,255,255,.12)';g.beginPath();g.ellipse(-.4,6,.5,2,0,0,TAU);g.fill();return;}
+ if(a.t==='drupes'){const n=a.n||5,r0=a.r||2.2;g.strokeStyle=a.stalk||'#a08a50';g.lineWidth=1;g.beginPath();g.moveTo(0,0);g.lineTo(0,3);g.stroke();
+  const fr=[];for(let i=0;i<n;i++){const u=n>1?i/(n-1)-.5:0,ex=u*12,ey=12+(1-Math.abs(u)*2)*3;g.lineWidth=.5;g.beginPath();g.moveTo(0,3);g.quadraticCurveTo(ex*.2,7,ex,ey);g.stroke();
+   for(let k=0;k<3;k++){const t=.45+k*.27;fr.push([lerp(0,ex,t*t)+(k%2?.6:-.6),lerp(3,ey,t)+r0*.4]);}}
+  for(const[fx,fy]of fr){g.fillStyle=a.col;g.beginPath();g.ellipse(fx,fy,r0*.92,r0*(a.egg?1.15:1),0,0,TAU);g.fill();g.fillStyle=a.hi;g.beginPath();g.arc(fx-r0*.3,fy-r0*.35,r0*.32,0,TAU);g.fill();}return;}
  if(a.t==='acorn'){const st=a.stalk||1.6;g.strokeStyle='#6a5a3a';g.lineWidth=.9;g.beginPath();g.moveTo(0,0);g.lineTo(0,st);g.stroke();
   const capH=a.h*a.capD,cy=st+capH;g.fillStyle=a.nut;g.beginPath();g.ellipse(0,cy+(a.h-capH)*.45,a.w*(a.flat?1.05:.92),(a.h-capH)*.62+capH*.4,0,0,TAU);g.fill();
   g.fillStyle='rgba(255,255,255,.18)';g.beginPath();g.ellipse(-a.w*.35,cy+a.h*.3,a.w*.22,a.h*.22,-.2,0,TAU);g.fill();g.fillStyle='#4a3420';g.beginPath();g.arc(0,cy+a.h*.95-capH*.2,.6,0,TAU);g.fill();
@@ -219,6 +259,16 @@ function drawFlowerSp(g,id,x,y,h,t,seed){const F=FLW[id],a=F.art;const sw=RM?0:M
  if(a.k==='slipper'){g.strokeStyle='#4b7432';g.lineWidth=1.4;const top=[x+sw,y-H];g.beginPath();g.moveTo(x,y);g.quadraticCurveTo(x,y-H*.6,top[0],top[1]);g.stroke();g.fillStyle='#6a9a3a';for(const s of[-1,1]){g.beginPath();g.ellipse(x+s*3,y-H*.35,2.2,6,s*.4,0,TAU);g.fill();}
   g.fillStyle='#fbfaf4';g.beginPath();g.ellipse(top[0],top[1]-3,2,4.2,0,0,TAU);g.fill();for(const s of[-1,1]){g.beginPath();g.ellipse(top[0]+s*3.4,top[1]+.5,1.4,3.6,s*1.1,0,TAU);g.fill();}
   const gr=g.createRadialGradient(top[0],top[1]+3.4,.5,top[0],top[1]+3.4,4.2);gr.addColorStop(0,'#fbe4ee');gr.addColorStop(1,'#de6a9a');g.fillStyle=gr;g.beginPath();g.ellipse(top[0],top[1]+3.6,3.4,3.8,0,0,TAU);g.fill();return;}
+ if(a.k==='fuchsia'){const P0=[x,y],P1=[x+sw,y-H*1.15],P2=[x+H*.5+sw,y-H*.72];const q=u=>{const A=(1-u)*(1-u),B=2*(1-u)*u,C2=u*u;return[A*P0[0]+B*P1[0]+C2*P2[0],A*P0[1]+B*P1[1]+C2*P2[1]];};
+  g.strokeStyle='#7a2a3a';g.lineWidth=1.3;g.lineCap='round';g.beginPath();g.moveTo(P0[0],P0[1]);g.quadraticCurveTo(P1[0],P1[1],P2[0],P2[1]);g.stroke();
+  g.fillStyle='#3e6b2f';for(const u of[.3,.5,.68]){const p=q(u);for(const sd of[-1,1]){g.save();g.translate(p[0],p[1]);g.rotate(sd*.9-.3);g.beginPath();g.ellipse(0,-3.4,1.5,3.6,0,0,TAU);g.fill();g.restore();}}
+  for(let i=0;i<a.n;i++){const[fx,fy]=q(.55+.45*i/Math.max(1,a.n-1));g.strokeStyle='#7a2a3a';g.lineWidth=.6;g.beginPath();g.moveTo(fx,fy);g.lineTo(fx,fy+3);g.stroke();
+   g.fillStyle=a.c1;g.beginPath();g.ellipse(fx,fy+5,.9,2.2,0,0,TAU);g.fill();for(const sd of[-1,1]){g.beginPath();g.moveTo(fx,fy+6.6);g.lineTo(fx+sd*4.4,fy+5.4);g.lineTo(fx+sd*1.3,fy+8.4);g.fill();}
+   g.fillStyle=a.c2;g.beginPath();g.ellipse(fx,fy+9.4,2,2.7,0,0,TAU);g.fill();g.strokeStyle=a.st;g.lineWidth=.4;for(const sd of[-.8,0,.8]){g.beginPath();g.moveTo(fx,fy+11);g.lineTo(fx+sd,fy+15.4);g.stroke();}g.fillStyle='#f2e6c8';g.beginPath();g.arc(fx,fy+15.6,.5,0,TAU);g.fill();}return;}
+ if(a.k==='bromeliad'){const L=H*.75,leaf=(an,len,c,w)=>{g.save();g.translate(x,y);g.rotate(an);g.fillStyle=c;g.beginPath();g.moveTo(-w,0);g.quadraticCurveTo(-w*.6,-len*.6,len*.12,-len);g.quadraticCurveTo(w*.6,-len*.6,w,0);g.closePath();g.fill();g.restore();};
+  for(let i=0;i<11;i++){const u=i/10-.5;leaf(u*2.6+(i%2?.05:-.05),L*(.75+.25*Math.cos(u*2)),i%3?a.c:'#3f6a2e',2.2);}
+  for(let i=0;i<5;i++){const u=i/4-.5;leaf(u*1.3,L*.42,a.c2,2);}
+  g.fillStyle=a.wool;g.beginPath();g.ellipse(x,y-L*.38,L*.12,L*.2,0,0,TAU);g.fill();g.fillStyle=a.fl;for(let k=0;k<9;k++){g.beginPath();g.arc(x+((k*5)%5-2)*L*.04,y-L*.24-k*L*.032,.8,0,TAU);g.fill();}return;}
  if(a.k==='cluster'){g.strokeStyle='#6a8a5a';g.lineWidth=1.3;const top=[x+sw,y-H*.85];g.beginPath();g.moveTo(x,y);g.lineTo(top[0],top[1]);g.stroke();leafPair(g,x,y,H*.8,'#7a9a6a');
   for(let i=0;i<9;i++){const an=i*2.39,rr=Math.sqrt(i)*1.9;const cx=top[0]+Math.cos(an)*rr*1.3,cy=top[1]+Math.sin(an)*rr*(a.dome?.6:.8)-(a.dome?1:0);g.fillStyle=a.c;g.beginPath();g.arc(cx,cy,1.7,0,TAU);g.fill();g.fillStyle=a.eye;g.beginPath();g.arc(cx,cy,.7,0,TAU);g.fill();}return;}
  if(a.k==='hearts'){const P0=[x,y],P1=[x+sw,y-H*1.15],P2=[x+H*.55+sw,y-H*.62];const q=u=>{const A=(1-u)*(1-u),B=2*(1-u)*u,C2=u*u;return[A*P0[0]+B*P1[0]+C2*P2[0],A*P0[1]+B*P1[1]+C2*P2[1]];};
@@ -253,3 +303,60 @@ drawPolar=function(ctx,v,R,rot){_drawPolarBase(ctx,v,R,rot);const V=POLAR[v];if(
 const _drawPhylloBase=drawPhyllo;
 drawPhyllo=function(ctx,v,R,seed){_drawPhylloBase(ctx,v,R,seed);const V=PHYLLO[v];if(!V||!V.tip)return;ctx.fillStyle=V.p;const r=rng(seed);for(let i=0;i<V.n;i++){const a=i*TAU/V.n+(r()-.5)*.1;ctx.beginPath();ctx.ellipse(Math.cos(a)*R*1.15,Math.sin(a)*R*1.15,R*.2,R*.13,a,0,TAU);ctx.fill();}};
 
+
+/* ================= TREE GROWTH FORMS =================
+   Growth forms beyond the four bases in SPECIES (oak, maple, birch, pine). A species picks one with `form` and gets
+   the same tree genSplineTree builds: a climbable trunk and limbs, plus leaves behind the limbs and in front of the
+   squirrel. makePath, pathAt, wAt and leafBlob come from the game script. */
+const TREE_FORMS={
+ // An unbranched, ringed trunk under a crown of arching feather-leaved fronds. Each frond is a climbable limb.
+ palm(sp,seed,x,gy,s){const r=rng(seed);
+  const H=430*s*(sp.H||1),lean=(r()-.5)*(sp.lean||40)*s;const tc=[];for(let i=0;i<=5;i++){const t=i/5;tc.push([x+lean*t*t+(i&&i<5?(r()-.5)*4*s:0),gy-H*t]);}
+  const w0=sp.trunk*1.25*s+4*s,trunk=makePath(tc,w0,w0*(sp.taper||.72),{kind:'trunk',sp,taper:1});
+  const fsp=Object.assign({},sp,{bark:sp.rachis[0],barkHi:sp.rachis[1],barkLo:sp.rachis[2],mark:null,strips:null,rings:null,shaft:null});
+  const limbs=[],leaves=[],leavesF=[],back=[],backLv=[];
+  const frond=(e,side,at,L,P0,fl)=>{const pts=[[P0.x,P0.y]];let a=e,px=P0.x,py=P0.y;const bend=(sp.arch||.24)*(e<0?1.35:1);
+   for(let j=1;j<=5;j++){px+=side*Math.cos(a)*L/5;py-=Math.sin(a)*L/5;pts.push([px,Math.min(gy-30*s,py)]);a=Math.max(-1.45,a-bend);}
+   return makePath(pts,(fl?4.6:7)*s*(sp.rachisW||1),1.3*s,{kind:'limb',sp:fsp,emerge:.3});};
+  // leaflets: narrow blades either side of the midrib, tipped toward the frond tip and hanging by sp.hang (0 stiff, 1 limp)
+  const leaflets=(P,out,outF,fF,scale)=>{const step=6*s*(scale||1);for(let os=P.len*.1;os<=P.len;os+=step){const u=os/P.len,q=pathAt(P,os),ll=(sp.leaflet||30)*s*(scale||1)*(.3+.8*Math.sin(Math.PI*Math.min(1,u*1.05)));const blobs=[];
+    const nb=sp.plume?3:2;for(let k=0;k<nb;k++){const sd=k%2?1:-1,a=q.ang+sd*(Math.PI/2-.55)+(sp.plume&&k===2?(r()-.5)*2.4:(r()-.5)*.25);let vx=Math.cos(a),vy=Math.sin(a);const h=sp.hang==null?.45:sp.hang;vx*=1-h;vy=vy*(1-h)+h;const l=Math.hypot(vx,vy)||1;vx/=l;vy/=l;
+     const len=ll*(.8+r()*.35);blobs.push({dx:vx*len/2,dy:vy*len/2,rx:len/2,ry:(sp.leafletW||1.5)*s*(scale||1),rot:Math.atan2(vy,vx),c:sp.leaf[(r()*sp.leaf.length)|0]});}
+    const o={x:q.x,y:q.y,blobs,own:P,os};((outF&&r()<fF)?outF:out).push(o);}};
+  const n=sp.fronds||10,top=pathAt(trunk,trunk.len);
+  for(let k=0;k<n;k++){const side=k%2?1:-1,i=k>>1,m=Math.ceil(n/2),e=1.3-2.05*i/Math.max(1,m-1)+(r()-.5)*.2;
+   const fore=r()<.22,L=(sp.frondL||1)*(150+60*r())*s*(e>1.1?.72:1)*(fore?.6:1);
+   const at=trunk.len-Math.max(0,-e)*12*s-r()*4*s,P0=pathAt(trunk,at),P=frond(e,side,at,L,P0,false);
+   const behind=!fore&&r()<.42;limbs.push({path:P,at,behind});leaflets(P,leaves,behind?null:leavesF,.3);}
+  // fronds behind the crown, blurred into the back layer
+  for(let k=0;k<3;k++){const side=r()<.5?-1:1,e=.9-k*.7+(r()-.5)*.3,P=frond(e,side,trunk.len,(sp.frondL||1)*(110+40*r())*s,top,true);back.push(P);leaflets(P,backLv,null,0,.85);}
+  leafBlob(r,{leaf:sp.leaf},top.x,top.y-4*s,10*s,leaves);
+  return{sp,trunk,limbs,twigs:[],leaves,blooms:[],twigsF:[],leavesF,x,back,backTw:[],backLv};},
+
+ // Araucaria: a tall bare trunk, then whorls of limbs that run out and curve up to one flat, umbrella-like top,
+ // with brushy tufts of branchlets clustered toward the limb tips.
+ araucaria(sp,seed,x,gy,s){const r=rng(seed);
+  const H=470*s*1.22*(sp.H||1),tc=[];for(let i=0;i<=5;i++){const t=i/5;tc.push([x+(i?(r()-.5)*6*s:0),gy-H*t]);}
+  const trunk=makePath(tc,sp.trunk*1.25*s+6*s,2.6*s,{kind:'trunk',sp,taper:1.6});const yTop=gy-H;
+  const limbs=[],leaves=[],leavesF=[],back=[],backLv=[];
+  const tuft=(qx,qy,size,out)=>{const blobs=[];const c=()=>sp.leaf[(r()*sp.leaf.length)|0];
+   for(let k=0;k<3;k++)blobs.push({dx:(r()-.5)*size*.7,dy:-size*.2+(r()-.5)*size*.3,rx:size*.45,ry:size*.32,rot:r()*TAU,c:c()});
+   const nb=12+((r()*6)|0);for(let k=0;k<nb;k++){const a=-Math.PI/2+(r()-.5)*3.4,l=size*(.8+r()*.7);blobs.push({dx:Math.cos(a)*l/2,dy:Math.sin(a)*l/2,rx:l/2,ry:size*.13,rot:a,c:c()});}
+   out.push({x:qx,y:qy,blobs});return out[out.length-1];};
+  const tufts=(P,out,outF,lr)=>{const step=11*s;for(let os=P.len*.32;os<=P.len+1;os+=step){const u=(os-P.len*.32)/(P.len*.68),q=pathAt(P,Math.min(os,P.len));
+    Object.assign(tuft(q.x,q.y-5*s,lr*(.8+.6*u),(outF&&r()<.3)?outF:out),{own:P,os:Math.min(os,P.len)});}};
+  const lr=(sp.leafR||9)*s*1.6,n=sp.whorlN||8,w0=sp.wStart||.64;let side=r()<.5?-1:1;
+  const limb=(st,R,yTip)=>{const P=pathAt(trunk,st),pts=[[P.x,P.y]];yTip=Math.min(yTip,P.y-18*s);
+   for(let j=1;j<=5;j++){const t=j/5;pts.push([P.x+side*R*t+(j<5?(r()-.5)*6*s:0),P.y+(yTip-P.y)*Math.pow(t,2.3)+7*s*Math.sin(Math.PI*t)*(1-t)]);}return{P,pts};};
+  for(let k=0;k<n;k++){const st=trunk.len*(w0+(.96-w0)*(k+.5)/n);side=-side;const R=((sp.wL||1)*(235-125*k/n)+(r()-.5)*30)*s;
+   const{P,pts}=limb(st,R,yTop+(r()-.4)*22*s);const path=makePath(pts,wAt(trunk,st)*.5,2.4*s,{kind:'limb',sp,emerge:.3+.3*r()});
+   const behind=k>0&&r()<.36;limbs.push({path,at:st,behind});tufts(path,leaves,behind?null:leavesF,lr);}
+  for(let k=0;k<4;k++){const st=trunk.len*(w0+(.92-w0)*r());side=r()<.5?-1:1;const{pts}=limb(st,(120+r()*90)*s,yTop+(r()-.2)*30*s);const P=makePath(pts,wAt(trunk,st)*.36,1.8*s);back.push(P);tufts(P,backLv,null,lr*.9);}
+  const top=pathAt(trunk,trunk.len);tuft(top.x,top.y-6*s,lr*1.5,leaves);
+  return{sp,trunk,limbs,twigs:[],leaves,blooms:[],twigsF:[],leavesF,x,back,backTw:[],backLv};}};
+// pictures and the distant tree layer have room for a tree about as tall as a pine, so the tall araucaria is drawn smaller there
+TREE_FORMS.araucaria.flat=.62;
+// the same trees as flat segments and leaves, for pictures and the distant tree layer (see genRecursive)
+function formSegs(T){const segs=[],add=(P,c)=>{const p=P.pts,n=p.length-1;for(let i=0;i<n;i+=3){const j=Math.min(n,i+3);segs.push({x1:p[i][0],y1:p[i][1],x2:p[j][0],y2:p[j][1],w1:wAt(P,P.cum[i]),w2:wAt(P,P.cum[j]),c});}};
+ for(const P of T.back)add(P,P.sp&&P.sp.bark);add(T.trunk);for(const lb of T.limbs)add(lb.path,lb.path.sp!==T.sp&&lb.path.sp.bark);
+ return{segs,leaves:[...T.backLv,...T.leaves,...T.leavesF].map(L=>({x:L.x,y:L.y,blobs:L.blobs}))};}

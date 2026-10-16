@@ -174,6 +174,37 @@
   "sci": {"text":"Magnolia obovata","src":["https://www.rhs.org.uk/plants/23120/wd/details","https://en.wikipedia.org/wiki/Magnolia_obovata"],"checked":"2026-10","sig":"458d7036","note":"The Tohoku Forest Office page still uses the synonym Magnolia hypoleuca."},
   "wiki": "Magnolia_obovata",
   "range": {"text":"Japan and the southern Kuril Islands","src":["https://www.rhs.org.uk/plants/23120/wd/details","https://www.rinya.maff.go.jp/tohoku/sidou/jumoku/shubetu/hoonoki.html"],"checked":"2026-10","sig":"7420ebd7"}
+ },
+ "paranapine": {
+  "name": {"text":"Paraná pine","src":["https://en.wikipedia.org/wiki/Araucaria_angustifolia","https://www.infoteca.cnptia.embrapa.br/infoteca/bitstream/doc/304455/1/CT0060.pdf"],"checked":"2026-10","sig":"dedea4ea","note":"Portuguese: pinheiro-do-paraná, araucária; seed = pinhão. Also called Brazilian pine or candelabra tree. Embrapa notes the trade name 'parana pine'."},
+  "sci": {"text":"Araucaria angustifolia","src":["https://api.gbif.org/v1/species/114810361","https://api.gbif.org/v1/species/114810361/speciesProfiles"],"checked":"2026-10","sig":"9cc32863","note":"Accepted in Flora e Funga do Brasil (via its GBIF checklist, FB33971), which lists Floresta Ombrófila Mista among its vegetation types. The floradobrasil.jbrj.gov.br site itself blocked automated fetches with a bot challenge."},
+  "range": {"text":"Uplands of southern and southeastern Brazil, Misiones in Argentina, and eastern Paraguay","src":["https://www.infoteca.cnptia.embrapa.br/infoteca/bitstream/doc/304455/1/CT0060.pdf"],"checked":"2026-10","sig":"bcaa3229"}
+ },
+ "yerbamate": {
+  "name": {"text":"Yerba mate","src":["https://en.wikipedia.org/wiki/Yerba_mate","https://www.alice.cnptia.embrapa.br/alice/bitstream/doc/1139739/1/Especies-Arboreas-Brasileiras-vol-1-Erva-Mate.pdf"],"checked":"2026-10","sig":"24bef89e","note":"Portuguese: erva-mate, congonha. Embrapa: characteristic of montane Floresta Ombrófila Mista, always in mature associations with the Paraná pine."},
+  "sci": {"text":"Ilex paraguariensis","src":["https://api.gbif.org/v1/species/114687755","https://api.gbif.org/v1/species/114687755/speciesProfiles"],"checked":"2026-10","sig":"85a485c0"},
+  "wiki": "Yerba_mate",
+  "range": {"text":"Southern and southeastern Brazil, northeastern Argentina, eastern Paraguay and northern Uruguay","src":["https://www.alice.cnptia.embrapa.br/alice/bitstream/doc/1139739/1/Especies-Arboreas-Brasileiras-vol-1-Erva-Mate.pdf"],"checked":"2026-10","sig":"826ebd4a"}
+ },
+ "imbuia": {
+  "name": {"text":"Imbuia","src":["https://en.wikipedia.org/wiki/Ocotea_porosa","https://www.alice.cnptia.embrapa.br/alice/bitstream/doc/1140081/1/Especies-Arboreas-Brasileiras-vol-1-Imbuia.pdf"],"checked":"2026-10","sig":"7545ea82","note":"Portuguese: imbuia, embuia, canela-imbuia. English Wikipedia also gives 'Brazilian walnut'. Embrapa: characteristic of montane Floresta Ombrófila Mista, forming the second storey and sometimes dense stands (imbuiais). Probably the longest-lived tree of the araucaria forest."},
+  "sci": {"text":"Ocotea porosa","src":["https://api.gbif.org/v1/species/114734063","https://api.gbif.org/v1/species/114734063/speciesProfiles"],"checked":"2026-10","sig":"fab06159","note":"Flora e Funga gives the authority as (Nees & Mart.) Barroso. GBIF's backbone and Embrapa give other authorities, but the binomial is the same."},
+  "range": {"text":"Southern and southeastern Brazil uplands","src":["https://www.alice.cnptia.embrapa.br/alice/bitstream/doc/1140081/1/Especies-Arboreas-Brasileiras-vol-1-Imbuia.pdf"],"checked":"2026-10","sig":"86f28f55"}
+ },
+ "pinheirobravo": {
+  "name": {"text":"Pinheiro-bravo","src":["https://www.alice.cnptia.embrapa.br/alice/bitstream/doc/1140112/1/Especies-Arboreas-Brasileiras-vol-1-Pinheiro-Bravo.pdf","https://www.conifers.org/po/Podocarpus_lambertii.php"],"checked":"2026-10","sig":"48d1faae","note":"No established English name: the Gymnosperm Database and Wikipedia give only Portuguese names, so the Portuguese name is used. Other Portuguese names: pinheirinho, pinho-bravo. A descriptive English option would be 'Lambert's podocarp', but it is not a standard name."},
+  "sci": {"text":"Podocarpus lambertii","src":["https://api.gbif.org/v1/species/114810465","https://api.gbif.org/v1/species/114810465/speciesProfiles"],"checked":"2026-10","sig":"38a20eed"},
+  "range": {"text":"Southern and southeastern Brazil uplands and Misiones, Argentina","src":["https://www.conifers.org/po/Podocarpus_lambertii.php","https://www.alice.cnptia.embrapa.br/alice/bitstream/doc/1140112/1/Especies-Arboreas-Brasileiras-vol-1-Pinheiro-Bravo.pdf"],"checked":"2026-10","sig":"2d271741"}
+ },
+ "queenpalm": {
+  "name": {"text":"Queen palm","src":["https://en.wikipedia.org/wiki/Syagrus_romanzoffiana"],"checked":"2026-10","sig":"accf6aa5","note":"Portuguese: jerivá, coqueiro-jerivá; fruits = coquinhos. Embrapa records it in Floresta Ombrófila Mista (Aluvial and Montana) in Paraná and Santa Catarina at 5–142 trees per hectare. Chosen over juçara (Euterpe edulis); see 'rejected'."},
+  "sci": {"text":"Syagrus romanzoffiana","src":["https://api.gbif.org/v1/species/114690697","https://api.gbif.org/v1/species/114690697/speciesProfiles"],"checked":"2026-10","sig":"d1e80a97"},
+  "range": {"text":"Eastern and southern Brazil to Paraguay, Uruguay and northeastern Argentina","src":["https://www.alice.cnptia.embrapa.br/alice/bitstream/doc/1140835/1/Especies-Arboreas-Brasileiras-vol-2-Jeriva.pdf"],"checked":"2026-10","sig":"fbb26c52"}
+ },
+ "argcedar": {
+  "name": {"text":"Argentine cedar","src":["https://en.wikipedia.org/wiki/Cedrela_fissilis"],"checked":"2026-10","sig":"2f6985e1","note":"Portuguese: cedro, cedro-rosa. Habitat: Embrapa says it is common in Floresta Ombrófila Mista (all formations), and Paraná's IAT lists it among the common araucaria-forest companions. However, the Flora e Funga do Brasil vegetation list (via GBIF) does not include Floresta Ombrófila Mista. It is also naturally scattered, at 1–7 trees per hectare in southern forests (Embrapa), so it gets a low weight."},
+  "sci": {"text":"Cedrela fissilis","src":["https://api.gbif.org/v1/species/114741932"],"checked":"2026-10","sig":"df135bee"},
+  "range": {"text":"Costa Rica to southern Brazil and northeastern Argentina","src":["https://www.alice.cnptia.embrapa.br/alice/bitstream/doc/1139731/1/Especies-Arboreas-Brasileiras-vol-1-Cedro.pdf","https://en.wikipedia.org/wiki/Cedrela_fissilis"],"checked":"2026-10","sig":"4fe3117d"}
  }
 };
 
@@ -292,5 +323,25 @@
   "name": "Tochi nut",
   "tree": {"text":"tochi","src":["https://www.rinya.maff.go.jp/tohoku/sidou/jumoku/shubetu/totinoki.html","https://www.pref.yamagata.jp/documents/40694/syunndayori_202501_tochimoti.pdf"],"checked":"2026-10","sig":"21c17002"},
   "fact": {"text":"Tochi nuts are bitter, but wood mice still bury them. People take about 20 days to wash out the bitterness for tochi-mochi.","src":["https://eprints.lib.hokudai.ac.jp/repo/huscap/all/50928/PB145-4_798-801.pdf","https://www.pref.yamagata.jp/documents/40694/syunndayori_202501_tochimoti.pdf"],"checked":"2026-10","sig":"fe779aee"}
+ },
+ "pinhao": {
+  "name": "Pinhão",
+  "tree": {"text":"paranapine","src":["https://www.infoteca.cnptia.embrapa.br/infoteca/bitstream/doc/304455/1/CT0060.pdf"],"checked":"2026-10","sig":"b12a880d"},
+  "fact": {"text":"Buried pinhão seeds survive best, so the ones squirrels forget to dig up can sprout into new pines.","src":["https://rif.emnuvens.com.br/revista/article/view/779","https://www.infoteca.cnptia.embrapa.br/infoteca/bitstream/doc/304455/1/CT0060.pdf","https://bdtd.ibict.br/vufind/Record/UNIOESTE-1_f77ea7b57cdc8be603dafc40d968af3a"],"checked":"2026-10","sig":"a807cd37","note":"Alberts 1992 (Revista do Instituto Florestal, São Paulo state) watched the Brazilian squirrel, then called Sciurus aestuans, burying Paraná pine seeds in Campos do Jordão. Embrapa CT 60 lists squirrels, including the serelepe, among the pinhão's dispersers. Squinzani 2021 (UNIOESTE dissertation) found buried seeds were the only ones still surviving at the last check. The original squirrel-as-disperser paper (Bordignon & Monteiro-Filho 2000, Arq. Ciênc. Vet. Zool. UNIPAR) is cited in these sources, but I could not open it."}
+ },
+ "palmnut": {
+  "name": "Queen palm nut",
+  "tree": {"text":"queenpalm","src":["https://www.alice.cnptia.embrapa.br/alice/bitstream/doc/1140835/1/Especies-Arboreas-Brasileiras-vol-2-Jeriva.pdf"],"checked":"2026-10","sig":"29b930aa"},
+  "fact": {"text":"Squirrels gnaw a neat triangle-shaped hole in this nut's shell, and bury extra nuts to eat in winter.","src":["https://www.scielo.br/j/zool/a/MzcVdZNFs9RxYY6y6WS36Bg/","https://www.alice.cnptia.embrapa.br/alice/bitstream/doc/1140835/1/Especies-Arboreas-Brasileiras-vol-2-Jeriva.pdf"],"checked":"2026-10","sig":"3f521db3","note":"Mendes & Cândido-Jr 2014 (Zoologia 31(3), araucaria moist forest, Cascavel PR): the main opening method (about 50% of records) cuts a triangular hole starting at the germination pore. Embrapa: the squirrel eats jerivá coquinhos and buries seeds for winter, and some forgotten seeds are dispersed. Jerivá makes up about 40% of its diet."}
+ },
+ "podoseed": {
+  "name": "Pinheiro-bravo seed",
+  "tree": {"text":"pinheirobravo","src":["https://www.alice.cnptia.embrapa.br/alice/bitstream/doc/1140112/1/Especies-Arboreas-Brasileiras-vol-1-Pinheiro-Bravo.pdf","https://www.conifers.org/po/Podocarpus_lambertii.php"],"checked":"2026-10","sig":"61da04a4"},
+  "fact": {"text":"Its seed sits on a juicy dark-purple stalk. Birds eat the stalk and help spread the seed.","src":["https://www.alice.cnptia.embrapa.br/alice/bitstream/doc/1140112/1/Especies-Arboreas-Brasileiras-vol-1-Pinheiro-Bravo.pdf","https://www.conifers.org/po/Podocarpus_lambertii.php"],"checked":"2026-10","sig":"7a34ab6e","note":"Embrapa: the fleshy, juicy stalk turns dark purple and is edible, and dispersal is mainly by birds (ornitocórica). The Gymnosperm Database calls the receptacle reddish purple."}
+ },
+ "cedarpod": {
+  "name": "Argentine cedar pod",
+  "tree": {"text":"argcedar","src":["https://www.alice.cnptia.embrapa.br/alice/bitstream/doc/1139731/1/Especies-Arboreas-Brasileiras-vol-1-Cedro.pdf"],"checked":"2026-10","sig":"5f5c6e0d"},
+  "fact": {"text":"Its woody pod splits open into five parts, and its winged seeds drift away on the wind.","src":["https://www.alice.cnptia.embrapa.br/alice/bitstream/doc/1139731/1/Especies-Arboreas-Brasileiras-vol-1-Cedro.pdf"],"checked":"2026-10","sig":"c1d3a196","note":"Embrapa: a pear-shaped woody capsule opens by five valves and holds about 30–100 seeds, each winged at one end. Seeds fall or are carried by the wind. Many opened capsules stay on the tree until the next season. This is the only one of the four without a fauna link; it was picked because it looks so different. See 'rejected' for the yerba mate alternative."}
  }
 };
