@@ -12,7 +12,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { CLAIMS, PLAIN, FILES, readData, writeDataFiles, sig } from './species_data.mjs';
+import { CLAIMS, PLAIN, FILES, SUBSTRATES, HABITS, readData, writeDataFiles, sig } from './species_data.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const ATTR = path.join(ROOT, 'ATTRIBUTION.md');
@@ -48,7 +48,7 @@ const host = u => { const h = new URL(u).hostname.replace(/^www\./, ''); return 
 const wikiURL = r => 'https://en.wikipedia.org/wiki/' + (r.wiki || r.sci.text.replace(/ /g, '_'));
 
 function attributionTables(data) {
-  const kinds = { squirrels: 'Squirrels', birds: 'Birds', trees: 'Trees', nuts: 'Nuts and cones', flowers: 'Wildflowers' };
+  const kinds = { squirrels: 'Squirrels', birds: 'Birds', trees: 'Trees', nuts: 'Nuts and cones', flowers: 'Wildflowers', fungi: 'Mushrooms' };
   let md = '\nGenerated from `data/*.js` by `node tools/check_facts.mjs --write`; edit the data files, not these tables. Each card claim\'s own sources are listed beside it in the data files.\n\n';
   for (const [kind, title] of Object.entries(kinds)) {
     md += `### ${title}\n\n`;
@@ -143,19 +143,34 @@ async function main() {
   same('squirrels (SQUIRRELS)', Object.keys(literal(html, 'const SQUIRRELS=')), Object.keys(data.squirrels));
   same('nuts (NUTS)', Object.keys(literal(html, 'const NUTS=')), Object.keys(data.nuts));
   same('flowers (FLW)', Object.keys(literal(html, 'const FLW=')), Object.keys(data.flowers));
+  same('fungi (FUNGI)', Object.keys(literal(html, 'const FUNGI=')), Object.keys(data.fungi));
   const calls = [...literalText(html, 'const CALLS=').matchAll(/(?:^|\n)\s*(\w+):\(\)=>/g)].map(m => m[1]);
   for (const id of Object.keys(data.birds)) if (!calls.includes(id)) warns.push(`birds.${id}: no CALLS entry, so it plays the cardinal's call`);
   const ZN = literal(html, 'const ZN=');
-  const used = { squirrels: new Set(), birds: new Set(), trees: new Set(Object.values(data.nuts).map(n => n.tree.text)), nuts: new Set(), flowers: new Set() };
-  for (const [zid, Z] of Object.entries(ZN)) for (const kind of Object.keys(used)) for (const id of kind === 'trees' ? Z.trees.map(t => t[0]) : Z[kind]) {
+  const used = { squirrels: new Set(), birds: new Set(), trees: new Set(Object.values(data.nuts).map(n => n.tree.text)), nuts: new Set(), flowers: new Set(), fungi: new Set() };
+  for (const [zid, Z] of Object.entries(ZN)) for (const kind of Object.keys(used)) for (const id of kind === 'trees' ? Z.trees.map(t => t[0]) : Z[kind] || []) {
     used[kind].add(id);
     if (!data[kind][id]) errors.push(`forest ${zid}: ${kind} "${id}" has no facts in data/`);
   }
   for (const kind of Object.keys(used)) for (const id of Object.keys(data[kind])) if (!used[kind].has(id)) warns.push(`${kind}.${id}: not in any forest`);
 
+  // 2b. a mushroom grows only where its data says: a known substrate and habit, real host trees, and in each of its forests
+  //     at least one of its host trees, or the game can never place it there
+  for (const [id, f] of Object.entries(data.fungi)) {
+    const at = `fungi.${id}`;
+    if (!SUBSTRATES.includes(f.substrate)) errors.push(`${at}.substrate: "${f.substrate}" is not one of ${SUBSTRATES.join(', ')}`);
+    if (f.habit && !HABITS.includes(f.habit)) errors.push(`${at}.habit: "${f.habit}" is not one of ${HABITS.join(', ')}`);
+    const hosts = f.hosts || [];
+    if (!Array.isArray(hosts)) { errors.push(`${at}.hosts: not a list of tree ids`); continue; }
+    for (const h of hosts) if (!data.trees[h]) errors.push(`${at}.hosts: "${h}" is not a tree in data/trees.js`);
+    if (!hosts.length && ['trunk base', 'living trunk', 'dead wood'].includes(f.substrate)) errors.push(`${at}: grows on wood (${f.substrate}) but lists no host trees`);
+    for (const [zid, Z] of Object.entries(ZN)) if ((Z.fungi || []).includes(id) && hosts.length && !hosts.some(h => Z.trees.some(t => t[0] === h)))
+      errors.push(`${at}: none of its host trees (${hosts.join(', ')}) grow in forest ${zid}, so it can never appear there`);
+  }
+
   // 3. a scientific name shared by two entries must be colour forms of one species
   const bySci = {};
-  for (const kind of ['squirrels', 'birds', 'trees', 'flowers']) for (const [id, r] of Object.entries(data[kind])) (bySci[r.sci.text] ||= []).push([kind, id, r.name.text.replace(/ \(.*\)$/, '')]);
+  for (const kind of ['squirrels', 'birds', 'trees', 'flowers', 'fungi']) for (const [id, r] of Object.entries(data[kind])) (bySci[r.sci.text] ||= []).push([kind, id, r.name.text.replace(/ \(.*\)$/, '')]);
   for (const [s, list] of Object.entries(bySci)) if (new Set(list.map(x => x[2])).size > 1) warns.push(`"${s}" is used by differently named entries: ${list.map(x => x[0] + '.' + x[1]).join(', ')}`);
 
   // 4. --links: every source still loads

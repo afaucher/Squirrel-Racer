@@ -93,6 +93,7 @@ figcaption em{font-style:normal;margin-top:4px}
 .sr-main button span{display:block;font:400 14px/1.35 var(--body);color:#596455;margin-top:2px}
 .sr-main button.primary,.sr-actions button:first-child{background:#b65c17;color:#fff}
 .sr-main button:hover,.sr-tile:hover{filter:brightness(.97)}
+.sr-safe{margin:10px 0 0;padding:8px 10px;border-radius:10px;background:#f6e7d6;color:#7a3a10;font:600 13px/1.4 var(--body)}
 .sr-toggles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
 .sr-toggles button{display:flex;align-items:center;justify-content:center;gap:8px;font:700 15px/1.2 var(--body);border:1px solid #d3dac6;border-radius:14px;padding:12px;background:transparent;color:#1b221c;cursor:pointer}
 .sr-toggles button:hover{background:#eef1e6}
@@ -182,7 +183,7 @@ a{color:var(--accent)}
 <header>
   <div class="eyebrow">A cozy field guide you can climb</div>
   <h1>Squirrel <span>Ranger</span></h1>
-  <p class="lede">Be a real squirrel in real forests. Run the branches, leap between trees, photograph the birds and wildflowers, and collect the nuts and cones. There's no score and no wrong way to go.</p>
+  <p class="lede">Be a real squirrel in real forests. Run the branches, leap between trees, photograph the birds, wildflowers and mushrooms, and collect the nuts and cones. There's no score and no wrong way to go.</p>
 </header>
 
 <section class="panel" id="panel-play">
@@ -193,7 +194,7 @@ a{color:var(--accent)}
     <li><b>Land anywhere</b>You latch onto whatever you touch: limb, trunk or ground. Thin branch tips bend and weaken your launch, so leap from closer to the trunk.</li>
     <li><b>Photo</b>Hold the camera (top right), Space, or a controller's A button to look through the lens. It opens under your finger or mouse pointer and follows it as you slide (on a keyboard or controller, the arrows or right stick aim it). Let go to take the photo. Only what's inside the circle counts, and what your mission is looking for is chosen first. Nuts and cones within reach are collected.</li>
     <li><b>Menu</b>The acorn (top left), M or Start. Play any of the real forests as one of its squirrels, take a mission (each is dealt its own forest and squirrel), or browse your collection. Mute and full screen are at the bottom of the menu.</li>
-    <li><b>Missions</b>Photograph three different birds, collect three different nuts or cones, or photograph three different wildflowers. Each mission shows its three in outline on the right, and each one fills in when you find it; tap a frame to see it again (and hear the call, for birds). Finish a mission and the squirrel you played joins your collection.</li>
+    <li><b>Missions</b>Photograph three different birds, collect three different nuts or cones, or photograph three different wildflowers or mushrooms. Each mission shows its three in outline on the right, and each one fills in when you find it; tap a frame to see it again (and hear the call, for birds). Finish a mission and the squirrel you played joins your collection.</li>
     <li><b>Flying squirrels glide</b>Play as a southern, northern, Humboldt's or Japanese flying squirrel and, once a leap starts to fall, it spreads its gliding membrane and sails much farther.</li>
     <li><b>Big leaps</b>Long flights turn your tail into a rainbow. Land a long leap on a branch and you get stars, fireflies and falling leaves.</li>
     <li><b>Full screen</b>Tap Full screen at the bottom of the menu, or press F. Esc exits.</li>
@@ -209,8 +210,10 @@ a{color:var(--accent)}
 <script src="data/birds.js"></script>
 <script src="data/trees.js"></script>
 <script src="data/flowers.js"></script>
+<script src="data/fungi.js"></script>
 <script src="art/birds.js"></script>
 <script src="art/plants.js"></script>
+<script src="art/fungi.js"></script>
 <script src="art/squirrel.js"></script>
 <script>
 "use strict";
@@ -758,6 +761,16 @@ for(const[id,n]of Object.entries(NUTS)){const ti=TREE_INFO[n.tree];n.id=id;n.sci
 /* ---- wildflowers: art in art/plants.js (FLW), facts merged in from data/flowers.js ---- */
 for(const id in FLW){const f=facts(SPECIES_DATA.flowers[id]);FLW[id]={id,name:f.name,sci:f.sci,range:f.range,art:FLW[id]};}
 
+/* ---- mushrooms: art in art/fungi.js (FUNGI), facts and where each one grows (substrate, host trees, habit) merged in from data/fungi.js ---- */
+for(const id in FUNGI){const f=facts(SPECIES_DATA.fungi[id]);FUNGI[id]={hosts:[],habit:'single',...f,id,art:FUNGI[id]};}
+
+/* ---- the kinds of things you find: one entry per kind, so missions, cards, the collection and info pages treat them alike ---- */
+const KINDS={s:{one:'Squirrel',many:'Squirrels',list:'squirrels'},b:{one:'Bird',many:'Birds',list:'birds',mission:'Photograph these 3 birds'},
+ n:{one:'Nut',many:'Nuts and cones',list:'nuts'},f:{one:'Wildflower',many:'Wildflowers',list:'flowers',mission:'Photograph these 3 wildflowers'},
+ m:{one:'Mushroom',many:'Mushrooms',list:'fungi',mission:'Photograph these 3 mushrooms'}};
+// the kinds you find in a forest; each mission asks for one of them
+const FINDS=['b','n','f','m'];
+
 /* ---- squirrels: coats and the species-to-coat map (SQUIRRELS) in art/squirrel.js, facts merged in from data/squirrels.js ---- */
 for(const[id,r]of Object.entries(SPECIES_DATA.squirrels))Object.assign(SQUIRRELS[id],facts(r));
 
@@ -766,36 +779,37 @@ const ZN={
  east:{name:'Eastern Hardwood Forest',where:'Eastern United States',sky:['#9fc0d3','#e3ead8'],hills:'#b9cbc7',far:'#93a8b5',farLeaf:['#9db1bd','#a6b9c4'],
   trees:[['whiteoak',3],['redoak',3],['hickory',2],['beech',2],['sugarmaple',2]],squirrels:['egray','eblack','egraywhite','efox','efoxdark','sflying'],
   birds:['cardinal','bluejay','titmouse','wbnut','rbwood'],nuts:['whiteacorn','redacorn','hickorynut','beechnut'],
-  flowers:['bloodroot','trillium','vabluebells','wildcolumbine','mayapple','springbeauty','wildgeranium','blackeyedsusan','neaster','goldenrod','coneflower']},
+  flowers:['bloodroot','trillium','vabluebells','wildcolumbine','mayapple','springbeauty','wildgeranium','blackeyedsusan','neaster','goldenrod','coneflower'],fungi:['chickenofthewoods','henofthewoods','turkeytail','bearsheadtooth','indigomilkcap']},
  boreal:{name:'Boreal Forest',where:'Canada and Alaska',sky:['#a6bfcc','#e6ebe4'],hills:'#a9bcb8',far:'#8ea3a8',farLeaf:['#8fa6a4','#9ab0ad'],
   trees:[['whitespruce',4],['blackspruce',2],['balsamfir',3],['jackpine',2],['paperbirch',2],['aspen',2]],squirrels:['amred','nflying'],
   birds:['canjay','borchick','rbnut','wwcross','sgrouse','junco'],nuts:['whitesprucecone','blacksprucecone','balsamfircone','jackpinecone'],
-  flowers:['fireweed','bunchberry','twinflower','pricklyrose','ladyslipper','pearly','marshmarigold','labradortea','arcticlupine','woodlily','harebell']},
+  flowers:['fireweed','bunchberry','twinflower','pricklyrose','ladyslipper','pearly','marshmarigold','labradortea','arcticlupine','woodlily','harebell'],fungi:['birchpolypore','chaga','redbeltedconk','aspenoyster','whitebirchbolete','deertruffle']},
  sw:{name:'Southwest Ponderosa Pine',where:'Arizona, New Mexico and Colorado',sky:['#8fbbe0','#efe7d4'],hills:'#c9bba3',far:'#a5a59a',farLeaf:['#a8ae96','#b3b8a0'],
   trees:[['ponderosa',6],['gambeloak',3],['douglasfir',2],['aspen',1],['pinyon',2]],squirrels:['abert','abertblack','kaibab','arizonagray'],
   birds:['stjay','pygnut','mtnchick','acornwp','wbluebird','rfwarbler'],nuts:['ponderosacone','gambelacorn','douglascone','pinyonnut'],
-  flowers:['scarletgilia','paintbrush','silverylupine','blueflax','rmiris','bluecolumbine','goldeneye','globemallow','mexicanhat','blanketflower','penstemon']},
+  flowers:['scarletgilia','paintbrush','silverylupine','blueflax','rmiris','bluecolumbine','goldeneye','globemallow','mexicanhat','blanketflower','penstemon'],fungi:['flyagaric','whiteking','aspenoyster','rustygill','aspenbracket']},
  pnw:{name:'Pacific Northwest Forest',where:'Western Washington, Oregon and British Columbia',sky:['#a9bcc3','#e2e7e2'],hills:'#9fb3ad',far:'#7f9690',farLeaf:['#86a096','#90a99f'],
   trees:[['douglasfir',4],['westernhemlock',3],['westernredcedar',2],['sitkaspruce',2],['bigleafmaple',2],['redalder',1],['beakedhazel',1]],squirrels:['douglas','westerngray','humboldt'],
   birds:['stjay','chbchick','varthrush','pileated','rbnut','pacwren'],nuts:['douglascone','hemlockcone','sitkacone','beakednut'],
-  flowers:['westerntrillium','bleedingheart','dwarforegongrape','westerncolumbine','tigerlily','fawnlily','salmonberry','redcurrant','skunkcabbage','vanillaleaf','bunchberry']},
+  flowers:['westerntrillium','bleedingheart','dwarforegongrape','westerncolumbine','tigerlily','fawnlily','salmonberry','redcurrant','skunkcabbage','vanillaleaf','bunchberry'],fungi:['rhizopogon','chanterelle','redbeltedconk','turkeytail','dyerspolypore']},
  cal:{name:'Caledonian Pinewood',where:'Scottish Highlands and northern Europe',sky:['#a7bcc6','#e4e8df'],hills:'#aebfb8',far:'#91a5a8',farLeaf:['#98aca6','#a3b6b0'],
   trees:[['scotspine',6],['silverbirch',3],['hazel',2],['pedoak',2],['eubeech',2],['rowan',1]],squirrels:['eured','eudark'],
   birds:['eujay','crestit','gspot','coaltit','robin','chaffinch'],nuts:['scotscone','hazelnut','eubeechnut','pedacorn'],
-  flowers:['bluebell','woodanemone','primrose','celandine','twinflower','foxglove','woodsorrel','heather','redcampion','harebell','wintergreen']},
+  flowers:['bluebell','woodanemone','primrose','celandine','twinflower','foxglove','woodsorrel','heather','redcampion','harebell','wintergreen'],fungi:['flyagaric','birchpolypore','ochrebrittlegill','hooffungus','porcelain']},
  jp:{name:'Japanese Beech Forest',where:'Mountains of northern Honshu, Japan',sky:['#b4c6d0','#e6eae6'],hills:'#a9bcb2',far:'#8ea39c',farLeaf:['#93a993','#9fb49d'],
   trees:[['buna',7],['mizunara',2],['itaya',2],['hoonoki',2],['tochi',1],['jwalnut',1]],squirrels:['jsquirrel','jgiantfly','jdwarffly'],
   birds:['eujay','varitit','eunut','jgreenwp','narcfly','jrobin'],nuts:['bunanut','mizunaraacorn','jwalnutnut','tochinut'],
-  flowers:['katakuri','nirinso','shiraneaoi','mizubasho','enreiso','cobralily','goldenlily','sankayou','yamaajisai','toadlily','marshmarigold']},
+  flowers:['katakuri','nirinso','shiraneaoi','mizubasho','enreiso','cobralily','goldenlily','sankayou','yamaajisai','toadlily','marshmarigold'],fungi:['henofthewoods','hooffungus','tsukiyotake','bunaharitake','panthercap']},
  atl:{name:'Atlantic Forest',where:'Araucaria forest of the southern Brazil uplands',sky:['#bccdd7','#e4e7df'],hills:'#a3b4ae',far:'#7f968c',farLeaf:['#6f8a7a','#80998a'],farCrowns:['umbrella','round','umbrella'],
   trees:[['paranapine',7],['yerbamate',4],['imbuia',3],['pinheirobravo',3],['queenpalm',3],['argcedar',2]],squirrels:['serelepe'],
   birds:['rbtoucan','azjay','wspwood','arauctit','diadtan','rbthrush'],nuts:['pinhao','palmnut','podoseed','cedarpod'],
-  flowers:['royalfuchsia','anisesage','flowerofsouls','palacelily','pinksorrel','brazilplume','wildbanana','woollybegonia','smallspiderwort','mossverbena','tropmilkweed']}};
+  flowers:['royalfuchsia','anisesage','flowerofsouls','palacelily','pinksorrel','brazilplume','wildbanana','woollybegonia','smallspiderwort','mossverbena','tropmilkweed'],fungi:['redbracket','birdsnest','crosscage','sulphurtuft','fringedstar']}};
 const ZONE_IDS=['east','boreal','sw','pnw','cal','jp','atl'];
 function zone(){return ZN[PLAY.zone||'east'];}
 function itemInfo(kind,id){if(kind==='s'){const q=SQUIRRELS[id];return{kind,id,name:q.name,sci:q.sci,range:q.range,fact:q.fact};}
  if(kind==='b'){const b=BIRD_SP[id];return{kind,id,name:b.name,sci:b.sci,range:b.range,fact:b.fact,pl:b.pl};}
  if(kind==='n'){const n=NUTS[id];return{kind,id,name:n.name,sci:n.sci,range:n.range,fact:n.fact,tree:n.treeName};}
+ if(kind==='m'){const m=FUNGI[id];return{kind,id,name:m.name,sci:m.sci,range:m.range,fact:m.fact,grows:m.grows};}
  const f=FLW[id];return{kind,id,name:f.name,sci:f.sci,range:f.range};}
 
 /* ---- nut, cone and wildflower drawing: art/plants.js ---- */
@@ -813,6 +827,10 @@ function pictureOf(kind,id,W,H){W=W||160;H=H||120;
  if(kind==='t')return artCanvas('t'+id,W,H,g=>{const T=genRecursive(SPECIES[id],77+id.length*13,0,40,.32);drawSegs(g,T.segs,SPECIES[id]);drawLeaves(g,T.leaves,null,.95);});
  if(kind==='s')return artCanvas('s'+id,W,H,g=>{const C=COATS[SQUIRRELS[id].coat];g.scale(1.2,1.2);drawSquirrel(g,makeRig(),'alert',0,1,0,C);});
  if(kind==='sh')return artCanvas('sh'+id,W,H,g=>{const C=COATS[SQUIRRELS[id].coat];g.scale(1.6,1.6);drawSquirrel(g,makeRig(),'alert',0,1,0,C);},SHCROP);
+ // a mushroom as it grows: brackets on a strip of bark, everything else on a little patch of ground
+ if(kind==='m')return artCanvas('m'+id,W,H,g=>{const F=FUNGI[id],a=F.art,sh=a.shape;g.scale(3.2,3.2);
+  if(sh==='shelf'||sh==='hoof'||sh==='oyster'){const host=SPECIES[F.hosts[0]]||SPECIES.oak;g.fillStyle=host.bark;g.fillRect(-4,-a.s*1.6,4,a.s*2.2);g.fillStyle=host.barkLo||'#3c3027';g.fillRect(-4,-a.s*1.6,1.2,a.s*2.2);drawFungus(g,id,0,0,{seed:3,habit:F.habit});}
+  else{g.fillStyle='rgba(107,90,62,.55)';g.beginPath();g.ellipse(0,0,a.s*.85,a.s*.12,0,0,TAU);g.fill();drawFungus(g,id,0,0,{seed:3,habit:F.habit==='cluster'?'cluster':'single'});}});
  return artCanvas('f'+id,W,H,g=>{g.scale(2.6,2.6);drawFlowerSp(g,id,0,18,34,0,3);});}
 function outlineOf(kind,id,W,H){const k='o'+kind+id+W+'x'+H;let c=ART.get(k);if(c)return c;const src=pictureOf(kind,id,W,H);
  const a=document.createElement('canvas');a.width=src.width;a.height=src.height;const ag=a.getContext('2d');ag.drawImage(src,0,0);ag.globalCompositeOperation='source-in';ag.fillStyle='#fff';ag.fillRect(0,0,a.width,a.height);
@@ -911,7 +929,7 @@ function worldBirdCall(){if(!W)return false;let best=[];for(const T of W.trees.v
  const b=best[(Math.random()*best.length)|0],d=Math.hypot(b.x-cam.x,b.y-cam.y);playCall(b.sp,{world:1,pan:(b.x-cam.x)/600,vol:clamp(1.2-d/700,.15,1)});return true;}
 
 /* ---- populate trees with birds, nuts and flowers ---- */
-function pickTreeKey(hsh){const Z=zone(),M=PLAY.mission;let tot=0;const ws=Z.trees.map(([k,w])=>{const boost=(M&&M.type==='n'&&!M.done&&M.targets.some(id=>!M.got.includes(id)&&NUTS[id].tree===k))?3:1;tot+=w*boost;return[k,w*boost];});let r=(hsh%1000)/1000*tot;for(const[k,w]of ws){if((r-=w)<0)return k;}return ws[0][0];}
+function pickTreeKey(hsh){const Z=zone(),M=PLAY.mission;let tot=0;const ws=Z.trees.map(([k,w])=>{const boost=(M&&!M.done&&M.targets.some(id=>!M.got.includes(id)&&(M.type==='n'?NUTS[id].tree===k:M.type==='m'&&FUNGI[id].hosts.includes(k))))?3:1;tot+=w*boost;return[k,w*boost];});let r=(hsh%1000)/1000*tot;for(const[k,w]of ws){if((r-=w)<0)return k;}return ws[0][0];}
 function populateTree(T,i,hsh){const Z=zone(),M=PLAY.mission,r=rng(hsh^0x5bd1e995),taken=W.taken;T.birds=[];T.nuts=[];T.flowers=[];
  const limbs=T.limbs.filter(l=>!l.behind&&l.path.len>60);
  // birds
@@ -926,14 +944,53 @@ function populateTree(T,i,hsh){const Z=zone(),M=PLAY.mission,r=rng(hsh^0x5bd1e99
    const id=i+':n'+k;if(!taken.has(id))T.nuts.push({id,sp:nut,P:L,s,x:p[0],y:p[1],rot:(r()-.5)*.4});}
   const ng=1+((r()*2)|0);for(let k=0;k<ng;k++){const id=i+':g'+k;if(!taken.has(id))T.nuts.push({id,sp:nut,x:T.x+(r()<.5?-1:1)*(22+r()*70),y:6,ground:1,rot:Math.PI/2*(r()<.5?1:-1)+(r()-.5)*.6});}}
  // wildflowers
- const nf=5+((r()*4)|0);for(let k=0;k<nf;k++){const fx=i*SP+(r()-.5)*SP;if(Math.abs(fx-T.x)<30)continue;const id=i+':f'+k;T.flowers.push({id,sp:Z.flowers[(r()*Z.flowers.length)|0],x:fx,h:26+r()*24,seed:(r()*99)|0,y:Math.abs(Math.round(fx*7))%10});}}
+ const nf=5+((r()*4)|0);for(let k=0;k<nf;k++){const fx=i*SP+(r()-.5)*SP;if(Math.abs(fx-T.x)<30)continue;const id=i+':f'+k;T.flowers.push({id,sp:Z.flowers[(r()*Z.flowers.length)|0],x:fx,h:26+r()*24,seed:(r()*99)|0,y:Math.abs(Math.round(fx*7))%10});}
+ // fallen logs and stumps, mostly of this tree's own species; a mission's wood-rotting mushroom gets dead wood of a tree it grows on
+ T.logs=[];T.fungi=[];const ztrees=Z.trees.map(t=>t[0]),left_m=M&&M.type==='m'&&!M.done?M.targets.filter(id=>!M.got.includes(id)).map(id=>FUNGI[id]):[];
+ const dwWant=left_m.filter(f=>f.substrate==='dead wood');
+ if(r()<(dwWant.length?.75:.4)){let sp=T.key;const hs=dwWant.length?dwWant[(r()*dwWant.length)|0].hosts.filter(h=>ztrees.includes(h)):[];if(hs.length&&r()<.7)sp=hs[(r()*hs.length)|0];else if(r()<.25)sp=ztrees[(r()*ztrees.length)|0];
+  const side=r()<.5?-1:1,stump=r()<.35;T.logs.push({sp,stump,x:T.x+side*(T.trunk.w0/2+46+r()*70),y:stump?12:14,L:60+r()*50,R:stump?11+r()*4:7.5+r()*3.5,H:14+r()*10,seed:(r()*99)|0});}
+ // mushrooms, each only where it really grows: soil near its partner trees, on their trunks or trunk bases, or on their dead wood
+ const fsites=f=>{const host=!f.hosts.length||f.hosts.includes(T.key),out=[];
+  if(host&&(f.substrate==='soil'||f.substrate==='leaf litter'||f.substrate==='moss'||f.substrate==='buried'))out.push('ground');
+  if(host&&f.substrate==='trunk base')out.push('base');
+  if(host&&f.substrate==='living trunk')out.push('trunk');
+  if(f.substrate==='dead wood'&&T.logs.some(L=>f.hosts.includes(L.sp)))out.push('log');
+  // red squirrels dry some mushrooms in the branches to eat in winter
+  if(f.cached&&limbs.length)out.push('limb');
+  return out;};
+ // choose among the species that can grow at this tree, so a birch specialist shows up wherever there is birch;
+ // drying in the branches alone only sometimes counts
+ const here=(Z.fungi||[]).map(id=>FUNGI[id]).filter(f=>{const st=fsites(f);return st.some(x=>x!=='limb')||(st.length&&r()<.25);}),wantHere=left_m.filter(f=>here.includes(f));
+ const nm=(r()<.75?1:0)+(r()<.45?1:0)+(wantHere.length&&r()<.6?1:0);
+ // truffles are mostly hidden underground, so they turn up half as often
+ const wsum=here.reduce((a,f)=>a+(f.substrate==='buried'?.5:1),0),pickHere=()=>{let x=r()*wsum;for(const f of here)if((x-=f.substrate==='buried'?.5:1)<0)return f;return here[here.length-1];};
+ // a fallen log or stump of the right tree nearly always has a wood-rotter on it
+ const logFirst=T.logs.length&&r()<.85?here.filter(f=>f.substrate==='dead wood'&&T.logs.some(L=>f.hosts.includes(L.sp))):[];
+ for(let k=0,tries=0;k<nm+(logFirst.length?1:0)&&here.length&&tries<12;tries++){const f=k===0&&logFirst.length?logFirst[(r()*logFirst.length)|0]:wantHere.length&&r()<.6?wantHere[(r()*wantHere.length)|0]:pickHere();let st=fsites(f);if(!st.length)continue;if(k===0&&logFirst.includes(f))st=['log'];
+  if(st.length>1&&st.includes('limb')&&r()<.75)st=st.filter(x=>x!=='limb');
+  const site=st[(r()*st.length)|0],o={id:i+':m'+k,sp:f.id,site,habit:f.habit,seed:(r()*999)|0,side:r()<.5?-1:1},sh=f.art.shape,shelf=sh==='shelf'||sh==='hoof'||sh==='oyster';
+  if(site==='ground'){o.x=T.x+o.side*(T.trunk.w0/2+16+r()*90);o.y=12+r()*8;}
+  else if(site==='base'){o.x=T.x+o.side*T.trunk.w0*.42;o.y=3;}
+  else if(site==='trunk'){const P=T.trunk,s=P.len*(.05+r()*.28),q=pathAt(P,s),w=wAt(P,s)/2;Object.assign(o,{P,s,x:q.x+o.side*w*.9,y:q.y});}
+  else if(site==='log'){const L=T.logs.find(L=>f.hosts.includes(L.sp));o.log=L;
+   if(L.stump){if(shelf){o.x=L.x+o.side*L.R*.95;o.y=L.y-L.H*(.25+r()*.5);}else{o.x=L.x+(r()-.5)*L.R;o.y=L.y-L.H;}}
+   else if(shelf){o.x=L.x+(r()-.5)*L.L*.5;o.y=L.y-L.R*(.6+r()*.9);}else{o.x=L.x+(r()-.6)*L.L*.6;o.y=L.y-L.R*2+1;}}
+  else{const L=limbs[(r()*limbs.length)|0].path,s=L.len*(.3+r()*.45),q=pathAt(L,s),w=wAt(L,s)/2,nx=-Math.sin(q.ang),ny=Math.cos(q.ang),p1=[q.x+nx*w,q.y+ny*w],p2=[q.x-nx*w,q.y-ny*w],top=p1[1]<p2[1]?p1:p2;Object.assign(o,{P:L,s,x:top[0],y:top[1]+1,habit:'single',scale:.75});}
+  T.fungi.push(o);k++;}}
 function birdPos(b){if(b.kind==='limb')return[b.x,b.y+sagAt(b.P,b.s)];return[b.x,b.y];}
 function nutPos(n){return n.ground?[n.x,n.y]:[n.x,n.y+sagAt(n.P,n.s)];}
+// mushrooms and dead wood are drawn a little larger than life so they read at squirrel scale
+const FUNGUS_SCALE=1.35;
+function fungusPos(o){return o.site==='limb'?[o.x,o.y+sagAt(o.P,o.s)]:[o.x,o.y];}
+// ground mushrooms sit on a little patch of leaf litter
+function drawFungusInst(ctx,o){const[x,y]=fungusPos(o),a=FUNGI[o.sp].art;if(o.site==='ground'&&a.shape!=='truffle'){ctx.fillStyle='rgba(96,72,42,.38)';ctx.beginPath();ctx.ellipse(x,y+1,a.s*.9*FUNGUS_SCALE,a.s*.16*FUNGUS_SCALE,0,0,TAU);ctx.fill();}drawFungus(ctx,o.sp,x,y,{seed:o.seed,habit:o.habit,side:o.side,scale:(o.scale||1)*FUNGUS_SCALE});}
 const BIRD_SCALE=.62;
 // birds and nuts sit on a trunk (depth 0) or a limb (behind -1, front 1); pass z to draw only those on that layer
 const perchDepth=o=>o.P?(o.P.depth||0):0;
 function drawTreeCritters(ctx,T,t,z){for(const n of T.nuts){if(n.ground||(z!=null&&perchDepth(n)!==z))continue;const[x,y]=nutPos(n);ctx.save();ctx.translate(x,y);ctx.rotate(n.rot);drawNutArt(ctx,n.sp,1);ctx.restore();}
- for(const b of T.birds){if(b.kind==='ground'||(z!=null&&perchDepth(b)!==z))continue;drawOneBird(ctx,b,t);}}
+ for(const b of T.birds){if(b.kind==='ground'||(z!=null&&perchDepth(b)!==z))continue;drawOneBird(ctx,b,t);}
+ for(const o of T.fungi||[]){if((o.site!=='trunk'&&o.site!=='limb')||(z!=null&&perchDepth(o)!==z))continue;drawFungusInst(ctx,o);}}
 function drawGroundCritters(ctx,T,t){for(const n of T.nuts){if(!n.ground)continue;ctx.save();ctx.translate(n.x,n.y);ctx.rotate(n.rot);drawNutArt(ctx,n.sp);ctx.restore();}for(const b of T.birds)if(b.kind==='ground')drawOneBird(ctx,b,t);}
 function drawOneBird(ctx,b,t){const sp=BIRD_SP[b.sp],[x,y]=birdPos(b);const st=BirdArt.idle(sp,RM?0:t,b.seed);ctx.save();ctx.translate(x,y);if(b.kind!=='trunk'&&b.face<0)ctx.scale(-1,1);if(b.lean)ctx.rotate(b.lean*b.face*.5);BirdArt.drawBird(ctx,sp,0,0,BIRD_SCALE,st);ctx.restore();}
 
@@ -945,11 +1002,11 @@ ALBUM.load();
 // every mission asks for three different species
 function pick3(a){const b=a.slice();for(let i=b.length-1;i>0;i--){const j=(Math.random()*(i+1))|0;[b[i],b[j]]=[b[j],b[i]];}return b.slice(0,3);}
 // each mission rolls a forest, then a squirrel from that forest, then what to find there.
-// Half the time the three are one of each kind (bird, nut or cone, wildflower); otherwise each kind is random.
-function genMissions(){const pick=a=>a[(Math.random()*a.length)|0],types=Math.random()<.5?pick3(['b','n','f']):[0,0,0].map(()=>pick(['b','n','f']));return types.map(type=>{const zid=pick(ZONE_IDS),Z=ZN[zid];return{zone:zid,squirrel:pick(Z.squirrels),type,targets:pick3(type==='b'?Z.birds:type==='n'?Z.nuts:Z.flowers),need:3};});}
+// Half the time the three are different kinds (FINDS: bird, nut or cone, wildflower, mushroom); otherwise each kind is random.
+function genMissions(){const pick=a=>a[(Math.random()*a.length)|0],types=Math.random()<.5?pick3(FINDS):[0,0,0].map(()=>pick(FINDS));return types.map(type=>{const zid=pick(ZONE_IDS),Z=ZN[zid];return{zone:zid,squirrel:pick(Z.squirrels),type,targets:pick3(Z[KINDS[type].list]),need:3};});}
 const isCone=id=>/cone$/i.test(NUTS[id].name);
 function nutNoun(ids){const c=ids.filter(isCone).length;return c===ids.length?'cones':c?'nuts and cones':'nuts';}
-function missionText(m){return m.type==='b'?'Photograph these 3 birds':m.type==='f'?'Photograph these 3 wildflowers':'Collect these 3 '+nutNoun(m.targets);}
+function missionText(m){return KINDS[m.type].mission||'Collect these 3 '+nutNoun(m.targets);}
 function andList(a){return a.length<2?a.join(''):a.slice(0,-1).join(', ')+' and '+a[a.length-1];}
 function missionNames(m){return andList(m.targets.map(id=>itemInfo(m.type,id).name));}
 function wanted(M,kind,id){return!!M&&!M.done&&M.type===kind&&!M.got.includes(id)&&M.targets.includes(id);}
@@ -983,7 +1040,8 @@ function lensPick(w,h){const M=PLAY.mission,taken=W.taken,r=lensR(w,h),z=cam.zoo
  const add=(kind,id,inst,x,y,sz)=>{const[sx,sy]=toScreen(x,y,w,h),dl=Math.hypot(sx-LENS.cx,sy-LENS.cy);if(dl<r+sz*z*.5)c0.push({kind,id,inst,x,y,sx,sy,dl,sz:sz*z});};
  for(const T of W.trees.values()){for(const b of T.birds){const[x,y]=birdPos(b);add('b',b.sp,b,x,y-8,22);}
   for(const n of T.nuts){const[x,y]=nutPos(n);add('n',n.sp,n,x,y+5,12);}
-  for(const f of T.flowers){add('f',f.sp,f,f.x,f.y-f.h,14);}}
+  for(const f of T.flowers){add('f',f.sp,f,f.x,f.y-f.h,14);}
+  for(const o of T.fungi||[]){const[x,y]=fungusPos(o),a=FUNGI[o.sp].art,sh=a.shape,shelf=sh==='shelf'||sh==='hoof'||sh==='oyster';add('m',o.sp,o,x+(shelf?o.side*a.s*.5*FUNGUS_SCALE:0),y-(shelf?0:a.s*.6*FUNGUS_SCALE),a.s*1.5*FUNGUS_SCALE);}}
  const sq=S.flying?{x:S.x,y:S.y}:surfacePos(),reach=o=>o.kind!=='n'||Math.hypot(o.x-sq.x,o.y-sq.y)<70;
  c0.sort((a,b)=>a.dl-b.dl);
  const fresh=c0.filter(o=>!taken.has(o.inst.id)),isTarget=o=>wanted(M,o.kind,o.id);
@@ -1010,7 +1068,7 @@ function drawLens(ctx,w,h,t){if(!LENS.on)return;const R=lensR(w,h),cx=LENS.cx,cy
  ctx.restore();}
 function takePhoto(){const c=document.getElementById('play'),w=c.clientWidth,h=c.clientHeight,M=PLAY.mission,taken=W.taken;flashUI();SFX.shutter();
  const{pick,isTarget,reach}=lensPick(w,h);
- if(!pick){showCard(null,{msg:'Nothing in the lens that time. Aim the circle at a bird, a nut or cone, or a wildflower.'});return;}
+ if(!pick){showCard(null,{msg:'Nothing in the lens that time. Aim the circle at a bird, a nut or cone, a wildflower or a mushroom.'});return;}
  const info=itemInfo(pick.kind,pick.id);
  if(taken.has(pick.inst.id)){showCard(info,{msg:"You've already collected this one here."});return;}
  if(!reach(pick)){showCard(info,{msg:'Climb within reach to collect it.',want:M&&!M.done&&!isTarget(pick)?M:null});return;}
@@ -1049,7 +1107,7 @@ function buildUI(){const st=document.getElementById('stage');
 function trackMouse(e){const r=document.getElementById('play').getBoundingClientRect();MOUSE.x=e.clientX-r.left;MOUSE.y=e.clientY-r.top;MOUSE.t=performance.now();}
 function flashUI(){const f=document.getElementById('sr-flash');f.classList.remove('go');void f.offsetWidth;f.classList.add('go');}
 function pic(kind,id,cls,W,H){const c=document.createElement('canvas');const src=pictureOf(kind,id,W,H);c.width=src.width;c.height=src.height;c.getContext('2d').drawImage(src,0,0);c.className=cls||'';return c;}
-function figHTML(info,label){return`<figcaption>${label?`<span class="sr-k">${label}</span>`:''}<b>${info.name}</b><i>${info.sci}</i><span>${info.range}</span>${info.tree?`<span class="sr-tree">From the ${info.tree}</span>`:''}${info.fact?`<em>${info.fact}</em>`:''}</figcaption>`;}
+function figHTML(info,label){return`<figcaption>${label?`<span class="sr-k">${label}</span>`:''}<b>${info.name}</b><i>${info.sci}</i><span>${info.range}</span>${info.tree?`<span class="sr-tree">From the ${info.tree}</span>`:''}${info.grows?`<span class="sr-tree">${info.grows}</span>`:''}${info.fact?`<em>${info.fact}</em>`:''}</figcaption>`;}
 let cardT=0;
 function showCard(info,o){o=o||{};clearTimeout(cardT);const C=UI.card;C.innerHTML='';C.className='sr-card'+(o.match?' match':'');
  const row=document.createElement('div');row.className='sr-pair';
@@ -1089,24 +1147,25 @@ UI.go=function(v){const[a,b,c]=v.split(':');
  if(a==='collection'&&b==='back'){openMenu('collection');UI.menuIn.scrollTop=UI.collScroll||0;return;}
  openMenu(a,b);};
 const ICON_PLAY='<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9v6h4l5 4V5L8 9z"/><path d="M16.5 8.5a5 5 0 0 1 0 7"/><path d="M19 6a8.5 8.5 0 0 1 0 12"/></svg>';
-function wikiURL(k,id){const w=k==='b'?BIRD_SP[id].wiki:k==='s'&&SQUIRRELS[id].wiki;return'https://en.wikipedia.org/wiki/'+(w||itemInfo(k,id).sci.replace(/ /g,'_'));}
+function wikiURL(k,id){const w=k==='b'?BIRD_SP[id].wiki:k==='s'?SQUIRRELS[id].wiki:k==='m'&&FUNGI[id].wiki;return'https://en.wikipedia.org/wiki/'+(w||itemInfo(k,id).sci.replace(/ /g,'_'));}
 // the full page for one species, opened from the collection
-function infoView(k,id){const i=itemInfo(k,id),have=ALBUM.has[k+':'+id],zones=ZONE_IDS.filter(z=>(k==='s'?ZN[z].squirrels:k==='b'?ZN[z].birds:k==='n'?ZN[z].nuts:ZN[z].flowers).includes(id)).map(z=>ZN[z].name);
- const kindName={s:'Squirrel',b:'Bird',n:NUTS[id]&&isCone(id)?'Cone':'Nut',f:'Wildflower'}[k];
+function infoView(k,id){const i=itemInfo(k,id),have=ALBUM.has[k+':'+id],zones=ZONE_IDS.filter(z=>ZN[z][KINDS[k].list].includes(id)).map(z=>ZN[z].name);
+ const kindName=k==='n'?(isCone(id)?'Cone':'Nut'):KINDS[k].one;
  const status=have?(k==='s'?`In your collection · ${have} mission${have>1?'s':''} completed`:'Collected'):(k==='s'?'Complete a mission as this squirrel to add it':`Not found yet. Look for it in the ${andList(zones)}.`);
  let h=`<div class="sr-head"><button type="button" data-go="collection:back" class="back">Back</button><span class="sr-k">${kindName}</span></div>
  <div class="sr-info"><div class="sr-info-pic${have?'':' dim'}"><div data-pic="${k}:${id}" data-w="240" data-h="180"></div></div><div class="sr-info-txt">
  <h2>${i.name}</h2><p class="sci"><i>${i.sci}</i></p><p class="status${have?' got':''}">${have?'<span class="tick" role="img" aria-label="Found"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>':''}${status}</p>
  <dl><dt>Native range</dt><dd>${i.range}</dd><dt>Lives in</dt><dd>${andList(zones)}</dd>`;
  if(k==='b')h+=`<dt>Field marks</dt><dd>${BIRD_SP[id].marks}</dd>`;
+ if(k==='m')h+=`<dt>Where it grows</dt><dd>${FUNGI[id].grows}</dd><dt>Field marks</dt><dd>${FUNGI[id].marks}</dd>`;
  if(i.fact)h+=`<dt>Did you know?</dt><dd>${i.fact}</dd>`;
- h+=`</dl><div class="sr-info-act">${k==='b'?`<button type="button" data-go="call:${id}">${ICON_PLAY}Play its call</button>`:''}<a href="${wikiURL(k,id)}" target="_blank" rel="noopener">Read more on Wikipedia</a></div></div></div>`;
+ h+=`</dl>${k==='m'?'<p class="sr-safe">Look, but never pick or eat a wild mushroom: many look alike, and some are deadly.</p>':''}<div class="sr-info-act">${k==='b'?`<button type="button" data-go="call:${id}">${ICON_PLAY}Play its call</button>`:''}<a href="${wikiURL(k,id)}" target="_blank" rel="noopener">Read more on Wikipedia</a></div></div></div>`;
  if(k==='n'){const n=NUTS[id],t=TREE_INFO[n.tree];h+=`<div class="sr-info-tree"><div data-pic="t:${n.tree}" data-w="160" data-h="120"></div><div><span class="sr-k">From the tree</span><b>${t[0]}</b><i>${t[1]}</i><span>${t[2]}</span></div></div>`;}
  return h;}
 function openMenu(view,arg){hideCard();let h='';
  if(view==='main'){h=`<div class="sr-title">${ICON.acorn}<div><h2>Squirrel Ranger</h2><p>Explore real forests as a real squirrel.</p></div></div><div class="sr-main">
   ${W&&PLAY.started?'<button type="button" data-go="resume" class="primary">Resume</button>':''}<button type="button" data-go="playz">Play<span>Explore freely. Pick a forest and a squirrel.</span></button>
-  <button type="button" data-go="missions">Missions<span>Find birds, nuts, cones and wildflowers.</span></button><button type="button" data-go="collection">Collection<span>Everything you've found, with names and ranges.</span></button></div><div class="sr-toggles">${menuToggles()}</div>`;}
+  <button type="button" data-go="missions">Missions<span>Find birds, nuts, cones, wildflowers and mushrooms.</span></button><button type="button" data-go="collection">Collection<span>Everything you've found, with names and ranges.</span></button></div><div class="sr-toggles">${menuToggles()}</div>`;}
  if(view==='playz'||view==='missionz'){h=`<div class="sr-head"><button type="button" data-go="main" class="back">Back</button><h2>${view==='playz'?'Choose a forest':'Missions: choose a forest'}</h2></div><div class="sr-grid zones">`+ZONE_IDS.map(z=>{const Z=ZN[z];const tr=Z.trees[0][0];
    return`<button type="button" class="sr-tile" data-go="${view==='playz'?'plays':'missions'}:${z}"><div data-pic="t:${tr}" data-w="150" data-h="112"></div><b>${Z.name}</b><i>${Z.where}</i></button>`;}).join('')+'</div>';}
  if(view==='plays'){const Z=ZN[arg];h=`<div class="sr-head"><button type="button" data-go="playz" class="back">Back</button><h2>${Z.name}: choose your squirrel</h2></div><div class="sr-grid">`+Z.squirrels.map(s=>{const q=SQUIRRELS[s];return`<button type="button" class="sr-tile" data-go="play:${arg}:${s}"><div data-pic="sh:${s}"></div><b>${q.name}</b><i>${q.sci}</i><span>${q.range}</span></button>`;}).join('')+'</div>';}
@@ -1114,7 +1173,7 @@ function openMenu(view,arg){hideCard();let h='';
    return`<button type="button" class="sr-tile mission" data-go="mission:${k}"><div class="quad"><div data-pic="sh:${m.squirrel}" data-w="100" data-h="90"></div>${ids.map(id=>`<div data-pic="${m.type}:${id}" data-w="100" data-h="90"></div>`).join('')}</div><span class="sr-where">${ZN[m.zone].name}<br>as the ${q.name}</span><b>${missionText(m)}</b><span class="sr-names">${missionNames(m)}</span></button>`;}).join('')+'</div><p class="sr-note">New missions are dealt each time you open this screen.</p>';}
  if(view==='info'){const[k,id]=arg.split(':');h=infoView(k,id);}
  if(view==='collection'){const tot=[];h=`<div class="sr-head"><button type="button" data-go="main" class="back">Back</button><h2>Collection</h2></div>`;
-  for(const z of ZONE_IDS){const Z=ZN[z];const sec=[['Squirrels','s',Z.squirrels],['Birds','b',Z.birds],['Nuts and cones','n',Z.nuts],['Wildflowers','f',Z.flowers]];
+  for(const z of ZONE_IDS){const Z=ZN[z];const sec=['s',...FINDS].map(k=>[KINDS[k].many,k,Z[KINDS[k].list]]);
    h+=`<h3 class="sr-zone">${Z.name}</h3>`;for(const[lab,k,ids]of sec){const got=ids.filter(id=>ALBUM.has[k+':'+id]).length;h+=`<h4>${lab} <span>${got} of ${ids.length}</span></h4><div class="sr-grid coll">`+ids.map(id=>{const i=itemInfo(k,id),have=ALBUM.has[k+':'+id];
      return`<button type="button" class="sr-tile${have?' done':''}" data-go="info:${k}:${id}" aria-label="${i.name}">${have?'<span class="tick" role="img" aria-label="Found"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M3 8.5l3.2 3L13 4.5" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>':''}${k==='n'?`<div class="duo"><div data-pic="t:${NUTS[id].tree}" data-w="90" data-h="80"></div><div data-pic="n:${id}" data-w="90" data-h="80"></div></div>`:`<div data-pic="${k}:${id}"></div>`}<b>${i.name}</b><i>${i.sci}</i>${k==='n'?`<span>${i.tree}</span>`:''}${k==='s'?`<span>${have?(have>1?have+' missions completed':'1 mission completed'):'Complete a mission as this squirrel'}</span>`:''}</button>`;}).join('')+'</div>';}}}
  renderMenu(h);}
@@ -1207,7 +1266,11 @@ function drawPlay(t,dt){
  const groundFront=()=>{for(const T of trees)drawTreeBase(ctx,T);
   grassBand(ctx,vx0,vx1,t,{seed:23,step:2.2,yMin:1,yMax:9,hMin:6,hMax:17,bw:3,wind:1,boost:.9,cols:GRASS_FRONT},trunks);
   for(const T of trees){for(const f of T.flowers){if(f.x<vx0-60||f.x>vx1+60)continue;drawFlowerSp(ctx,f.sp,f.x,f.y,f.h,t,f.seed);}drawGroundCritters(ctx,T,t);}
-  grassBand(ctx,vx0,vx1,t,{seed:37,step:2.4,yMin:9,yMax:24,hMin:7,hMax:19,bw:3.4,wind:1,boost:1.1,cols:GRASS_FRONT},trunks);};
+  // fallen logs and stumps, with the mushrooms growing on them, half in the grass
+  for(const T of trees)for(const L of T.logs||[]){const sp=SPECIES[L.sp];if(L.stump)drawStump(ctx,sp,L.x,L.y,L.R,L.H,L.seed);else drawLog(ctx,sp,L.x,L.y,L.L,L.R,L.seed);for(const o of T.fungi)if(o.log===L)drawFungusInst(ctx,o);}
+  grassBand(ctx,vx0,vx1,t,{seed:37,step:2.4,yMin:9,yMax:24,hMin:7,hMax:19,bw:3.4,wind:1,boost:1.1,cols:GRASS_FRONT},trunks);
+  // mushrooms on the ground and at trunk bases stand in front of the grass, so they can be seen
+  for(const T of trees)for(const o of T.fungi||[])if(o.site==='ground'||o.site==='base')drawFungusInst(ctx,o);};
  // aim: the dotted flight path, and the power ring that goes with the squirrel
  let mode,ph=S.phase;const aimA=curAim(),aiming=!!aimA;
  const drawAimPath=()=>{if(!aimA)return;const a=aimA,p=surfacePos();let x=p.x,y=p.y,vx=a.vx,vy=a.vy;for(let i=1;i<=64;i++){const st=.03;vy+=G*st;vy=glideVy(vy,st);x+=vx*st;y+=vy*st;if(y>0)break;if(i%3===0){ctx.globalAlpha=1-i/66;ctx.fillStyle='#fff8e8';ctx.beginPath();ctx.arc(x,y,3.2/cam.zoom+1,0,TAU);ctx.fill();}}ctx.globalAlpha=1;};

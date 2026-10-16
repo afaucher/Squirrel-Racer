@@ -25,6 +25,7 @@ Each forest has the same shape:
 | **Birds** | 5–6 | Common, easy to see, and visually distinct from each other. Aim for a mix of poses (see below). Prefer birds with a link to squirrels or seeds: jays that bury acorns, crossbills that eat spruce seed, tits that nest in old dreys. |
 | **Nuts and cones** | 4 | One per bearing tree. Pick ones that look different from each other. |
 | **Wildflowers** | 11 | Native woodland or clearing flowers. Mix colours, shapes and seasons. |
+| **Mushrooms** | 5 | Native, common and distinct from each other. **Where each one grows matters most**, because the game places it only there. Mix habitats: at least two on dead wood (fallen logs or stumps) of specific host trees, at least one from soil with its partner trees, and ideally a bracket on living trunks. Prefer squirrel links: red squirrels dry mushrooms in the branches, and flying squirrels dig up truffles. Never write a fact that suggests eating one. |
 
 **Check habitat, not just range.** A species can live in the right region but in the wrong place, like a meadow, prairie or dry oak woodland. For the Pacific Northwest, common camas and broadleaf lupine were swapped for Oregon fawn lily and vanilla leaf, and tall Oregon grape for the dwarf Oregon grape of the forest floor. When you keep a weaker fit on purpose (the western gray squirrel prefers drier oak and Douglas-fir woods), say so in its range.
 
@@ -188,6 +189,27 @@ Hanging nuts are placed under their own tree's limbs (upright cones on top), and
 
 If a flower needs a shape that doesn't exist, add a new `art.k` branch in `drawFlowerSp` (in `art/plants.js`) and keep it to simple filled shapes.
 
+### 2.3b Mushrooms: facts and where they grow in `data/fungi.js`, art in `FUNGI` (`art/fungi.js`)
+
+Each mushroom's card claims are `name`, `sci`, `range`, `grows`, `fact` and `marks` (field marks), each with sources. The `grows` claim ("On dead beech logs and stumps") comes with four plain fields that place the mushroom in the game. They must say exactly what the `grows` sources support:
+
+| Field | Meaning |
+|---|---|
+| `substrate` | `soil`, `leaf litter` or `moss` (on the ground near its host trees, or anywhere if it lists none); `buried` (a truffle, shown half dug up); `trunk base`; `living trunk` (brackets on standing trees); `dead wood` (fallen logs and stumps) |
+| `hosts` | Tree ids it grows on or with. Ground mushrooms appear only near these trees, trunk mushrooms only on them, and dead-wood mushrooms only on logs and stumps of these species. Wood-growers must list at least one, and every forest that lists the mushroom must have at least one of its hosts. |
+| `habit` | `single`, `scattered`, `cluster` (tufts from one base), `tiers` (overlapping shelves) or `ring` |
+| `cached` | `true` if squirrels are documented drying or caching it in trees; it can then also appear in the branches |
+
+Fallen logs and stumps are drawn in the bark of their own tree species, mostly the tree next to them. A mission for a dead-wood mushroom makes logs of its host trees more likely.
+
+`FUNGI.<id>` is the look: `{shape, s (size in world pixels), cap, cap2, under, stem, ring, bulb, spots, scales, bands, rim, glow, n, sh (stem height), sw (stem width), dome}`.
+
+| `shape` | Looks like |
+|---|---|
+| `convex`, `flat`, `funnel`, `conical`, `bell` | A cap on a stem, with `under` (gills or pores) showing below the rim |
+| `shelf`, `hoof`, `oyster` | Brackets growing out from a trunk or log; `bands` colours the growth zones; `oyster` has gills and a short side stem |
+| `coral`, `puffball`, `earthstar`, `cup`, `stinkhorn`, `jelly`, `truffle` | One-off shapes |
+
 ### 2.4 Birds: facts in `data/birds.js`, art in `BIRDS` (inside `BirdArt`, in `art/birds.js`)
 
 Each bird is drawn from its field marks on a shared body, facing right:
@@ -256,7 +278,8 @@ sw: {name:'Southwest Ponderosa Pine', where:'Arizona, New Mexico and Colorado',
   squirrels:['abert','kaibab'],
   birds:['stjay','pygnut','mtnchick','acornwp','wbluebird','rfwarbler'],
   nuts:['ponderosacone','gambelacorn','douglascone','pinyonnut'],
-  flowers:['scarletgilia', …11 ids…]},
+  flowers:['scarletgilia', …11 ids…],
+  fungi:[…5 ids…]},
 ```
 
 - `trees` are `[id, weight]`.
@@ -272,7 +295,7 @@ sw: {name:'Southwest Ponderosa Pine', where:'Arizona, New Mexico and Colorado',
    ```js
    (z => { const Z = ZN[z], w = open('', '_blank'), d = w.document; d.body.style.cssText = 'margin:0;background:#e8ecdf;font:12px sans-serif;display:flex;flex-wrap:wrap';
      const add = (k, id, label) => { const c = pictureOf(k, id, 160, 120), f = d.createElement('figure'); f.style.margin = '6px'; const i = d.createElement('img'); i.src = c.toDataURL(); i.width = 160; f.append(i, Object.assign(d.createElement('figcaption'), {textContent: label})); d.body.append(f); };
-     Z.squirrels.forEach(id => add('s', id, id)); Z.trees.forEach(([id]) => add('t', id, id)); Z.birds.forEach(id => add('b', id, id)); Z.nuts.forEach(id => add('n', id, id)); Z.flowers.forEach(id => add('f', id, id)); })('sw');
+     Z.squirrels.forEach(id => add('s', id, id)); Z.trees.forEach(([id]) => add('t', id, id)); Z.birds.forEach(id => add('b', id, id)); Z.nuts.forEach(id => add('n', id, id)); Z.flowers.forEach(id => add('f', id, id)); (Z.fungi || []).forEach(id => add('m', id, id)); })('sw');
    ```
 
    Compare each one with a photo. Check that the key field marks read at small size, and that the silhouettes are still recognisable (they become the mission outlines).

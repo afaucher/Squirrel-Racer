@@ -1,0 +1,338 @@
+// Squirrel Ranger species facts: Mushrooms.
+// Every claim on a card is {"text", "src": [urls], "checked": "YYYY-MM", "sig", "note"?}.
+// "sig" fingerprints the text when it was checked; edit the text and the check flags it for a re-check.
+// How to add or fix a fact: docs/ADDING-A-FOREST.md. Validate with: node tools/check_facts.mjs
+
+(window.SPECIES_DATA ||= {}).fungi = {
+ "chickenofthewoods": {
+  "name": {"text":"Chicken of the woods","src":["https://mushroomexpert.com/fungionwood/poroid%20fungi/species%20pages/Laetiporus%20sulphureus.htm"],"checked":"2026-10","sig":"bb16014e"},
+  "sci": {"text":"Laetiporus sulphureus","src":["https://www.speciesfungorum.org/Names/Names.asp?strGenus=Laetiporus","https://www.mushroomexpert.com/laetiporus_sulphureus.html"],"checked":"2026-10","sig":"7908832b"},
+  "range": {"text":"North America east of the Rocky Mountains","src":["https://www.mushroomexpert.com/laetiporus_sulphureus.html"],"checked":"2026-10","sig":"52f1b14c"},
+  "grows": {"text":"On trunks of living and dead oaks","src":["https://www.mushroomexpert.com/laetiporus_sulphureus.html","https://mushroomexpert.com/fungionwood/poroid%20fungi/species%20pages/Laetiporus%20sulphureus.htm"],"checked":"2026-10","sig":"bacaf283"},
+  "substrate": "living trunk",
+  "hosts": ["whiteoak","redoak"],
+  "habit": "tiers",
+  "fact": {"text":"This bright orange shelf rots the heartwood of oak trees from the inside, even while the tree is alive.","src":["https://www.mushroomexpert.com/laetiporus_sulphureus.html"],"checked":"2026-10","sig":"caf3f9c7"},
+  "marks": {"text":"Overlapping fan-shaped shelves 5-25 cm wide, bright orange to yellow-orange above, fading to whitish; underside sulphur-yellow tiny pores; no stem; no ring.","src":["https://www.mushroomexpert.com/laetiporus_sulphureus.html","https://mushroomexpert.com/fungionwood/poroid%20fungi/species%20pages/Laetiporus%20sulphureus.htm"],"checked":"2026-10","sig":"89b430e7"}
+ },
+ "henofthewoods": {
+  "name": {"text":"Hen of the woods (maitake)","src":["https://mushroomexpert.com/fungionwood/poroid%20fungi/species%20pages/Grifola%20frondosa.htm","https://ja.wikipedia.org/wiki/%E3%83%9E%E3%82%A4%E3%82%BF%E3%82%B1"],"checked":"2026-10","sig":"6b60618b"},
+  "sci": {"text":"Grifola frondosa","src":["https://www.speciesfungorum.org/Names/Names.asp?strGenus=Grifola"],"checked":"2026-10","sig":"e7d00e7f"},
+  "range": {"text":"Temperate forests of North America, Europe and Asia","src":["https://www.mushroomexpert.com/grifola_frondosa.html","https://ja.wikipedia.org/wiki/%E3%83%9E%E3%82%A4%E3%82%BF%E3%82%B1"],"checked":"2026-10","sig":"97e3c4cf"},
+  "grows": {"text":"At the base of oak trees and stumps","src":["https://www.mushroomexpert.com/grifola_frondosa.html","https://mushroomexpert.com/fungionwood/poroid%20fungi/species%20pages/Grifola%20frondosa.htm","https://www.pref.ishikawa.lg.jp/ringyo/publish/documents/isikawanokinoko_1.pdf"],"checked":"2026-10","sig":"5dbee7f2"},
+  "substrate": "trunk base",
+  "hosts": ["whiteoak","redoak","mizunara"],
+  "habit": "cluster",
+  "fact": {"text":"Hen of the woods often pops up at the very same tree base year after year.","src":["https://www.mushroomexpert.com/grifola_frondosa.html","https://mushroomexpert.com/fungionwood/poroid%20fungi/species%20pages/Grifola%20frondosa.htm"],"checked":"2026-10","sig":"e4b230ad"},
+  "marks": {"text":"A big rosette 15-40 cm wide of many grey-brown spoon-shaped caps (3-7 cm each) on one branched white stem; underside white pores; no ring.","src":["https://www.mushroomexpert.com/grifola_frondosa.html","https://mushroomexpert.com/fungionwood/poroid%20fungi/species%20pages/Grifola%20frondosa.htm"],"checked":"2026-10","sig":"aecb9541"}
+ },
+ "turkeytail": {
+  "name": {"text":"Turkey tail","src":["https://www.mushroomexpert.com/trametes_versicolor.html","https://mushroomexpert.com/fungionwood/poroid%20fungi/species%20pages/Trametes%20versicolor.htm"],"checked":"2026-10","sig":"71ca9bed"},
+  "sci": {"text":"Trametes versicolor","src":["https://www.speciesfungorum.org/Names/Names.asp?strGenus=Trametes"],"checked":"2026-10","sig":"7af515ab"},
+  "range": {"text":"Throughout North America","src":["https://www.mushroomexpert.com/trametes_versicolor.html"],"checked":"2026-10","sig":"be78409d"},
+  "grows": {"text":"On dead hardwood logs and stumps","src":["https://www.mushroomexpert.com/trametes_versicolor.html","https://mushroomexpert.com/fungionwood/poroid%20fungi/species%20pages/Trametes%20versicolor.htm","https://cfs.nrcan.gc.ca/herbier/davfp-num/17555","https://cfs.nrcan.gc.ca/herbier/davfp-num/7162"],"checked":"2026-10","sig":"ac6a751d"},
+  "substrate": "dead wood",
+  "hosts": ["whiteoak","redoak","hickory","beech","sugarmaple","redalder","bigleafmaple"],
+  "habit": "tiers",
+  "fact": {"text":"Turkey tail may be the most common wood-rotter of hardwood logs in North America.","src":["https://mushroomexpert.com/fungionwood/poroid%20fungi/species%20pages/Trametes%20versicolor.htm"],"checked":"2026-10","sig":"6b7dcd48"},
+  "marks": {"text":"Thin leathery fans 2-8 cm wide, 1-3 mm thick, with velvety rings of brown, grey, orange and blue and a pale edge; underside white with tiny pores; no stem.","src":["https://www.mushroomexpert.com/trametes_versicolor.html","https://mushroomexpert.com/fungionwood/poroid%20fungi/species%20pages/Trametes%20versicolor.htm"],"checked":"2026-10","sig":"7f360a6e"}
+ },
+ "bearsheadtooth": {
+  "name": {"text":"Bear's head tooth","src":["https://www.mushroomexpert.com/fungionwood/teeth%20and%20spine/species%20pages/Hericium%20americanum.htm"],"checked":"2026-10","sig":"605f3956"},
+  "sci": {"text":"Hericium americanum","src":["https://www.speciesfungorum.org/Names/Names.asp?strGenus=Hericium&strSpecies=americanum"],"checked":"2026-10","sig":"33f96a7b"},
+  "range": {"text":"Eastern North America","src":["https://www.mushroomexpert.com/hericium_americanum.html"],"checked":"2026-10","sig":"e0a6cbc7"},
+  "grows": {"text":"On dead beech, maple and oak logs and stumps","src":["https://www.mushroomexpert.com/hericium_americanum.html","https://dnr.state.mn.us/mcvmagazine/issues/2018/sep-oct/lions-mane.html"],"checked":"2026-10","sig":"62126880"},
+  "substrate": "dead wood",
+  "hosts": ["beech","sugarmaple","whiteoak","redoak"],
+  "habit": "single",
+  "fact": {"text":"Instead of gills, this fungus drops its spores from dangling white spines that look like icicles.","src":["https://www.mushroomexpert.com/hericium_americanum.html","https://www.mushroomexpert.com/fungionwood/teeth%20and%20spine/species%20pages/Hericium%20americanum.htm"],"checked":"2026-10","sig":"d0ffff5e"},
+  "marks": {"text":"A white branching clump 15-20 cm across, covered in hanging spines 0.5-4 cm long; turns yellowish with age; no cap, gills, stem or ring.","src":["https://www.mushroomexpert.com/hericium_americanum.html","https://www.mushroomexpert.com/fungionwood/teeth%20and%20spine/species%20pages/Hericium%20americanum.htm"],"checked":"2026-10","sig":"f1428468"}
+ },
+ "indigomilkcap": {
+  "name": {"text":"Indigo milk cap","src":["https://mdc.mo.gov/discover-nature/field-guide/indigo-milky"],"checked":"2026-10","sig":"77279258"},
+  "sci": {"text":"Lactarius indigo","src":["https://api.gbif.org/v1/species/match?name=Lactarius%20indigo&kingdom=Fungi","https://www.mushroomexpert.com/lactarius_indigo.html"],"checked":"2026-10","sig":"f029b9e1"},
+  "range": {"text":"Eastern North America to Mexico","src":["https://www.mushroomexpert.com/lactarius_indigo.html"],"checked":"2026-10","sig":"e1569e3c"},
+  "grows": {"text":"In soil under oak trees","src":["https://www.mushroomexpert.com/lactarius_indigo.html","https://mdc.mo.gov/discover-nature/field-guide/indigo-milky"],"checked":"2026-10","sig":"079ef7d8"},
+  "substrate": "soil",
+  "hosts": ["whiteoak","redoak"],
+  "habit": "scattered",
+  "fact": {"text":"Cut it and it bleeds blue milk that slowly turns green. Its threads trade nutrients with oak roots.","src":["https://mdc.mo.gov/discover-nature/field-guide/indigo-milky","https://www.mushroomexpert.com/lactarius_indigo.html"],"checked":"2026-10","sig":"667dac89"},
+  "marks": {"text":"Blue cap 5-15 cm, convex to vase-shaped, fading silvery blue and bruising green; blue gills; blue pitted stem 2-8 cm; no ring; no spots.","src":["https://www.mushroomexpert.com/lactarius_indigo.html","https://mdc.mo.gov/discover-nature/field-guide/indigo-milky"],"checked":"2026-10","sig":"e1d32aa8"}
+ },
+ "birchpolypore": {
+  "name": {"text":"Birch polypore","src":["https://mushroomexpert.com/fungionwood/poroid%20fungi/species%20pages/Fomitopsis%20betulina.htm"],"checked":"2026-10","sig":"b566597d"},
+  "sci": {"text":"Fomitopsis betulina","src":["https://www.speciesfungorum.org/Names/Names.asp?strGenus=Fomitopsis","https://www.mushroomexpert.com/fomitopsis_betulina.html"],"checked":"2026-10","sig":"eeab7ae7"},
+  "formerly": "Piptoporus betulinus",
+  "range": {"text":"Northern Hemisphere, wherever birch grows","src":["https://tidcf.nrcan.gc.ca/en/diseases-caused-by-pathogens/factsheet/354","https://www.first-nature.com/fungi/piptoporus-betulinus.php"],"checked":"2026-10","sig":"69bb1055"},
+  "grows": {"text":"Only on dead birch trees, standing or fallen","src":["https://tidcf.nrcan.gc.ca/en/diseases-caused-by-pathogens/factsheet/354","https://www.mushroomexpert.com/fomitopsis_betulina.html","https://www.first-nature.com/fungi/piptoporus-betulinus.php","https://www.wildlifetrusts.org/wildlife-explorer/fungi/birch-polypore"],"checked":"2026-10","sig":"ad1e1b1f"},
+  "substrate": "dead wood",
+  "hosts": ["paperbirch","silverbirch"],
+  "habit": "single",
+  "fact": {"text":"Ötzi, a 5,000-year-old Iceman found frozen in the Alps, carried pieces of this birch fungus.","src":["https://mushroomexpert.com/fungionwood/poroid%20fungi/species%20pages/Fomitopsis%20betulina.htm"],"checked":"2026-10","sig":"8ddfec95"},
+  "marks": {"text":"Kidney-shaped bracket 5-25 cm wide, smooth pale tan to grey-brown top with a rounded inrolled edge; white pore underside; short stubby side stalk; no ring.","src":["https://tidcf.nrcan.gc.ca/en/diseases-caused-by-pathogens/factsheet/354","https://www.mushroomexpert.com/fomitopsis_betulina.html"],"checked":"2026-10","sig":"25d6d328"}
+ },
+ "chaga": {
+  "name": {"text":"Chaga (cinder conk)","src":["https://www1.maine.gov/DACF/mfs/forest_health/documents/Chaga_Cinder%20Conk_MFS_FactSheet.pdf","https://mushroomexpert.com/fungionwood/crust%20and%20parchment/species%20pages/Inonotus%20obliquus.htm"],"checked":"2026-10","sig":"6146c99f"},
+  "sci": {"text":"Inonotus obliquus","src":["https://www.speciesfungorum.org/Names/Names.asp?strGenus=Inonotus"],"checked":"2026-10","sig":"80adb716"},
+  "range": {"text":"Northern forests around the world","src":["https://www1.maine.gov/DACF/mfs/forest_health/documents/Chaga_Cinder%20Conk_MFS_FactSheet.pdf","https://www.mushroomexpert.com/inonotus_obliquus.html"],"checked":"2026-10","sig":"d2cf74fc"},
+  "grows": {"text":"On trunks of living birch trees","src":["https://www.mushroomexpert.com/inonotus_obliquus.html","https://mushroomexpert.com/fungionwood/crust%20and%20parchment/species%20pages/Inonotus%20obliquus.htm"],"checked":"2026-10","sig":"deefbc75"},
+  "substrate": "living trunk",
+  "hosts": ["paperbirch"],
+  "habit": "single",
+  "fact": {"text":"That black lump is not burnt wood. Chaga makes its spores only after its birch tree dies.","src":["https://www1.maine.gov/DACF/mfs/forest_health/documents/Chaga_Cinder%20Conk_MFS_FactSheet.pdf","https://www.mushroomexpert.com/inonotus_obliquus.html"],"checked":"2026-10","sig":"2a018ec1"},
+  "marks": {"text":"Irregular black, hard, deeply cracked lump 10-40 cm bursting from birch bark, orange-brown inside; no cap, pores, stem or ring.","src":["https://www.mushroomexpert.com/inonotus_obliquus.html","https://mushroomexpert.com/fungionwood/crust%20and%20parchment/species%20pages/Inonotus%20obliquus.htm"],"checked":"2026-10","sig":"85861de1"}
+ },
+ "redbeltedconk": {
+  "name": {"text":"Red-belted conk","src":["https://www.fs.usda.gov/r10/natural-resources/forest-health/conifer-stem-decays"],"checked":"2026-10","sig":"ded3184e"},
+  "sci": {"text":"Fomitopsis mounceae","src":["https://www.mushroomexpert.com/fomitopsis_mounceae.html","https://www.speciesfungorum.org/Names/Names.asp?strGenus=Fomitopsis"],"checked":"2026-10","sig":"35e30895"},
+  "formerly": "Fomitopsis pinicola, in North America",
+  "range": {"text":"Northern North America","src":["https://www.mushroomexpert.com/fomitopsis_mounceae.html"],"checked":"2026-10","sig":"dca662ab"},
+  "grows": {"text":"On dead conifer logs, snags and stumps","src":["https://tidcf.nrcan.gc.ca/en/diseases-caused-by-pathogens/factsheet/18","https://www.fs.usda.gov/r10/natural-resources/forest-health/conifer-stem-decays","https://scf.rncan.gc.ca/herbarium/davfp-num/29691","https://www.mushroomexpert.com/fomitopsis_mounceae.html"],"checked":"2026-10","sig":"b991cce4"},
+  "substrate": "dead wood",
+  "hosts": ["whitespruce","blackspruce","balsamfir","jackpine","douglasfir","westernhemlock","sitkaspruce"],
+  "habit": "single",
+  "fact": {"text":"It turns dead conifer wood into crumbly brown cubes, recycling the tree back into the forest floor.","src":["https://www.fs.usda.gov/r10/natural-resources/forest-health/conifer-stem-decays","https://www.mushroomexpert.com/fomitopsis_mounceae.html"],"checked":"2026-10","sig":"aa1f0cad"},
+  "marks": {"text":"Woody hoof- or shelf-shaped conk 7-24 cm wide, grey to dark red-brown with a shiny red-orange band near the thick white edge; cream pore underside; no stem.","src":["https://www.mushroomexpert.com/fomitopsis_mounceae.html","https://mushroomexpert.com/fungionwood/poroid%20fungi/species%20pages/Fomitopsis%20mounceae.htm"],"checked":"2026-10","sig":"9b3ad18c"}
+ },
+ "aspenoyster": {
+  "name": {"text":"Aspen oyster","src":["https://www.mushroomexpert.com/pleurotus_populinus.html"],"checked":"2026-10","sig":"92897050"},
+  "sci": {"text":"Pleurotus populinus","src":["https://api.gbif.org/v1/species/match?name=Pleurotus%20populinus&kingdom=Fungi","https://www.mushroomexpert.com/pleurotus_populinus.html"],"checked":"2026-10","sig":"6aac3047"},
+  "range": {"text":"Northern and mountain North America","src":["https://www.mushroomexpert.com/pleurotus_populinus.html"],"checked":"2026-10","sig":"1b2c852e"},
+  "grows": {"text":"On dead aspen logs and trunks","src":["https://www.mushroomexpert.com/pleurotus_populinus.html","https://www.mushroomexpert.com/trees/populus_tremuloides.html","https://www.coloradomushrooms.com/mushroom.php?id=40"],"checked":"2026-10","sig":"5994368b"},
+  "substrate": "dead wood",
+  "hosts": ["aspen"],
+  "habit": "tiers",
+  "fact": {"text":"This oyster mushroom seems to grow only on aspens and cottonwoods, helping rot their fallen wood.","src":["https://www.mushroomexpert.com/pleurotus_populinus.html","https://mushroomexpert.com/fungionwood/gilled%20fungi/species%20pages/Pleurotus%20spp.htm"],"checked":"2026-10","sig":"43ee0fb3"},
+  "marks": {"text":"Fan-shaped whitish to pale tan caps 4-17 cm in shelf-like clusters; white gills running down to a short or missing side stem; no ring.","src":["https://www.mushroomexpert.com/pleurotus_populinus.html"],"checked":"2026-10","sig":"d3126e57"}
+ },
+ "whitebirchbolete": {
+  "name": {"text":"White birch bolete","src":["https://people.csail.mit.edu/bkph/Boletes/pages/Leccinum_holopus.html"],"checked":"2026-10","sig":"cb1aac24"},
+  "sci": {"text":"Leccinum holopus","src":["https://api.gbif.org/v1/species/match?name=Leccinum%20holopus&kingdom=Fungi","https://www.mushroomexpert.com/leccinum_holopus.html"],"checked":"2026-10","sig":"9a862baf"},
+  "range": {"text":"Northern forests around the world","src":["https://www.mushroomexpert.com/leccinum_holopus.html"],"checked":"2026-10","sig":"d2cf74fc"},
+  "grows": {"text":"In soil under paper birch, often in wet woods and bogs","src":["https://www.mushroomexpert.com/leccinum_holopus.html","https://people.csail.mit.edu/bkph/Boletes/pages/Leccinum_holopus.html","https://www.mushroomexpert.com/trees/betula_papyrifera.html"],"checked":"2026-10","sig":"81b3d365"},
+  "substrate": "soil",
+  "hosts": ["paperbirch"],
+  "habit": "scattered",
+  "fact": {"text":"This pale bolete is a root partner of paper birch. Look for dark, bristly flecks dotting its tall stem.","src":["https://www.mushroomexpert.com/leccinum_holopus.html"],"checked":"2026-10","sig":"4f7c5fac"},
+  "marks": {"text":"Convex white to pale brownish cap 2-10 cm, sometimes tinged greenish; creamy white pores, no gills; tall whitish stem 4-15 cm covered in white-to-dark scabers; no ring.","src":["https://www.mushroomexpert.com/leccinum_holopus.html","https://people.csail.mit.edu/bkph/Boletes/pages/Leccinum_holopus.html"],"checked":"2026-10","sig":"06f268e1"}
+ },
+ "deertruffle": {
+  "name": {"text":"Deer truffle","src":["https://www.fs.usda.gov/pnw/pubs/pnw_gtr772.pdf","https://www.fs.usda.gov/nrs/pubs/jrnl/2018/nrs_2018_castellano_001.pdf"],"checked":"2026-10","sig":"73a29a61"},
+  "sci": {"text":"Elaphomyces","src":["https://www.fs.usda.gov/nrs/pubs/jrnl/2018/nrs_2018_castellano_001.pdf","https://www.fs.usda.gov/pnw/pubs/pnw_gtr772.pdf"],"checked":"2026-10","sig":"0e171d2e"},
+  "range": {"text":"Northern Hemisphere forests, including subarctic conifer forests","src":["https://www.fs.usda.gov/pnw/pubs/pnw_gtr772.pdf","https://www.fs.usda.gov/nrs/pubs/jrnl/2018/nrs_2018_castellano_001.pdf"],"checked":"2026-10","sig":"74271822"},
+  "grows": {"text":"Buried in soil among the roots of spruce, fir and pine","src":["https://www.fs.usda.gov/pnw/pubs/pnw_gtr772.pdf","https://canadianfieldnaturalist.ca/index.php/cfn/article/download/1408/1402/5592","https://www.fs.usda.gov/nrs/pubs/jrnl/2018/nrs_2018_castellano_001.pdf"],"checked":"2026-10","sig":"4c699884"},
+  "substrate": "buried",
+  "hosts": ["whitespruce","balsamfir","jackpine"],
+  "habit": "scattered",
+  "cached": true,
+  "fact": {"text":"Red squirrels dry and stash these underground truffles. Flying squirrels dig them up too, spreading their spores.","src":["https://www.eaglehill.us/NENAonline/articles/NENA-14-1/23-Vernes.shtml","https://redlist.info/iucn/species_view/213648","https://canadianfieldnaturalist.ca/index.php/cfn/article/download/1408/1402/5592"],"checked":"2026-10","sig":"8d5b222e"},
+  "marks": {"text":"Round underground ball 0.5-4 cm with a tough warty rind, usually brown (some dark blue to black), crusted with soil and roots; fills with dark powdery spores; no cap, gills or stem.","src":["https://www.fs.usda.gov/pnw/pubs/pnw_gtr772.pdf"],"checked":"2026-10","sig":"5a3a0cba"}
+ },
+ "flyagaric": {
+  "name": {"text":"Fly agaric","src":["https://mykoweb.com/CAF/species/Amanita_muscaria.html"],"checked":"2026-10","sig":"4385beb4"},
+  "sci": {"text":"Amanita muscaria","src":["https://www.gbif.org/species/7874844","https://www.mushroomexpert.com/amanita_muscaria_flavivolvata.html"],"checked":"2026-10","sig":"7cf754da"},
+  "range": {"text":"Northern forests around the world","src":["https://treesforlife.org.uk/into-the-forest/trees-plants-animals/others/fly-agaric/fly-agaric-facts/","https://www.mushroomexpert.com/amanita_muscaria_flavivolvata.html"],"checked":"2026-10","sig":"d2cf74fc"},
+  "grows": {"text":"From soil under pines and birches","src":["https://www.coloradomushrooms.com/mushroom.php?id=1","https://www.woodlandtrust.org.uk/trees-woods-and-wildlife/fungi-and-lichens/fly-agaric/","https://treesforlife.org.uk/into-the-forest/trees-plants-animals/others/fly-agaric/fly-agaric-facts/"],"checked":"2026-10","sig":"67987f1d"},
+  "substrate": "soil",
+  "hosts": ["ponderosa","silverbirch","scotspine"],
+  "habit": "scattered",
+  "fact": {"text":"It is poisonous to people, yet squirrels eat it without harm: Abert's squirrels in the Southwest, red squirrels in Scotland.","src":["https://www.fs.usda.gov/database/feis/animals/mammal/scab/all.html","https://treesforlife.org.uk/into-the-forest/trees-plants-animals/others/fly-agaric/fly-agaric-facts/"],"checked":"2026-10","sig":"f8faf5d2"},
+  "marks": {"text":"Red cap 5–25 cm, convex then flat, covered in cottony white to pale-yellow warts; white gills; white stem 5–18 cm with a high skirt-like ring and a swollen bulb ringed with veil bands.","src":["https://www.mushroomexpert.com/amanita_muscaria_flavivolvata.html","https://www.coloradomushrooms.com/mushroom.php?id=1"],"checked":"2026-10","sig":"2b2592ac"}
+ },
+ "whiteking": {
+  "name": {"text":"White king bolete","src":["https://www.gbif.org/species/6015633"],"checked":"2026-10","sig":"7ad95cfd"},
+  "sci": {"text":"Boletus barrowsii","src":["https://www.gbif.org/species/6015633","https://www.mushroomexpert.com/boletus_barrowsii.html"],"checked":"2026-10","sig":"95b2fa7a"},
+  "range": {"text":"Southwest and Colorado, west to the Pacific coast","src":["https://www.mushroomexpert.com/boletus_barrowsii.html"],"checked":"2026-10","sig":"2c963792"},
+  "grows": {"text":"From soil with ponderosa pine roots","src":["https://www.mushroomexpert.com/boletus_barrowsii.html"],"checked":"2026-10","sig":"e63a239d"},
+  "substrate": "soil",
+  "hosts": ["ponderosa"],
+  "habit": "scattered",
+  "fact": {"text":"This chunky white bolete partners with ponderosa pine roots and pops up after summer monsoon rains.","src":["https://www.mushroomexpert.com/boletus_barrowsii.html"],"checked":"2026-10","sig":"344277e4"},
+  "marks": {"text":"Whitish to pale-brown dry convex cap 5–16 cm; pores white and 'stuffed' when young, turning yellow then olive-yellow; thick club-shaped whitish stem 5–15 cm with a fine white net pattern; no ring.","src":["https://www.mushroomexpert.com/boletus_barrowsii.html"],"checked":"2026-10","sig":"852ac747"}
+ },
+ "rustygill": {
+  "name": {"text":"Rusty-gilled polypore","src":["https://www.invasive.org/browse/subject/12463?tab=subject-info"],"checked":"2026-10","sig":"006bc285"},
+  "sci": {"text":"Gloeophyllum sepiarium","src":["https://www.gbif.org/species/5249253"],"checked":"2026-10","sig":"f8ba2cf5"},
+  "range": {"text":"Widespread across North America","src":["https://www.mushroomexpert.com/gloeophyllum_sepiarium.html"],"checked":"2026-10","sig":"cc04f675"},
+  "grows": {"text":"On dead conifer logs, fire-killed trees and fallen branches","src":["https://tidcf.nrcan.gc.ca/en/diseases-caused-by-pathogens/factsheet/201","https://www.mushroomexpert.com/gloeophyllum_sepiarium.html"],"checked":"2026-10","sig":"f3227c05"},
+  "substrate": "dead wood",
+  "hosts": ["ponderosa","douglasfir","aspen"],
+  "habit": "scattered",
+  "fact": {"text":"This rusty shelf is a polypore with gills, and it often rots fire-killed trees and fallen branches.","src":["https://tidcf.nrcan.gc.ca/en/diseases-caused-by-pathogens/factsheet/201","https://www.mushroomexpert.com/gloeophyllum_sepiarium.html"],"checked":"2026-10","sig":"8fe49ba4"},
+  "marks": {"text":"Thin leathery shelf up to 12 cm, zoned and velvety, bright yellow-orange at the edge fading to cinnamon, dark brown and nearly black at the base; underside of tough brownish gills mixed with slot-like pores; no stem.","src":["https://www.mushroomexpert.com/gloeophyllum_sepiarium.html","https://tidcf.nrcan.gc.ca/en/diseases-caused-by-pathogens/factsheet/201"],"checked":"2026-10","sig":"a6635b2e"}
+ },
+ "aspenbracket": {
+  "name": {"text":"Aspen bracket","src":["https://www.minnesotaseasons.com/Fungi/Aspen_Bracket.html","https://www.gbif.org/species/2520773"],"checked":"2026-10","sig":"230c2328"},
+  "sci": {"text":"Phellinus tremulae","src":["https://www.gbif.org/species/2520773","https://mushroomexpert.com/phellinus_tremulae.html"],"checked":"2026-10","sig":"dfd93a06"},
+  "range": {"text":"Throughout North America where aspen grows","src":["https://mushroomexpert.com/phellinus_tremulae.html","https://mycoportal.org/portal/collections/individual/index.php?occid=4645"],"checked":"2026-10","sig":"f4d4716a"},
+  "grows": {"text":"On living aspen trunks at old branch stubs","src":["https://www.fs.usda.gov/foresthealth/docs/fidls/FIDL-149-DecayofAspen.pdf","https://mycoportal.org/portal/collections/individual/index.php?occid=4645"],"checked":"2026-10","sig":"104ce915"},
+  "substrate": "living trunk",
+  "hosts": ["aspen"],
+  "habit": "single",
+  "fact": {"text":"Birds that dig their own nest holes choose aspens this fungus has softened inside, because digging is easier.","src":["https://www.fs.usda.gov/foresthealth/docs/fidls/FIDL-149-DecayofAspen.pdf"],"checked":"2026-10","sig":"16fc5ee3"},
+  "marks": {"text":"Hard woody hoof-like conk 5–20 cm, triangular from the side; top black and cracked with a paler brown growing edge; underside purplish- to tawny-brown with tiny pores; no stem.","src":["https://www.fs.usda.gov/foresthealth/docs/fidls/FIDL-149-DecayofAspen.pdf","https://mushroomexpert.com/phellinus_tremulae.html"],"checked":"2026-10","sig":"b881b653"}
+ },
+ "rhizopogon": {
+  "name": {"text":"Wine-colored false truffle","src":["https://www.gbif.org/species/2524240","https://research.fs.usda.gov/download/treesearch/20351.pdf"],"checked":"2026-10","sig":"1f33a98f"},
+  "sci": {"text":"Rhizopogon vinicolor","src":["https://www.gbif.org/species/2524240","https://research.fs.usda.gov/treesearch/20143"],"checked":"2026-10","sig":"561aee26"},
+  "range": {"text":"Douglas-fir forests of Oregon and Washington","src":["https://research.fs.usda.gov/treesearch/20143","https://research.fs.usda.gov/download/treesearch/20351.pdf"],"checked":"2026-10","sig":"b680a5a9"},
+  "grows": {"text":"Buried in soil among Douglas-fir roots","src":["https://research.fs.usda.gov/treesearch/20143","https://en.wikipedia.org/wiki/Rhizopogon_vinicolor"],"checked":"2026-10","sig":"42f010b6"},
+  "substrate": "buried",
+  "hosts": ["douglasfir"],
+  "habit": "scattered",
+  "fact": {"text":"Flying squirrels sniff out and eat these underground truffles, then spread the spores in their droppings.","src":["https://research.fs.usda.gov/download/treesearch/20351.pdf"],"checked":"2026-10","sig":"d2f203f6"},
+  "marks": {"text":"Lumpy round truffle 1–3.3 cm, dirty white at first, turning wine-red where exposed; firm buff interior that darkens with age; a few root-like threads at the base; no cap, gills or stem.","src":["https://en.wikipedia.org/wiki/Rhizopogon_vinicolor"],"checked":"2026-10","sig":"69425c24"}
+ },
+ "chanterelle": {
+  "name": {"text":"Pacific golden chanterelle","src":["https://www.oregonlegislature.gov/bills_laws/lawsstatutes/1999hjr0068.html","https://explore.beatymuseum.ubc.ca/mushroomsup/C_formosus.html"],"checked":"2026-10","sig":"776f3ca1"},
+  "sci": {"text":"Cantharellus formosus","src":["https://www.gbif.org/species/5466954","https://www.mushroomexpert.com/cantharellus_formosus.html"],"checked":"2026-10","sig":"c58f1f37"},
+  "range": {"text":"British Columbia to northern California","src":["https://www.mushroomexpert.com/cantharellus_formosus.html","https://explore.beatymuseum.ubc.ca/mushroomsup/C_formosus.html"],"checked":"2026-10","sig":"0992aff8"},
+  "grows": {"text":"From soil with Douglas-fir, western hemlock and Sitka spruce roots","src":["https://explore.beatymuseum.ubc.ca/mushroomsup/C_formosus.html","https://www.mushroomexpert.com/cantharellus_formosus.html"],"checked":"2026-10","sig":"11ad4dc0"},
+  "substrate": "soil",
+  "hosts": ["douglasfir","westernhemlock","sitkaspruce"],
+  "habit": "scattered",
+  "fact": {"text":"Oregon made the Pacific golden chanterelle its official state mushroom in 1999.","src":["https://www.oregonlegislature.gov/bills_laws/lawsstatutes/1999hjr0068.html"],"checked":"2026-10","sig":"8b3c4898"},
+  "marks": {"text":"Orange-yellow cap 2–14 cm, flat to vase-shaped with a wavy edge; underside has thick forked ridges (false gills), often pinkish, running down the stem; smooth stem 4–8 cm the same colour, tapering downward; no ring.","src":["https://www.mushroomexpert.com/cantharellus_formosus.html","https://explore.beatymuseum.ubc.ca/mushroomsup/C_formosus.html"],"checked":"2026-10","sig":"26abf414"}
+ },
+ "dyerspolypore": {
+  "name": {"text":"Dyer's polypore","src":["https://www.gbif.org/species/2542126","https://pnwhandbooks.org/node/3770"],"checked":"2026-10","sig":"1e16bc8d"},
+  "sci": {"text":"Phaeolus schweinitzii","src":["https://www.gbif.org/species/2542126"],"checked":"2026-10","sig":"e26acc54"},
+  "range": {"text":"Widespread in North America; very common on western Douglas-fir","src":["https://www.mushroomexpert.com/phaeolus_schweinitzii.html","https://tidcf.nrcan.gc.ca/en/diseases-caused-by-pathogens/factsheet/328"],"checked":"2026-10","sig":"2749aa48"},
+  "grows": {"text":"At the base of living Douglas-firs or on the ground over their roots","src":["https://tidcf.nrcan.gc.ca/en/diseases-caused-by-pathogens/factsheet/328","https://pnwhandbooks.org/node/3770","https://www.mushroomexpert.com/phaeolus_schweinitzii.html"],"checked":"2026-10","sig":"8b56c664"},
+  "substrate": "trunk base",
+  "hosts": ["douglasfir"],
+  "habit": "single",
+  "fact": {"text":"Its root rot can weaken big Douglas-firs so much that strong winds knock them over.","src":["https://tidcf.nrcan.gc.ca/en/diseases-caused-by-pathogens/factsheet/328"],"checked":"2026-10","sig":"a0766c46"},
+  "marks": {"text":"Large velvety rosette or bracket 7–30 cm, rusty to dark brown with a bright yellow-orange edge when young; pores yellow to greenish-yellow, aging and bruising brown; short thick brown velvety stem when growing on the ground.","src":["https://www.mushroomexpert.com/phaeolus_schweinitzii.html","https://tidcf.nrcan.gc.ca/en/diseases-caused-by-pathogens/factsheet/328"],"checked":"2026-10","sig":"74afa240"}
+ },
+ "ochrebrittlegill": {
+  "name": {"text":"Ochre brittlegill","src":["https://www.naturespot.org/node/757","https://www.first-nature.com/fungi/russula-ochroleuca.php"],"checked":"2026-10","sig":"20d38f90"},
+  "sci": {"text":"Russula ochroleuca","src":["https://www.speciesfungorum.org/Names/SynSpecies.asp?RecordID=211825"],"checked":"2026-10","sig":"62f85970"},
+  "range": {"text":"Common and widespread across Britain and Europe","src":["https://www.naturespot.org/node/757","https://www.first-nature.com/fungi/russula-ochroleuca.php"],"checked":"2026-10","sig":"0dea5cd3"},
+  "grows": {"text":"From dry, well-drained soil, often close to the base of Scots pines","src":["https://www.first-nature.com/fungi/russula-ochroleuca.php","https://www.naturespot.org/node/757"],"checked":"2026-10","sig":"9ed48e57"},
+  "substrate": "soil",
+  "hosts": ["scotspine"],
+  "habit": "scattered",
+  "cached": true,
+  "fact": {"text":"Red squirrels hang this mushroom on branches to dry, saving it as a snack for later.","src":["https://eprints.ncl.ac.uk/59719","https://treesforlife.org.uk/into-the-forest/trees-plants-animals/mammals/red-squirrel/red-squirrel-diet/"],"checked":"2026-10","sig":"07370d18"},
+  "marks": {"text":"Ochre-yellow cap, rounded then flat with a slight dip, creamy-white brittle gills, white stem greying with age, no ring; cap 4-10 cm, stem 4-7 cm.","src":["https://www.first-nature.com/fungi/russula-ochroleuca.php","https://www.naturespot.org/node/757"],"checked":"2026-10","sig":"007bc959"}
+ },
+ "hooffungus": {
+  "name": {"text":"Hoof fungus","src":["https://treesforlife.org.uk/forest/tinder-fungus/","https://www.rinya.maff.go.jp/tohoku/koho/tohoku/3_zukan/0_kinrui/1_kinoko.html"],"checked":"2026-10","sig":"a98d2138"},
+  "sci": {"text":"Fomes fomentarius","src":["https://www.speciesfungorum.org/Names/SynSpecies.asp?RecordID=194860","https://www.rinya.maff.go.jp/tohoku/koho/tohoku/3_zukan/0_kinrui/1_kinoko.html"],"checked":"2026-10","sig":"d3c87cb6"},
+  "range": {"text":"Northern forests of Europe, Asia and North America","src":["https://treesforlife.org.uk/forest/tinder-fungus/","https://www.rinya.maff.go.jp/tohoku/syo/asahi/shasinkan/kinoko.html"],"checked":"2026-10","sig":"da4ea7e3"},
+  "grows": {"text":"On dead birch and beech trunks, standing or fallen","src":["https://treesforlife.org.uk/forest/tinder-fungus/"],"checked":"2026-10","sig":"dc73b24a"},
+  "substrate": "dead wood",
+  "hosts": ["silverbirch","eubeech","buna"],
+  "habit": "tiers",
+  "fact": {"text":"It adds a new layer of pores every year; one hoof fungus was estimated to be 22 years old.","src":["https://treesforlife.org.uk/forest/tinder-fungus/"],"checked":"2026-10","sig":"5093f9cc"},
+  "marks": {"text":"Hard, woody, hoof-shaped bracket, dark grey (black when wet) with ridges for each year's growth, cream to pale brown pores underneath, no stem; 5-45 cm across.","src":["https://treesforlife.org.uk/forest/tinder-fungus/"],"checked":"2026-10","sig":"ca58e193"}
+ },
+ "porcelain": {
+  "name": {"text":"Porcelain fungus","src":["https://www.woodlandtrust.org.uk/trees-woods-and-wildlife/fungi-and-lichens/porcelain-fungus/"],"checked":"2026-10","sig":"45604e2f"},
+  "sci": {"text":"Mucidula mucida","src":["https://www.speciesfungorum.org/Names/SynSpecies.asp?RecordID=456952","https://first-nature.com/fungi/oudemansiella-mucida.php"],"checked":"2026-10","sig":"966b08d1"},
+  "formerly": "Oudemansiella mucida",
+  "wiki": "Oudemansiella_mucida",
+  "range": {"text":"Beech woods of Britain and northern Europe","src":["https://first-nature.com/fungi/oudemansiella-mucida.php"],"checked":"2026-10","sig":"688b3112"},
+  "grows": {"text":"On dead beech trunks, stumps and fallen branches, often high up","src":["https://www.woodlandtrust.org.uk/trees-woods-and-wildlife/fungi-and-lichens/porcelain-fungus/","https://first-nature.com/fungi/oudemansiella-mucida.php"],"checked":"2026-10","sig":"353a414c"},
+  "substrate": "dead wood",
+  "hosts": ["eubeech"],
+  "habit": "cluster",
+  "fact": {"text":"It makes its own fungus-killer chemical to keep rival fungi off its beech log.","src":["https://www.woodlandtrust.org.uk/trees-woods-and-wildlife/fungi-and-lichens/porcelain-fungus/"],"checked":"2026-10","sig":"d2400b86"},
+  "marks": {"text":"Translucent, slimy, shiny white domed cap ageing ochre in the centre, widely spaced white gills, slender curved white stem with a collar-like ring; cap 2-8 cm, stem up to 8 cm.","src":["https://www.woodlandtrust.org.uk/trees-woods-and-wildlife/fungi-and-lichens/porcelain-fungus/","https://first-nature.com/fungi/oudemansiella-mucida.php"],"checked":"2026-10","sig":"fa0c0359"}
+ },
+ "tsukiyotake": {
+  "name": {"text":"Moonlight mushroom (tsukiyotake)","src":["https://en.wikipedia.org/wiki/Omphalotus_japonicus","https://www.fsc.go.jp/sonota/haz_tukiyo.pdf"],"checked":"2026-10","sig":"b5ea821c"},
+  "sci": {"text":"Omphalotus guepiniiformis","src":["https://www.speciesfungorum.org/Names/SynSpecies.asp?RecordID=637036","https://www.rinya.maff.go.jp/tohoku/koho/tohoku/3_zukan/0_kinrui/1_kinoko.html"],"checked":"2026-10","sig":"1a8ab976"},
+  "formerly": "Omphalotus japonicus",
+  "wiki": "Omphalotus_japonicus",
+  "range": {"text":"Mountains across Japan, especially Tohoku and Chubu; also Korea and far-east Russia","src":["https://www.pref.kyoto.jp/kankyo/rdb2002/bio/db/fun0042.html"],"checked":"2026-10","sig":"f5f50d3b"},
+  "grows": {"text":"In overlapping shelves on dead beech and painted maple logs and branches","src":["https://www.pref.kyoto.jp/kankyo/rdb2002/bio/db/fun0042.html","https://www.fsc.go.jp/sonota/haz_tukiyo.pdf","https://www.pref.ishikawa.lg.jp/ringyo/publish/documents/isikawanokinoko_1.pdf"],"checked":"2026-10","sig":"fb067aee"},
+  "substrate": "dead wood",
+  "hosts": ["buna","itaya"],
+  "habit": "tiers",
+  "fact": {"text":"Its gills glow a ghostly blue-white in the dark. It is one of Japan's most common poisonous mushrooms.","src":["https://www.fsc.go.jp/sonota/haz_tukiyo.pdf"],"checked":"2026-10","sig":"638f1906"},
+  "marks": {"text":"Semicircular to kidney-shaped cap, yellow-orange-brown with small scales, turning purple-brown; pale yellow-to-white gills; very short side stem (~2 cm) with a ridge-like ring and a dark purple stain inside the base; cap 10-25 cm.","src":["https://www.fsc.go.jp/sonota/haz_tukiyo.pdf","https://www.pref.kyoto.jp/kankyo/rdb2002/bio/db/fun0042.html"],"checked":"2026-10","sig":"58b0fce6"}
+ },
+ "bunaharitake": {
+  "name": {"text":"Beech needle mushroom (buna-haritake)","src":["https://www.pref.yamanashi.jp/documents/32857/tokuyo5.pdf","https://ja.wikipedia.org/wiki/%E3%83%96%E3%83%8A%E3%83%8F%E3%83%AA%E3%82%BF%E3%82%B1"],"checked":"2026-10","sig":"001fb079"},
+  "sci": {"text":"Mycoleptodonoides aitchisonii","src":["https://www.speciesfungorum.org/Names/SynSpecies.asp?RecordID=334682","https://www.rinya.maff.go.jp/tohoku/koho/tohoku/3_zukan/0_kinrui/1_kinoko.html"],"checked":"2026-10","sig":"75c6e89e"},
+  "wiki": "Mycoleptodonoides",
+  "range": {"text":"Beech forests of Japan, common in Tohoku","src":["https://www.pref.yamanashi.jp/documents/32857/tokuyo5.pdf","https://www.rinya.maff.go.jp/tohoku/syo/asahi/shasinkan/kinoko.html"],"checked":"2026-10","sig":"b5588523"},
+  "grows": {"text":"In overlapping white shelves on dead standing and fallen beech","src":["https://www.pref.yamanashi.jp/documents/32857/tokuyo5.pdf","https://www.pref.ishikawa.lg.jp/ringyo/publish/documents/isikawanokinoko_1.pdf"],"checked":"2026-10","sig":"f3ba900a"},
+  "substrate": "dead wood",
+  "hosts": ["buna"],
+  "habit": "tiers",
+  "fact": {"text":"Its sweet smell is so strong you can sniff out a patch before you see it.","src":["https://www.pref.yamanashi.jp/documents/32857/tokuyo5.pdf","https://ja.wikipedia.org/wiki/%E3%83%96%E3%83%8A%E3%83%8F%E3%83%AA%E3%82%BF%E3%82%B1"],"checked":"2026-10","sig":"0a11124f"},
+  "marks": {"text":"Pure white fan- or spatula-shaped caps fused at the base, yellowing with age, with soft pointed spines (2-3 mm) hanging underneath instead of gills, almost no stem; each cap 3-10 cm.","src":["https://www.pref.ishikawa.lg.jp/ringyo/publish/documents/isikawanokinoko_1.pdf","https://www.pref.yamanashi.jp/documents/32857/tokuyo5.pdf","https://ja.wikipedia.org/wiki/%E3%83%96%E3%83%8A%E3%83%8F%E3%83%AA%E3%82%BF%E3%82%B1"],"checked":"2026-10","sig":"0aab1da3"}
+ },
+ "panthercap": {
+  "name": {"text":"Panther cap (tengutake)","src":["https://www.kobe-u.ac.jp/en/news/article/2022_02_04_01/","https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000142712.html"],"checked":"2026-10","sig":"cef85f94"},
+  "sci": {"text":"Amanita pantherina","src":["https://www.speciesfungorum.org/Names/SynSpecies.asp?RecordID=156565","https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000142712.html"],"checked":"2026-10","sig":"60c20201"},
+  "range": {"text":"Broadleaf forests of Japan","src":["https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000142712.html","https://www.rinya.maff.go.jp/tohoku/syo/asahi/shasinkan/kinoko.html"],"checked":"2026-10","sig":"ebcd31bf"},
+  "grows": {"text":"From soil under beech, sometimes in a fairy ring","src":["https://esj.ne.jp/meeting/abst/73/P1-132.html","https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000142712.html"],"checked":"2026-10","sig":"da627bf3"},
+  "substrate": "soil",
+  "hosts": ["buna"],
+  "habit": "ring",
+  "fact": {"text":"A Japanese squirrel was seen eating this poisonous mushroom, then coming back days later for another!","src":["https://www.kobe-u.ac.jp/en/news/article/2022_02_04_01/"],"checked":"2026-10","sig":"af4fbf1e"},
+  "marks": {"text":"Grey-brown to olive-brown cap scattered with white warts and a lined edge, white crowded gills, white stem with a ring and a bulbous base wrapped in a collar-like volva; cap 6-15 cm.","src":["https://www.mhlw.go.jp/stf/seisakunitsuite/bunya/0000142712.html"],"checked":"2026-10","sig":"b3376cff"}
+ },
+ "redbracket": {
+  "name": {"text":"Red-orange bracket (urupê)","src":["https://pt.wikipedia.org/wiki/Urup%C3%AA","https://periodicos.ufam.edu.br/index.php/educamazonia/article/download/16382/10751/45436"],"checked":"2026-10","sig":"0994b5f0"},
+  "sci": {"text":"Fabisporus sanguineus","src":["https://www.speciesfungorum.org/Names/SynSpecies.asp?RecordID=121361","https://scielo.br/j/hoehnea/a/b9hwkdnQZfTB73HGpvcyjrN/?lang=en"],"checked":"2026-10","sig":"825c702c"},
+  "formerly": "Pycnoporus sanguineus",
+  "range": {"text":"Tropics and subtropics worldwide, including the araucaria highlands","src":["https://en.wikipedia.org/wiki/Pycnoporus_sanguineus","https://scielo.br/j/hoehnea/a/b9hwkdnQZfTB73HGpvcyjrN/?lang=en","https://www.gbif.org/occurrence/2575900409"],"checked":"2026-10","sig":"b2b7158e"},
+  "grows": {"text":"On dead logs and fallen branches of broadleaf trees, often in sunny spots","src":["https://en.wikipedia.org/wiki/Pycnoporus_sanguineus","https://colfungi.org/taxon/urn:lsid:indexfungorum.org:names:121361/general-information","https://www.gbif.org/occurrence/3868120752"],"checked":"2026-10","sig":"de8e01b9"},
+  "substrate": "dead wood",
+  "hosts": ["yerbamate","imbuia","argcedar"],
+  "habit": "scattered",
+  "fact": {"text":"Its fiery orange-red colour comes from a natural pigment called cinnabarin.","src":["https://frontiersin.org/journals/microbiology/articles/10.3389/fmicb.2022.1015913/full","https://en.wikipedia.org/wiki/Pycnoporus_sanguineus"],"checked":"2026-10","sig":"023741a5"},
+  "marks": {"text":"Thin, leathery, fan-shaped bracket with no stem (sometimes a stubby side stem), bright orange-red on top and underneath, with tiny round pores (4-6 per mm) on the underside, about 2-8 cm across and only a few mm thick.","src":["https://colfungi.org/taxon/urn:lsid:indexfungorum.org:names:121361/general-information","https://virtualmycota.landcareresearch.co.nz/WebForms/vM_Species_Details.aspx?pk=9593"],"checked":"2026-10","sig":"18304dd1"}
+ },
+ "birdsnest": {
+  "name": {"text":"White-egg bird's nest fungus","src":["https://en.wikipedia.org/wiki/Crucibulum_laeve","https://www.mushroomexpert.com/crucibulum_laeve.html"],"checked":"2026-10","sig":"da10635a"},
+  "sci": {"text":"Crucibulum laeve","src":["https://www.speciesfungorum.org/Names/SynSpecies.asp?RecordID=252929","https://new.scielo.br/j/abb/a/c7gB9MnT849MqBHRfnrLkfP/?lang=en"],"checked":"2026-10","sig":"50d553c6"},
+  "range": {"text":"Worldwide in cooler zones; in southern Brazil mainly in araucaria highlands above 900 m","src":["https://lume.ufrgs.br/bitstream/handle/10183/234373/001025315.pdf?sequence=1&isAllowed=y","https://en.wikipedia.org/wiki/Crucibulum_laeve"],"checked":"2026-10","sig":"8b00ae28"},
+  "grows": {"text":"On fallen twigs, branches and needles of Paraná pine on the forest floor","src":["https://lume.ufrgs.br/bitstream/handle/10183/234373/001025315.pdf?sequence=1&isAllowed=y","https://www.mushroomexpert.com/crucibulum_laeve.html"],"checked":"2026-10","sig":"81bf506f"},
+  "substrate": "leaf litter",
+  "hosts": ["paranapine"],
+  "habit": "scattered",
+  "fact": {"text":"Raindrops splash its tiny 'eggs' out of the cup, flinging its spores to new places.","src":["https://www.mushroomexpert.com/crucibulum_laeve.html"],"checked":"2026-10","sig":"d1cb3c81"},
+  "marks": {"text":"A tiny cup or goblet, yellowish to brown outside, shiny whitish-grey inside, closed by a yellow lid when young; it holds several flat pale 'eggs' about 1.5-2 mm wide and has no stem; the cup is about 0.4-1 cm across.","src":["https://www.mushroomexpert.com/crucibulum_laeve.html","https://new.scielo.br/j/abb/a/c7gB9MnT849MqBHRfnrLkfP/?lang=en"],"checked":"2026-10","sig":"caf92821"}
+ },
+ "crosscage": {
+  "name": {"text":"Greek-cross cage stinkhorn","src":["https://pmc.ncbi.nlm.nih.gov/articles/PMC7194408/"],"checked":"2026-10","sig":"98e9d991"},
+  "sci": {"text":"Blumenavia crucis-hellenicae","src":["https://pmc.ncbi.nlm.nih.gov/articles/PMC7194408/","https://www.speciesfungorum.org/Names/Names.asp?pg=1&strGenus=Blumenavia&strSpecies=crucis"],"checked":"2026-10","sig":"673d3bc7"},
+  "wiki": "Blumenavia",
+  "range": {"text":"Only known from Paraná and Rio Grande do Sul, Brazil","src":["https://pmc.ncbi.nlm.nih.gov/articles/PMC7194408/"],"checked":"2026-10","sig":"55a50e0e"},
+  "grows": {"text":"On the forest floor of araucaria forest, on leaf litter and rotting wood","src":["https://pmc.ncbi.nlm.nih.gov/articles/PMC7194408/","https://lume.ufrgs.br/bitstream/handle/10183/234373/001025315.pdf?sequence=1&isAllowed=y"],"checked":"2026-10","sig":"52442cb4"},
+  "substrate": "leaf litter",
+  "hosts": ["paranapine"],
+  "habit": "single",
+  "fact": {"text":"It stinks on purpose! The smell draws insects, which carry its sticky spores away.","src":["https://pmc.ncbi.nlm.nih.gov/articles/PMC7194408/"],"checked":"2026-10","sig":"e6da877f"},
+  "marks": {"text":"A white cage of 3-4 grooved arms, joined at the top and free at the base, rising from a white to dark-yellow egg-like cup, with a cross-shaped pyramid of spore slime at the top; no stem or ring; 4-9 cm tall and 2.7-4 cm wide.","src":["https://pmc.ncbi.nlm.nih.gov/articles/PMC7194408/"],"checked":"2026-10","sig":"f2f39736"}
+ },
+ "sulphurtuft": {
+  "name": {"text":"Southern sulphur tuft","src":["https://www.scielo.br/j/abb/a/h9XTCXWVZg9bFNLGfFNvMYM/?lang=en","https://scielo.br/j/hoehnea/a/zS4GPCcwzrhVSFTYmH6HChD/?lang=en"],"checked":"2026-10","sig":"f597a862"},
+  "sci": {"text":"Hypholoma subviride","src":["https://www.speciesfungorum.org/Names/SynSpecies.asp?RecordID=332416","https://www.scielo.br/j/abb/a/h9XTCXWVZg9bFNLGfFNvMYM/?lang=en"],"checked":"2026-10","sig":"7055f5c9"},
+  "wiki": "Hypholoma_fasciculare",
+  "range": {"text":"Tropics and subtropics worldwide; very common in the araucaria forests of Rio Grande do Sul","src":["https://www.scielo.br/j/abb/a/h9XTCXWVZg9bFNLGfFNvMYM/?lang=en","https://scielo.br/j/hoehnea/a/zS4GPCcwzrhVSFTYmH6HChD/?lang=en"],"checked":"2026-10","sig":"ecf27f7a"},
+  "grows": {"text":"In tufts on bark and fallen trunks of conifers and broadleaf trees, including Paraná pine","src":["https://scielo.br/j/hoehnea/a/zS4GPCcwzrhVSFTYmH6HChD/?lang=en","https://www.scielo.br/j/abb/a/h9XTCXWVZg9bFNLGfFNvMYM/?lang=en"],"checked":"2026-10","sig":"c2706007"},
+  "substrate": "dead wood",
+  "hosts": ["paranapine","pinheirobravo","yerbamate","imbuia","argcedar"],
+  "habit": "cluster",
+  "fact": {"text":"Its sulphur-yellow gills turn dark purplish-brown as its spores ripen. It belongs to a poisonous group.","src":["https://www.scielo.br/j/abb/a/h9XTCXWVZg9bFNLGfFNvMYM/?lang=en","https://scielo.br/j/hoehnea/a/zS4GPCcwzrhVSFTYmH6HChD/?lang=en"],"checked":"2026-10","sig":"3e9c9e05"},
+  "marks": {"text":"Tufts of small mushrooms with smooth sulphur-yellow caps (conical to convex, then flat), yellow gills that darken to reddish brown, a thin striated yellow stem, a cobweb veil that vanishes quickly, no ring; cap 0.4-3.5 cm, stem up to 6.6 cm.","src":["https://www.scielo.br/j/abb/a/h9XTCXWVZg9bFNLGfFNvMYM/?lang=en"],"checked":"2026-10","sig":"2e5aec0f"}
+ },
+ "fringedstar": {
+  "name": {"text":"Fringed earthstar (estrela-da-terra)","src":["https://en.wikipedia.org/wiki/Geastrum_fimbriatum","https://www.gbif.org/occurrence/4929172365"],"checked":"2026-10","sig":"556ba907"},
+  "sci": {"text":"Geastrum fimbriatum","src":["https://www.speciesfungorum.org/Names/Names.asp?pg=1&strGenus=Geastrum&strSpecies=fimbriatum"],"checked":"2026-10","sig":"741e9ff1"},
+  "range": {"text":"Widespread in Europe, Asia and the Americas, including the araucaria highlands","src":["https://en.wikipedia.org/wiki/Geastrum_fimbriatum","https://lume.ufrgs.br/bitstream/handle/10183/234373/001025315.pdf?sequence=1&isAllowed=y","https://www.gbif.org/occurrence/6510745008"],"checked":"2026-10","sig":"d20802a9"},
+  "grows": {"text":"On the soil of the forest floor","src":["https://www.scielo.br/j/abb/a/PqPj9CyGYQpn5VFMBdrRCbr/?lang=en","https://en.wikipedia.org/wiki/Geastrum_fimbriatum"],"checked":"2026-10","sig":"c4c6d798"},
+  "substrate": "soil",
+  "hosts": [],
+  "habit": "scattered",
+  "fact": {"text":"Its outer skin splits into a star. Raindrops tapping the ball puff out its spores.","src":["https://en.wikipedia.org/wiki/Geastrales"],"checked":"2026-10","sig":"69ba3834"},
+  "marks": {"text":"A star of 5-7 yellowish-grey rays that curl under, holding a stemless olive-brown ball (0.7-1.9 cm) with a fringed, poorly defined mouth on top; no gills, stem or ring; whole star about 1.2-3.4 cm across.","src":["https://www.scielo.br/j/abb/a/PqPj9CyGYQpn5VFMBdrRCbr/?lang=en","https://en.wikipedia.org/wiki/Geastrum_fimbriatum"],"checked":"2026-10","sig":"408dfc0d"}
+ }
+};

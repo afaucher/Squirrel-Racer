@@ -13,10 +13,15 @@ export const CLAIMS = {
   trees: ['name', 'sci', 'range'],
   nuts: ['tree', 'fact'],
   flowers: ['name', 'sci', 'range'],
+  fungi: ['name', 'sci', 'range', 'grows', 'fact', 'marks'],
 };
-// Plain fields that are not claims: wiki (page name), pl (irregular plural), formerly (old scientific name), a nut's display name.
-export const PLAIN = ['wiki', 'pl', 'formerly'];
-const ORDER = ['name', 'sci', 'formerly', 'wiki', 'pl', 'tree', 'range', 'fact', 'marks'];
+// Plain fields that are not claims: wiki (page name), pl (irregular plural), formerly (old scientific name), a nut's display name,
+// and for a mushroom the details of its "grows" claim that place it in the game: substrate, hosts (tree ids), habit and cached.
+export const PLAIN = ['wiki', 'pl', 'formerly', 'substrate', 'hosts', 'habit', 'cached'];
+// Where a mushroom can grow, and how it grows there
+export const SUBSTRATES = ['soil', 'leaf litter', 'moss', 'buried', 'trunk base', 'living trunk', 'dead wood'];
+export const HABITS = ['single', 'scattered', 'cluster', 'tiers', 'ring'];
+const ORDER = ['name', 'sci', 'formerly', 'wiki', 'pl', 'tree', 'range', 'grows', 'substrate', 'hosts', 'habit', 'cached', 'fact', 'marks'];
 const CLAIM_ORDER = ['text', 'src', 'checked', 'sig', 'note'];
 
 export const FILES = {
@@ -24,6 +29,7 @@ export const FILES = {
   'birds.js': { kinds: ['birds'], title: 'Birds' },
   'trees.js': { kinds: ['trees', 'nuts'], title: 'Trees, and the nuts and cones they bear' },
   'flowers.js': { kinds: ['flowers'], title: 'Wildflowers' },
+  'fungi.js': { kinds: ['fungi'], title: 'Mushrooms' },
 };
 
 const HEADER = title => `// Squirrel Ranger species facts: ${title}.

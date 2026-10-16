@@ -16,6 +16,8 @@ These facts about the current code shape most of the ideas below.
 
 ## 1. More life in each forest
 
+**Mushrooms are done** (after `v1.0`): 29 species, 5 or 6 per forest, each placed by its sourced habitat and host trees, with fallen logs and stumps for the wood-rotters. Mosses, insects and small mammals are still to come.
+
 Add mammals, small mammals, mushrooms, insects and mosses alongside the birds, nuts and flowers.
 
 Each new kind needs:
@@ -100,6 +102,8 @@ Design notes:
 - **Protect progress:** unlocks would live next to the collection in localStorage. The more progress matters, the more an export/import or backup code is worth adding.
 
 ## 7. A kind registry (enabling work)
+
+**Started with mushrooms:** `KINDS` and `FINDS` in `index.html` now drive mission wording, the collection sections, info pages and which kinds missions can ask for. Drawing, placement and photo targeting are still per kind.
 
 Not a feature players see. Describe each kind once (its letter, labels, drawing, placement, mission wording, collection section) instead of in about 30 places. It makes every new kind in section 1 much cheaper, and new kinds automatically get collection sections, missions, quiz questions and badges.
 
