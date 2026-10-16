@@ -1099,7 +1099,7 @@ function openMenu(view,arg){hideCard();let h='';
 function startGame(cfg){PLAY.zone=cfg.zone;PLAY.squirrel=cfg.squirrel;PLAY.mission=cfg.mission||null;PLAY.started=1;newWorld((Math.random()*1e6)|0);buildFrames();closeMenu();input.seen=false;}
 
 /* ================= PLAY SANDBOX ================= */
-const PLAY={coat:'gray',scheme:'dual',zone:'east',squirrel:null,mission:null,paused:false,started:0};
+const PLAY={coat:'gray',zone:'east',squirrel:null,mission:null,paused:false,started:0};
 const G=980,VMAX=880,RUN=250,SP=470,SQS=.85,OFF=1e5;
 let W,S;
 function pickCoat(){const r=Math.random();PLAY.coat=r<.42?'gray':r<.68?'fox':r<.88?'red':'black';}
@@ -1107,7 +1107,7 @@ function newWorld(seed){if(PLAY.squirrel&&typeof SQUIRRELS!=='undefined')PLAY.co
  const ground=makePath([[-OFF,0],[OFF,0]],0,0,{kind:'ground',noFlip:true,sp:SPECIES.oak,depth:0});
  W={seed,ground,paths:[ground],trees:new Map(),flowers:[],far:[],mid:[],pool:{far:[],mid:[],queue:[]},taken:new Set()};
  for(let i=0;i<5;i++)W.pool.queue.push({k:'far',i});for(let i=0;i<8;i++)W.pool.queue.push({k:'mid',i});
- S={path:ground,s:OFF-60,side:-1,dir:1,flying:false,x:0,y:0,vx:0,vy:0,air:0,from:null,landT:0,phase:0,idle:0,speed:0,flipT:0,flipFrom:-1,sag:0,sagV:0,rig:makeRig()};S.x=-60;S.y=-NIM.stand;S.ta=0;S.nfx=1;S.nfy=1;S.fxA=1;S.fyA=1;S.held=ground;
+ S={path:ground,s:OFF-60,side:-1,dir:1,flying:false,x:0,y:0,vx:0,vy:0,air:0,from:null,landT:0,phase:0,idle:0,speed:0,sag:0,sagV:0,rig:makeRig()};S.x=-60;S.y=-NIM.stand;S.ta=0;S.nfx=1;S.nfy=1;S.fxA=1;S.fyA=1;S.held=ground;
  cam.x=60;cam.y=-60;cam.zoom=1.3;cam.lx=1;cam.ly=0;
 }
 const cam={x:0,y:-200,zoom:1.3,lx:1,ly:0,vx:0};
@@ -1131,12 +1131,8 @@ function flexAt(P,s){if(P.kind!=='limb')return 1;const w=wAt(P,s);return clamp((
 function sagLoad(P){if(S.flying||P.kind!=='limb')return null;if(P===S.path)return{us:Math.max(8,S.s),D:S.sag};const c=S.path&&S.path.lb;if(c&&c.parent===P)return{us:Math.max(8,c.at),D:S.sag*.45};return null;}
 // a limb bends under the squirrel (or under a fork the squirrel is on), and carries everything that grows from it
 function sagAt(P,s){const L=sagLoad(P);let y=0;if(L){const{us,D}=L;y=s<=us?D*(s/us)*(s/us):D*(1+(s-us)/us*.8);}const lb=P.lb;if(lb&&lb.parent)y+=sagAt(lb.parent,lb.at);return y;}
-const input={down:false,mode:null,sx:0,sy:0,x:0,y:0,t0:0,id:null};
-function toWorld(px,py,w,h){return[(px-w/2)/cam.zoom+cam.x,(py-h/2)/cam.zoom+cam.y];}
+const input={seen:false};
 function sqScreen(w,h){const p=surfacePos();const cx=p.x+p.nx*12*SQS,cy=p.y+p.ny*12*SQS;return[(cx-cam.x)*cam.zoom+w/2,(cy-cam.y)*cam.zoom+h/2];}
-function launch(w,h){const sp=sqScreen(w,h);let vx=sp[0]-input.x,vy=sp[1]-input.y;const L=Math.hypot(vx,vy);const pw=clamp(L/130,0,1);if(L<18)return false;const ff=flexAt(S.path,S.s);const m=.55+.45*ff;const v=pw*VMAX*m;const p=surfacePos();S.x=p.x;S.y=p.y;S.vx=vx/L*v;S.vy=vy/L*v;S.flying=true;S.air=0;S.from=S.path;S.lx=p.x;S.ly=p.y;FX.trail.length=0;S.sagV-=60*(1-ff);return true;}
-function aimVel(w,h){const sp=sqScreen(w,h);const vx=sp[0]-input.x,vy=sp[1]-input.y;const L=Math.hypot(vx,vy)||1;const pw=clamp(L/130,0,1);const ff=flexAt(S.path,S.s);const v=pw*VMAX*(.55+.45*ff);return{vx:vx/L*v,vy:vy/L*v,pw,L};}
-function flip(){if(S.path.noFlip||S.flying)return;S.flipFrom=S.side;S.side=-S.side;S.flipT=1;}
 function updatePlay(dt,w,h){
  updateAudio(dt);pollKeys(dt);if(S.flying)pollPad();
  if(S.flying){S.vy+=G*dt;S.vy=glideVy(S.vy,dt);S.x+=S.vx*dt;S.y+=S.vy*dt;S.air+=dt;if(Math.abs(S.x-S.lx)>270&&S.air>.45)FX.rbHold=Math.max(FX.rbHold,.35);if(FX.rb>.3){const a=Math.atan2(S.vy,S.vx);FX.trail.push({x:S.x-Math.cos(a)*18,y:S.y-Math.sin(a)*8,age:0});}
@@ -1145,19 +1141,19 @@ function updatePlay(dt,w,h){
  }else{
   pollPad();nimbleMove(dt);
   S.s=clamp(S.s,0,S.path.len);
-  if(S.path.kind==='limb'){const ff=flexAt(S.path,S.s);const ca0=curAim(w,h),aimP=ca0?ca0.pw:0;const tgt=(7+aimP*26)*(1-ff)*clamp(S.s/S.path.len*1.5,0,1);S.sagV+=((tgt-S.sag)*180-S.sagV*9)*dt;S.sag+=S.sagV*dt;}else{S.sag=0;S.sagV=0;}
+  if(S.path.kind==='limb'){const ff=flexAt(S.path,S.s);const ca0=curAim(),aimP=ca0?ca0.pw:0;const tgt=(7+aimP*26)*(1-ff)*clamp(S.s/S.path.len*1.5,0,1);S.sagV+=((tgt-S.sag)*180-S.sagV*9)*dt;S.sag+=S.sagV*dt;}else{S.sag=0;S.sagV=0;}
  }
- S.phase=(S.phase+S.speed*dt/38)%1;{const kb=Math.exp(-dt*13);S.bx=(S.bx||0)*kb;S.by=(S.by||0)*kb;}if(S.landT>0)S.landT-=dt;if(S.flipT>0)S.flipT=Math.max(0,S.flipT-dt*4);
- if(!S.flying&&S.speed<12&&!curAim(w,h))S.idle+=dt;else S.idle=0;
+ S.phase=(S.phase+S.speed*dt/38)%1;{const kb=Math.exp(-dt*13);S.bx=(S.bx||0)*kb;S.by=(S.by||0)*kb;}if(S.landT>0)S.landT-=dt;
+ if(!S.flying&&S.speed<12&&!curAim())S.idle+=dt;else S.idle=0;
  // camera
- const caim=curAim(w,h),aimingNow=!!caim;let px,py,lx,ly;
+ const caim=curAim(),aimingNow=!!caim;let px,py,lx,ly;
  if(S.flying){px=S.x;py=S.y;const v=Math.hypot(S.vx,S.vy)||1;lx=S.vx/v;ly=S.vy/v*.4;}
  else{const p=surfacePos();px=p.x;py=p.y;const c=Math.cos(p.ang)*S.dir,sn=Math.sin(p.ang)*S.dir;lx=Math.abs(c)<.3?Math.sign(cam.lx||1):c;ly=sn*.6;
   if(caim){const v=Math.hypot(caim.vx,caim.vy)||1;lx=caim.vx/v;ly=caim.vy/v*.4;}}
  const kl=1-Math.exp(-dt*2.2);cam.lx+=(lx-cam.lx)*kl;cam.ly+=(ly-cam.ly)*kl;
  const base=clamp(Math.min(w,h)/270,.9,1.9),zt=base*(S.flying?.72:aimingNow?.8:1);cam.zoom+=(zt-cam.zoom)*(1-Math.exp(-dt*(S.flying?2.6:1.8)));
  let tx=px+cam.lx*(w/6)/cam.zoom,ty=py+cam.ly*(h/6)/cam.zoom-12;
- const maxY=((PLAY.scheme==='dual'?170:60)-h/2)/cam.zoom;ty=Math.min(ty,maxY);const k=1-Math.exp(-dt*(S.flying?5:4));const ox=cam.x,oy=cam.y;cam.x+=(tx-cam.x)*k;cam.y+=(ty-cam.y)*k;cam.vx=lerp(cam.vx,(cam.x-ox)/Math.max(dt,1e-3)/300,.2);cam.vy=lerp(cam.vy||0,(cam.y-oy)/Math.max(dt,1e-3)/300,.2);
+ const maxY=(170-h/2)/cam.zoom;ty=Math.min(ty,maxY);const k=1-Math.exp(-dt*(S.flying?5:4));const ox=cam.x,oy=cam.y;cam.x+=(tx-cam.x)*k;cam.y+=(ty-cam.y)*k;cam.vx=lerp(cam.vx,(cam.x-ox)/Math.max(dt,1e-3)/300,.2);cam.vy=lerp(cam.vy||0,(cam.y-oy)/Math.max(dt,1e-3)/300,.2);
 }
 // flying squirrels: once falling, the membrane holds the fall to a slow glide (about 130 units/s)
 const GLIDE_VY=70;
@@ -1191,7 +1187,7 @@ function drawPlay(t,dt){
   for(const T of trees){for(const f of T.flowers){if(f.x<vx0-60||f.x>vx1+60)continue;drawFlowerSp(ctx,f.sp,f.x,f.y,f.h,t,f.seed);}drawGroundCritters(ctx,T,t);}
   grassBand(ctx,vx0,vx1,t,{seed:37,step:2.4,yMin:9,yMax:24,hMin:7,hMax:19,bw:3.4,wind:1,boost:1.1,cols:GRASS_FRONT},trunks);};
  // aim: the dotted flight path, and the power ring that goes with the squirrel
- let mode,ph=S.phase;const aimA=curAim(w,h),aiming=!!aimA;
+ let mode,ph=S.phase;const aimA=curAim(),aiming=!!aimA;
  const drawAimPath=()=>{if(!aimA)return;const a=aimA,p=surfacePos();let x=p.x,y=p.y,vx=a.vx,vy=a.vy;for(let i=1;i<=64;i++){const st=.03;vy+=G*st;vy=glideVy(vy,st);x+=vx*st;y+=vy*st;if(y>0)break;if(i%3===0){ctx.globalAlpha=1-i/66;ctx.fillStyle='#fff8e8';ctx.beginPath();ctx.arc(x,y,3.2/cam.zoom+1,0,TAU);ctx.fill();}}ctx.globalAlpha=1;};
  // the squirrel, with its aim ring, rainbow trail and glow
  const drawSquirrelNow=()=>{
@@ -1230,7 +1226,7 @@ function drawPlay(t,dt){
  if(!PLAY.paused)lensUpdate(w,h,dt);else if(LENS.on)lensEnd(true);drawLens(ctx,w,h,t);
  drawSticks(ctx,w,h);
  // HUD
- if(!input.seen){ctx.fillStyle='rgba(20,26,20,.6)';const tw=Math.min(w-140,330);ctx.fillRect(w/2-tw/2,PLAY.scheme==='dual'?(PLAY.mission?(w<520?92:62):62):h-58,tw,42);ctx.fillStyle='#f3f1e8';ctx.font='600 13px "Atkinson Hyperlegible",sans-serif';ctx.textAlign='center';ctx.fillText(PLAY.scheme==='dual'?(w<520?'Left: move · Right: pull to leap':'Left: move · Right: pull back to leap'):'Drag to run · grab squirrel & pull back to jump',w/2,PLAY.scheme==='dual'?(PLAY.mission?(w<520?118:88):88):h-32);ctx.textAlign='start';}
+ if(!input.seen){ctx.fillStyle='rgba(20,26,20,.6)';const tw=Math.min(w-140,330);ctx.fillRect(w/2-tw/2,(PLAY.mission?(w<520?92:62):62),tw,42);ctx.fillStyle='#f3f1e8';ctx.font='600 13px "Atkinson Hyperlegible",sans-serif';ctx.textAlign='center';ctx.fillText((w<520?'Left: move · Right: pull to leap':'Left: move · Right: pull back to leap'),w/2,(PLAY.mission?(w<520?118:88):88));ctx.textAlign='start';}
 }
 
 
@@ -1254,10 +1250,9 @@ window.addEventListener('blur',()=>{lensEnd(true);KB.down.clear();KB.pull=null;K
 const DS={L:null,R:null,gp:{active:false,lx:0,ly:0,rs:null,rcur:null,aPrev:false,name:'',blocked:false},toast:null};
 const STICK_R=50;
 function aimFrom(ux,uy,pw){const ff=flexAt(S.path,S.s);const v=pw*VMAX*(.55+.45*ff);return{vx:ux*v,vy:uy*v,pw,L:100};}
-function dualAim(){if(S.flying||LENS.on)return null;const R=DS.R;if(R&&PLAY.scheme==='dual'){const dx=R.x-R.sx,dy=R.y-R.sy,L=Math.hypot(dx,dy);if(L>=30&&performance.now()-R.t0>110)return aimFrom(-dx/L,-dy/L,(.5+.5*clamp((L-30)/80,0,1)));}
+function curAim(){if(S.flying||LENS.on)return null;const R=DS.R;if(R){const dx=R.x-R.sx,dy=R.y-R.sy,L=Math.hypot(dx,dy);if(L>=30&&performance.now()-R.t0>110)return aimFrom(-dx/L,-dy/L,(.5+.5*clamp((L-30)/80,0,1)));}
  if(KB.pull&&KB.t>.1)return aimFrom(-KB.pull.x,-KB.pull.y,kbPower());
  const g=DS.gp;if(g.active&&g.rcur&&g.rcur.m>.45)return aimFrom(-g.rcur.x/g.rcur.m,-g.rcur.y/g.rcur.m,(.5+.5*clamp((g.rcur.m-.45)/.55,0,1)));return null;}
-function curAim(w,h){if(S.flying)return null;if(input.down&&input.mode==='aim'){const a=aimVel(w,h);return a.L>18?a:null;}return dualAim();}
 function jumpWith(a){if(S.flying||!a||LENS.on)return;S.dorsal=false;S.dorsalDraw=null;SFX.leap(a.pw||.5);const p=surfacePos();S.bx=S.by=0;S.x=p.x;S.y=p.y;S.vx=a.vx;S.vy=a.vy;S.flying=true;S.air=0;S.from=S.path;S.lx=p.x;S.ly=p.y;FX.trail.length=0;S.sagV-=60*(1-flexAt(S.path,S.s));}
 function stickVec(){let x=0,y=0;if(DS.L){x=DS.L.vx;y=DS.L.vy;}const kv=kbVec(KMOVE);if(kv&&!DS.L){x=kv.x;y=kv.y;}const g=DS.gp;if(g.active&&Math.hypot(g.lx,g.ly)>Math.hypot(x,y)){x=g.lx;y=g.ly;}return{x,y,m:Math.min(1,Math.hypot(x,y))};}
 function pollPad(){const g=DS.gp;let pads;try{pads=navigator.getGamepads?navigator.getGamepads():[];}catch(e){g.blocked=true;g.active=false;return;}
@@ -1283,8 +1278,8 @@ function padUI(){let p=null;try{for(const q of(navigator.getGamepads?navigator.g
 function setPadStatus(){const el=document.getElementById('pad-status');if(!el)return;const g=DS.gp;el.textContent=g.blocked?'This viewer blocks controllers. They work once the game runs on its own page.':g.active?'Connected: '+g.name:'No controller yet. Pair one, then press any button.';}
 window.addEventListener('gamepadconnected',()=>{pollPad();setPadStatus();});
 window.addEventListener('gamepaddisconnected',()=>{pollPad();setPadStatus();});
-function drawSticks(ctx,w,h){const dual=PLAY.scheme==='dual';ctx.save();ctx.lineWidth=2;ctx.font='700 11px "JetBrains Mono",monospace';ctx.textAlign='center';
- if(dual){const L=DS.L,lx=L?L.ox:72,ly=L?L.oy:h-78;ctx.globalAlpha=L?.85:.32;ctx.strokeStyle='#fff';ctx.fillStyle='rgba(255,255,255,.12)';ctx.beginPath();ctx.arc(lx,ly,STICK_R,0,TAU);ctx.fill();ctx.stroke();
+function drawSticks(ctx,w,h){ctx.save();ctx.lineWidth=2;ctx.font='700 11px "JetBrains Mono",monospace';ctx.textAlign='center';
+ {const L=DS.L,lx=L?L.ox:72,ly=L?L.oy:h-78;ctx.globalAlpha=L?.85:.32;ctx.strokeStyle='#fff';ctx.fillStyle='rgba(255,255,255,.12)';ctx.beginPath();ctx.arc(lx,ly,STICK_R,0,TAU);ctx.fill();ctx.stroke();
   const kx=lx+(L?L.vx*STICK_R:0),ky=ly+(L?L.vy*STICK_R:0);ctx.fillStyle='rgba(255,255,255,.75)';ctx.beginPath();ctx.arc(kx,ky,20,0,TAU);ctx.fill();if(!L){ctx.fillStyle='#fff';ctx.fillText('MOVE',lx,ly-STICK_R-8);}
   const R=DS.R,rx=R?R.sx:w-72,ry=R?R.sy:h-78;ctx.globalAlpha=R?.85:.32;ctx.strokeStyle='#fff';ctx.setLineDash([5,5]);ctx.beginPath();ctx.arc(rx,ry,STICK_R*.8,0,TAU);ctx.stroke();ctx.setLineDash([]);
   if(R){const dx=R.x-R.sx,dy=R.y-R.sy,L=Math.hypot(dx,dy);ctx.strokeStyle='rgba(229,139,68,.7)';ctx.lineWidth=3;ctx.beginPath();ctx.moveTo(rx,ry);ctx.lineTo(R.x,R.y);ctx.stroke();ctx.fillStyle='#e58b44';ctx.beginPath();ctx.arc(R.x,R.y,9,0,TAU);ctx.fill();
@@ -1293,20 +1288,13 @@ function drawSticks(ctx,w,h){const dual=PLAY.scheme==='dual';ctx.save();ctx.line
  if(DS.toast){DS.toast.t-=1/60;ctx.globalAlpha=Math.min(1,DS.toast.t);ctx.fillStyle='rgba(20,26,20,.7)';ctx.fillRect(w/2-100,62,200,30);ctx.fillStyle='#fff';ctx.font='600 13px "Atkinson Hyperlegible",sans-serif';ctx.fillText(DS.toast.txt,w/2,82);if(DS.toast.t<=0)DS.toast=null;}
  ctx.restore();}
 (function bindPlay(){const c=document.getElementById('play');
- c.addEventListener('pointerdown',e=>{input.seen=true;if(AMB.on)startAudio();if(PLAY.scheme==='dual'){const r=c.getBoundingClientRect();const x=e.clientX-r.left,y=e.clientY-r.top;try{c.setPointerCapture(e.pointerId);}catch(_){}e.preventDefault();
-   if(x<r.width/2){if(!DS.L)DS.L={id:e.pointerId,ox:x,oy:y,sx:x,sy:y,vx:0,vy:0,t0:performance.now(),moved:0};}else if(!DS.R)DS.R={id:e.pointerId,sx:x,sy:y,x,y,t0:performance.now()};return;}
-  if(input.down)return;c.setPointerCapture(e.pointerId);const r=c.getBoundingClientRect();const x=e.clientX-r.left,y=e.clientY-r.top;input.down=true;input.id=e.pointerId;input.sx=input.x=x;input.sy=input.y=y;input.t0=performance.now();[input.wx,input.wy]=toWorld(x,y,r.width,r.height);
-  const sp=sqScreen(r.width,r.height);input.mode=(!S.flying&&Math.hypot(x-sp[0],y-sp[1])<48)?'aim':'pull';e.preventDefault();});
- c.addEventListener('pointermove',e=>{if(PLAY.scheme==='dual'){const r=c.getBoundingClientRect();const x=e.clientX-r.left,y=e.clientY-r.top;
+ c.addEventListener('pointerdown',e=>{input.seen=true;if(AMB.on)startAudio();const r=c.getBoundingClientRect();const x=e.clientX-r.left,y=e.clientY-r.top;try{c.setPointerCapture(e.pointerId);}catch(_){}e.preventDefault();
+   if(x<r.width/2){if(!DS.L)DS.L={id:e.pointerId,ox:x,oy:y,sx:x,sy:y,vx:0,vy:0,t0:performance.now(),moved:0};}else if(!DS.R)DS.R={id:e.pointerId,sx:x,sy:y,x,y,t0:performance.now()};});
+ c.addEventListener('pointermove',e=>{const r=c.getBoundingClientRect();const x=e.clientX-r.left,y=e.clientY-r.top;
    if(DS.L&&e.pointerId===DS.L.id){DS.L.moved=Math.max(DS.L.moved,Math.hypot(x-DS.L.sx,y-DS.L.sy));let dx=(x-DS.L.ox)/STICK_R,dy=(y-DS.L.oy)/STICK_R;const m=Math.hypot(dx,dy);if(m>1){DS.L.ox+=(dx/m)*(m-1)*STICK_R*.5;DS.L.oy+=(dy/m)*(m-1)*STICK_R*.5;dx/=m;dy/=m;}DS.L.vx=dx;DS.L.vy=dy;}
-   if(DS.R&&e.pointerId===DS.R.id){DS.R.x=x;DS.R.y=y;}return;}
-  if(!input.down||e.pointerId!==input.id)return;const r=c.getBoundingClientRect();input.x=e.clientX-r.left;input.y=e.clientY-r.top;[input.wx,input.wy]=toWorld(input.x,input.y,r.width,r.height);});
+   if(DS.R&&e.pointerId===DS.R.id){DS.R.x=x;DS.R.y=y;}});
  const up=e=>{if(DS.L&&e.pointerId===DS.L.id){DS.L=null;return;}
-  if(DS.R&&e.pointerId===DS.R.id){const R=DS.R;DS.R=null;const dx=R.x-R.sx,dy=R.y-R.sy,L=Math.hypot(dx,dy),dtm=performance.now()-R.t0;if(L>=30)jumpWith(aimFrom(-dx/L,-dy/L,(.5+.5*clamp((L-30)/80,0,1))));return;}
-  if(!input.down||e.pointerId!==input.id)return;const r=c.getBoundingClientRect();const dx=input.x-input.sx,dy=input.y-input.sy,dtm=performance.now()-input.t0;
-  if(input.mode==='aim'){if(!launch(r.width,r.height)&&Math.hypot(dx,dy)<12)flip();}
-  else if(dtm<260&&Math.abs(dy)>28&&Math.abs(dy)>Math.abs(dx)*1.2)flip();
-  input.down=false;input.mode=null;};
+  if(DS.R&&e.pointerId===DS.R.id){const R=DS.R;DS.R=null;const dx=R.x-R.sx,dy=R.y-R.sy,L=Math.hypot(dx,dy),dtm=performance.now()-R.t0;if(L>=30)jumpWith(aimFrom(-dx/L,-dy/L,(.5+.5*clamp((L-30)/80,0,1))));return;}};
  c.addEventListener('pointerup',up);c.addEventListener('pointercancel',up);
 })();
 
