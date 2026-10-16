@@ -158,13 +158,13 @@ Each bird is drawn from field marks on a shared body, facing right:
 
 Then add the text to the `Object.assign(BIRD_SP.<id>, {range, fact, pl?})` lines. `pl` is only needed for an irregular plural (titmice, grouse).
 
-**Call.** Add a `CALLS.<id>` entry, a list of notes: `[start (s), start Hz, end Hz, length (s), wave, volume, wobble Hz?]`, where `wave` is `sine`, `square`, `sawtooth`, `triangle` or `noise`. `rep(n, gap, fn)` repeats a note. For example, the cardinal's four falling whistles:
+**Call.** Add a `CALLS.<id>` entry, a list of notes: `[start (s), start Hz, end Hz, length (s), wave, volume, wobble Hz?, width?]`, where `wave` is `sine`, `square`, `sawtooth`, `triangle` or `noise`. `width` only applies to `noise`: it is the filter's Q, 6 by default; lower it (1–2) for broad sounds like drumming or wingbeats, and raise the volume to match. `rep(n, gap, fn)` repeats a note and `rnd(lo, hi)` picks a random number. For example, the cardinal's four falling whistles:
 
 ```js
 cardinal: () => rep(4, .24, t => [[t, 3900, 1800, .17, 'sine', .9]]),
 ```
 
-A real recording at `audio/birds/<id>.mp3` replaces the synthesized call automatically.
+Every time a call plays, the whole thing is shifted a little in pitch and speed, so you don't need to add that yourself. For birds whose song is different every time (the robin, the Pacific wren), build the phrase with `rnd` so each call is new. The forest's background birds are drawn from its `birds` list, so they come for free.
 
 ### 2.5 Squirrels: `COATS` and `SQUIRRELS`
 
@@ -223,7 +223,6 @@ sw: {name:'Southwest Ponderosa Pine', where:'Arizona, New Mexico and Colorado',
 5. **Update the docs:**
    - Add the forest to the table in `README.md`.
    - Add every new species with its reference link to `ATTRIBUTION.md`, plus any new general sources.
-   - Credit any recordings you add, with their licence.
 
 ---
 

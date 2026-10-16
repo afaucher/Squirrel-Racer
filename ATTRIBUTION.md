@@ -167,21 +167,7 @@ These are cited as fact references only; no text or images are copied from them.
 
 ## Sounds
 
-The ambience and every bird call are synthesized in the browser. The game also loads recordings if you add them to `audio/` (see [audio/README.md](audio/README.md)). These sources were checked as CC0, so no attribution is required, but we credit them anyway:
-
-- [Birds and wind ambient](https://opengameart.org/content/birds-and-wind-ambient-birds-wind-and-synth), OpenGameArt (CC0)
-- [Ambient bird sounds](https://opengameart.org/content/ambient-bird-sounds) by isaiah658, OpenGameArt (CC0)
-- [Forest bird sounds](https://opengameart.org/content/forest-bird-sounds) by pauliuw, OpenGameArt (CC0)
-- [Rambouillet Forest](https://bigsoundbank.com/rambouillet-forest-s0136.html), BigSoundBank (CC0)
-
-For real recordings of each bird's call (`audio/birds/<id>.mp3`), good sources are:
-
-- National Park Service sound libraries for [Yellowstone](https://www.nps.gov/yell/learn/photosmultimedia/soundlibrary.htm) and [Rocky Mountain National Park](https://www.nps.gov/romo/learn/photosmultimedia/soundlibrary.htm). Public domain; credit "National Park Service".
-- [USGS](https://www.usgs.gov/information-policies-and-instructions/copyrights-and-credits) recordings. USGS-made works are public domain; credit "U.S. Geological Survey". Items from others marked as copyrighted are excluded.
-- US Fish & Wildlife Service recordings on Wikimedia Commons, tagged [PD-USGov-FWS](https://commons.wikimedia.org/wiki/Template:PD-USGov-FWS). Check each file's source details.
-- [xeno-canto](https://xeno-canto.org). Each recording carries its own Creative Commons licence, chosen by the recordist and often non-commercial (NC) or share-alike (SA); check it on the recording's page. Credit as "Recordist, XC123456, www.xeno-canto.org/123456". Avoid no-derivatives (ND) recordings if you need to trim them.
-
-Add a line here for each recording you include.
+The ambience and every bird call are synthesized in the browser; the game uses no recordings. Each call is modelled on how field guides (listed above) describe its rhythm and pitch.
 
 ## Research behind the motion and trees
 

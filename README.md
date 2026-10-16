@@ -6,14 +6,6 @@ A cozy treetop game in a single HTML5 file, for explorers aged 8 and up. You're 
 
 Open `index.html` in a browser. It works on phones (touch), with a keyboard, or with a game controller.
 
-To hear the recorded forest audio (see `audio/`), serve the folder over HTTP instead of opening the file directly, for example:
-
-```sh
-python3 -m http.server
-```
-
-then visit http://localhost:8000.
-
 ## Controls
 
 | | Touch | Keyboard | Controller |
@@ -46,7 +38,7 @@ Holding the photo button opens a round lens (a quarter of the screen across) and
 | Pacific Northwest Forest | Douglas, western gray, Humboldt's flying | Douglas-fir, western hemlock, western redcedar, Sitka spruce, bigleaf maple, red alder, beaked hazel | Steller's jay, chestnut-backed chickadee, varied thrush, pileated woodpecker, red-breasted nuthatch, Pacific wren |
 | Caledonian Pinewood | Eurasian red (and its dark form) | Scots pine, silver birch, hazel, pedunculate oak, European beech, rowan | Eurasian jay, crested tit, great spotted woodpecker, coal tit, European robin, common chaffinch |
 
-Each forest also has 11 native wildflowers and 4 nuts or cones. To add a forest, see [docs/ADDING-A-FOREST.md](docs/ADDING-A-FOREST.md): how the species are researched, how each one is described as data, and how to check the result. Birds are synthesized from the rhythm and pitch of their real calls; drop a recording at `audio/birds/<id>.mp3` to use it instead (see `audio/README.md`).
+Each forest also has 11 native wildflowers and 4 nuts or cones. To add a forest, see [docs/ADDING-A-FOREST.md](docs/ADDING-A-FOREST.md): how the species are researched, how each one is described as data, and how to check the result. Birds are synthesized from the rhythm and pitch of their real calls, a little different every time, and the birds you hear in the distance are always ones that live in that forest.
 
 ## Motion models (A/B toggle in the page)
 
@@ -62,7 +54,7 @@ Each forest also has 11 native wildflowers and 4 nuts or cones. To add a forest,
 - **Flying squirrels glide:** the southern, northern and Humboldt's flying squirrels have big eyes, flat tails and a furry membrane from wrist to ankle. Once a leap starts to fall, they spread it and glide, slowing their fall so they sail much farther. The aim arc shows the glide.
 - **Birds, nuts, cones and wildflowers:** each species drawn from its real field marks. Birds perch on limbs, cling to trunks (woodpeckers head-up, nuthatches head-down) or feed on the ground.
 - **Celebrations instead of a score:** a rainbow tail on long flights, and stars, fireflies and falling leaves for big branch landings.
-- **Forest audio:** a layered mixer whose canopy wind, birds, crickets and leaf rustle fade with height and speed, plus sounds for leaps, landings and celebrations. Synthesized by default; drop CC0 recordings into `audio/` to replace the beds.
+- **Forest audio:** a layered mixer whose canopy wind, birds, crickets and leaf rustle fade with height and speed, plus sounds for leaps, landings and celebrations. All synthesized in the browser; there are no audio files.
 
 ## Credits
 

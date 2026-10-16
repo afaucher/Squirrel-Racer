@@ -861,35 +861,24 @@ function squirrelDepth(){if(S.flying)return 9;if(PLAY.motion==='nimble'&&S.prim&
 
 /* ================= FOREST AUDIO =================
    Layers fade with where you are: canopy wind and birds grow with height, crickets live near the ground,
-   leaf rustle follows how fast you move. Each bed uses a CC0 recording if one is published next to the page
-   (audio/forest-birds.ogg, audio/canopy-wind.ogg, audio/ground-insects.ogg); otherwise it is synthesized. */
+   leaf rustle follows how fast you move. Everything is synthesized; there are no audio files. */
 const AMB={on:true,started:false,ctx:null,L:{},gust:0,gustT:0,nextBird:0,nextCricket:0};
 function amb_noise(ctx,sec){const n=ctx.sampleRate*sec,b=ctx.createBuffer(2,n,ctx.sampleRate);for(let ch=0;ch<2;ch++){const d=b.getChannelData(ch);let b0=0,b1=0,b2=0,b3=0,b4=0,b5=0,b6=0;for(let i=0;i<n;i++){const w=Math.random()*2-1;b0=.99886*b0+w*.0555179;b1=.99332*b1+w*.0750759;b2=.969*b2+w*.153852;b3=.8665*b3+w*.3104856;b4=.55*b4+w*.5329522;b5=-.7616*b5-w*.016898;d[i]=(b0+b1+b2+b3+b4+b5+b6+w*.5362)*.11;b6=w*.115926;}}return b;}
 function amb_loop(ctx,buf,rate){const s=ctx.createBufferSource();s.buffer=buf;s.loop=true;s.playbackRate.value=rate||1;s.start();return s;}
 function startAudio(){if(AMB.started||!AMB.on)return;const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;let ctx;try{ctx=new AC();}catch(e){return;}AMB.ctx=ctx;AMB.started=true;
  const master=ctx.createGain();master.gain.value=0;master.connect(ctx.destination);master.gain.setTargetAtTime(.8,ctx.currentTime,1.2);AMB.master=master;
  const nb=amb_noise(ctx,5);
- const bed=(name)=>{const g=ctx.createGain();g.gain.value=0;g.connect(master);const synth=ctx.createGain();synth.connect(g);AMB.L[name]={gain:g,synth,rec:null};return synth;};
+ const bed=(name)=>{const g=ctx.createGain();g.gain.value=0;g.connect(master);AMB.L[name]={gain:g};return g;};
  {const out=bed('wind'),bp=ctx.createBiquadFilter();bp.type='bandpass';bp.frequency.value=450;bp.Q.value=.5;amb_loop(ctx,nb,.6).connect(bp).connect(out);AMB.L.wind.filter=bp;}
  {const out=bed('rustle'),hp=ctx.createBiquadFilter();hp.type='highpass';hp.frequency.value=2600;const lfo=ctx.createGain();amb_loop(ctx,nb,1.37).connect(hp).connect(lfo).connect(out);AMB.L.rustle.flutter=lfo;}
  bed('birds');bed('crickets');
- const fx=ctx.createGain();fx.gain.value=.9;fx.connect(master);AMB.fx=fx;
- // swap in CC0 recordings when they are published alongside the page
- for(const[name,file]of[['birds','audio/forest-birds.ogg'],['wind','audio/canopy-wind.ogg'],['crickets','audio/ground-insects.ogg']]){
-  fetch(file).then(r=>r.ok?r.arrayBuffer():Promise.reject()).then(a=>ctx.decodeAudioData(a)).then(buf=>{const L=AMB.L[name];const src=amb_loop(ctx,buf);const g=ctx.createGain();g.gain.value=0;src.connect(g).connect(L.gain);g.gain.setTargetAtTime(1,ctx.currentTime,2);L.synth.gain.setTargetAtTime(name==='wind'?.35:.15,ctx.currentTime,2);L.rec=src;}).catch(()=>{});}}
+ const fx=ctx.createGain();fx.gain.value=.9;fx.connect(master);AMB.fx=fx;}
 function amb_env(g,t,a,peak,d){g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(peak,t+a);g.gain.exponentialRampToValueAtTime(.0001,t+a+d);}
-function amb_bird(){const ctx=AMB.ctx,t0=ctx.currentTime+.02,pan=ctx.createStereoPanner?ctx.createStereoPanner():null,dist=ctx.createGain(),lp=ctx.createBiquadFilter();lp.type='lowpass';const far=Math.random();lp.frequency.value=9000-far*5000;dist.gain.value=.22-far*.14;
- if(pan){pan.pan.value=Math.random()*1.6-.8;dist.connect(lp).connect(pan).connect(AMB.L.birds.synth);}else dist.connect(lp).connect(AMB.L.birds.synth);
- const note=(t,f0,f1,dur,peak)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.setValueAtTime(f0,t);o.frequency.exponentialRampToValueAtTime(f1,t+dur);amb_env(g,t,.01,peak,dur);o.connect(g).connect(dist);o.start(t);o.stop(t+dur+.05);};
- const kind=Math.random();
- if(kind<.3){note(t0,3950,3900,.32,.9);note(t0+.4,3450,3350,.36,.8);}                                  // "fee-bee"
- else if(kind<.6){const n=6+Math.floor(Math.random()*5);for(let i=0;i<n;i++)note(t0+i*.065,6200-i*180,5600-i*180,.05,.6);} // trill
- else if(kind<.92){const n=3+Math.floor(Math.random()*3);for(let i=0;i<n;i++){const t=t0+i*.28,b=2300+Math.random()*700;note(t,b,b*1.35,.11,.8);note(t+.12,b*1.3,b*.95,.12,.7);}} // warble
- else{for(let i=0;i<16;i++){const t=t0+i*.055,s=ctx.createBufferSource(),bp=ctx.createBiquadFilter(),g=ctx.createGain();s.buffer=AMB.click||(AMB.click=amb_noise(ctx,.03));bp.type='bandpass';bp.frequency.value=1100;bp.Q.value=4;amb_env(g,t,.002,1.2*(1-i/20),.03);s.connect(bp).connect(g).connect(dist);s.start(t);}} // woodpecker
-}
+// a distant bird somewhere off-screen: always one of this forest's own species
+function amb_bird(){const ids=zone().birds,far=Math.random();playCall(ids[(Math.random()*ids.length)|0],{world:1,far,pan:Math.random()*1.6-.8,vol:.85-far*.5});}
 function amb_crickets(){const ctx=AMB.ctx,t0=ctx.currentTime+.02,o=ctx.createOscillator(),g=ctx.createGain(),pan=ctx.createStereoPanner?ctx.createStereoPanner():null;o.frequency.value=4300+Math.random()*500;g.gain.value=0;
  for(let i=0;i<4;i++){const t=t0+i*.055;g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.12,t+.008);g.gain.linearRampToValueAtTime(0,t+.03);}
- o.connect(g);if(pan){pan.pan.value=Math.random()*1.6-.8;g.connect(pan).connect(AMB.L.crickets.synth);}else g.connect(AMB.L.crickets.synth);o.start(t0);o.stop(t0+.3);}
+ o.connect(g);if(pan){pan.pan.value=Math.random()*1.6-.8;g.connect(pan).connect(AMB.L.crickets.gain);}else g.connect(AMB.L.crickets.gain);o.start(t0);o.stop(t0+.3);}
 function amb_burst(dur,f0,f1,type,peak){if(!AMB.started||!AMB.on)return;const ctx=AMB.ctx,t=ctx.currentTime,s=ctx.createBufferSource(),f=ctx.createBiquadFilter(),g=ctx.createGain();s.buffer=AMB.click2||(AMB.click2=amb_noise(ctx,1));f.type=type;f.frequency.setValueAtTime(f0,t);f.frequency.exponentialRampToValueAtTime(f1,t+dur);amb_env(g,t,.01,peak,dur);s.connect(f).connect(g).connect(AMB.fx);s.start(t);s.stop(t+dur+.1);}
 const SFX={focus:()=>amb_burst(.03,3800,3400,'bandpass',.25),shutter:()=>{amb_burst(.05,3000,2000,'highpass',.5);setTimeout(()=>amb_burst(.07,2400,1200,'bandpass',.45),70);},leap:p=>amb_burst(.35,500,1800,'bandpass',.25+.35*p),land:()=>amb_burst(.14,600,180,'lowpass',.5),
  chime:tier=>{if(!AMB.started||!AMB.on||tier<1)return;const ctx=AMB.ctx,t=ctx.currentTime,notes=[1046.5,1318.5,1568,2093,2637].slice(0,tier+2);notes.forEach((f,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type='sine';o.frequency.value=f;amb_env(g,t+i*.07,.005,.07,.9);o.connect(g).connect(AMB.fx);o.start(t+i*.07);o.stop(t+i*.07+1);});}};
@@ -900,8 +889,8 @@ function updateAudio(dt){if(!AMB.started)return;const ctx=AMB.ctx,now=ctx.curren
  set(L.wind.gain.gain,.05+.22*hgt+.12*AMB.gust*(.4+.6*hgt),1.2);set(L.wind.filter.frequency,320+520*AMB.gust+300*hgt,1.5);
  set(L.rustle.gain.gain,(.015+.1*spd*(.35+.65*hgt)+.05*Math.min(1,Math.abs(cam.vx||0)))*(1-.6*gnd),.25);set(L.rustle.flutter.gain,.6+.4*Math.sin(now*7.3),.05);
  set(L.birds.gain.gain,.45+.55*hgt,1.5);set(L.crickets.gain.gain,.9*gnd,1.2);
- if(now>AMB.nextBird){if(!L.birds.rec||Math.random()<.35){if(!(Math.random()<.55&&worldBirdCall()))amb_bird();}AMB.nextBird=now+(1.4+Math.random()*4)/(.6+hgt);}
- if(gnd>.05&&now>AMB.nextCricket){if(!L.crickets.rec)amb_crickets();AMB.nextCricket=now+.7+Math.random()*.9;}}
+ if(now>AMB.nextBird){if(!(Math.random()<.55&&worldBirdCall()))amb_bird();AMB.nextBird=now+(1.4+Math.random()*4)/(.6+hgt);}
+ if(gnd>.05&&now>AMB.nextCricket){amb_crickets();AMB.nextCricket=now+.7+Math.random()*.9;}}
 function setSound(on){AMB.on=on;if(on){startAudio();if(AMB.ctx){AMB.ctx.resume&&AMB.ctx.resume();AMB.master.gain.setTargetAtTime(.8,AMB.ctx.currentTime,.4);}}else if(AMB.ctx){AMB.master.gain.setTargetAtTime(0,AMB.ctx.currentTime,.2);}}
 
 
@@ -1515,8 +1504,9 @@ function outlineOf(kind,id,W,H){const k='o'+kind+id+W+'x'+H;let c=ART.get(k);if(
  c=document.createElement('canvas');c.width=src.width;c.height=src.height;const g=c.getContext('2d');for(let i=0;i<12;i++){const an=i/12*TAU;g.drawImage(a,Math.cos(an)*3,Math.sin(an)*3);}g.globalCompositeOperation='destination-out';g.drawImage(a,0,0);g.globalCompositeOperation='source-over';g.globalAlpha=.14;g.drawImage(a,0,0);
  ART.set(k,c);return c;}
 
-/* ---- bird calls: each bird's real call rhythm, synthesized (real recordings drop in from audio/birds/<id>.mp3) ---- */
+/* ---- bird calls: each bird's real call rhythm, synthesized ---- */
 const rep=(n,dt,f)=>{const a=[];for(let i=0;i<n;i++)a.push(...f(i*dt,i));return a;};
+const rnd=(lo,hi)=>lo+Math.random()*(hi-lo);
 const CALLS={
  cardinal:()=>rep(4,.24,t=>[[t,3900,1800,.17,'sine',.9]]),
  bluejay:()=>rep(2,.5,t=>[[t,2500,1800,.32,'sawtooth',.45],[t,2300,1700,.3,'noise',.4]]),
@@ -1526,37 +1516,53 @@ const CALLS={
  canjay:()=>rep(2,.7,t=>[[t,2900,1500,.45,'sine',.6]]),
  borchick:()=>[[0,4200,4100,.04,'sine',.7],[.08,3900,3800,.04,'sine',.7],[.2,3200,3000,.22,'sawtooth',.3,60],[.5,3200,3000,.22,'sawtooth',.3,60]],
  rbnut:()=>rep(6,.16,t=>[[t,1700,1650,.08,'square',.22]]),
- wwcross:()=>[...rep(3,.12,t=>[[t,3600,3400,.04,'triangle',.7]]),[.45,4200,4300,.7,'sine',.6,22]],
- sgrouse:()=>[...rep(3,.45,t=>[[t,200,170,.3,'sine',1]]),[1.5,400,200,.5,'noise',.5]],
+ // dry "chet" calls, then canary-like trills on one pitch after another with a dry rattle among them
+ wwcross:()=>{const a=rep(2,.14,t=>[[t,3800,3000,.035,'triangle',.7]]);let t=.4;for(const[f,n,dt,w]of[[3600,9,.045,'sine'],[5200,12,.035,'sine'],[2400,7,.05,'noise'],[4400,10,.04,'sine']]){for(let i=0;i<n;i++)a.push([t+i*dt,f,f*(w==='noise'?.8:1.12),dt*.65,w,w==='noise'?.9:.55]);t+=n*dt+.08;}return a;},
+ // males barely call: two very low hoots, then the whirring wings of the flutter flight and two wing claps
+ sgrouse:()=>[[0,150,130,.35,'triangle',.6],[.55,150,125,.4,'triangle',.6],[1.15,320,220,1.1,'noise',3,24,1],[2.4,1400,900,.05,'noise',3,0,.7],[2.8,1400,900,.05,'noise',3,0,.7]],
  junco:()=>[[0,4300,4200,1,'sine',.6,16]],
  stjay:()=>rep(5,.16,t=>[[t,1600,1300,.1,'sawtooth',.38],[t,1500,1200,.1,'noise',.25]]),
  pygnut:()=>rep(7,.11,t=>[[t,4800,4600,.045,'sine',.7]]),
  mtnchick:()=>[[0,3900,3800,.32,'sine',.8],[.4,3100,3080,.2,'sine',.8],[.65,3100,3080,.2,'sine',.8]],
  acornwp:()=>rep(3,.17,t=>[[t,1300,1800,.12,'sawtooth',.4]]),
  wbluebird:()=>rep(2,.45,t=>[[t,2700,2200,.12,'sine',.7]]),
- rfwarbler:()=>rep(8,.1,(t,i)=>[[t,5000+i*120,5600+i*120,.07,'sine',.6]]),
+ // sweet "tsee-tsee-tsee", two "sweet" notes, then an emphatic down-slurred "chew"
+ rfwarbler:()=>[...rep(5,.1,(t,i)=>[[t,4800+i*60,6200+i*60,.06,'sine',.6]]),...rep(2,.16,t=>[[.55+t,5600,4400,.11,'sine',.65]]),[.94,6800,3300,.16,'sine',.75]],
  eujay:()=>[[0,2200,1800,.5,'noise',.7],[0,1900,1700,.45,'sawtooth',.3]],
  crestit:()=>[[0,6500,6400,.04,'sine',.6],[.08,6500,6400,.04,'sine',.6],[.2,4800,4700,.45,'sine',.6,45]],
  gspot:()=>[...rep(2,.35,t=>[[t,3200,3000,.04,'square',.35]]),...rep(18,.05,t=>[[.9+t,900,800,.02,'noise',.8]])],
  coaltit:()=>rep(4,.32,t=>[[t,5200,4800,.1,'sine',.7],[t+.12,3800,3600,.1,'sine',.7]]),
- robin:()=>{const r=rng(7),a=[];let t=0;for(let i=0;i<14;i++){const f=2600+r()*3900;a.push([t,f,f*(.85+r()*.3),.06+r()*.05,'sine',.55]);t+=.08+r()*.05;}return a;},
+ // a new phrase every time, built from thin fast trills, wistful up-and-down whistles and tumbling cascades
+ robin:()=>{const a=[];let t=0;for(let m=0;m<4;m++){const k=Math.random();
+  if(k<.35){const n=3+(Math.random()*4|0),f=rnd(5500,7500);for(let i=0;i<n;i++){a.push([t,f,f*.9,.03,'sine',.5]);t+=.04;}}
+  else if(k<.7){const f=rnd(2600,4000);a.push([t,f,f*rnd(1.4,1.9),.16,'sine',.6]);t+=.2;a.push([t,f*1.7,f*rnd(.8,1.1),.14,'sine',.55]);t+=.17;}
+  else{const n=3+(Math.random()*3|0);let f=rnd(6000,7500);for(let i=0;i<n;i++){a.push([t,f,f*.92,.05,'sine',.55]);f*=.86;t+=.07;}}
+  t+=rnd(.08,.18);}return a;},
  varthrush:()=>[[0,3300,3250,1.3,'sine',.55,55],[1.9,4400,4350,1.2,'sine',.45,65]],
  chbchick:()=>[[0,7000,6500,.06,'sine',.6],[.1,6800,6400,.06,'sine',.6],[.25,4200,4000,.18,'sawtooth',.25,70],[.5,4200,4000,.18,'sawtooth',.25,70]],
- pileated:()=>rep(9,.14,(t,i)=>[[t,1300-i*20,1100-i*20,.09,'square',.3]]),
- pacwren:()=>{const r=rng(11),a=[];let t=0;for(let i=0;i<40;i++){const f=4000+r()*4000;a.push([t,f,f*(.8+r()*.4),.04,'sine',.5]);t+=.05+r()*.03;}return a;},
+ // either slow, heavy drumming that trails off, or the loud, wild, uneven "cuk-cuk-cuk" that rises and falls
+ pileated:()=>{const a=[];let t=0;
+  if(Math.random()<.4){let dt=.08;for(let i=0;i<22;i++){a.push([t,620,520,.03,'noise',5*(i<14?1:1-(i-14)/9),0,2]);t+=dt;dt=Math.max(.06,dt*.985);}}
+  else{const n=8+(Math.random()*5|0);for(let i=0;i<n;i++){const f=1150+180*Math.sin(Math.PI*i/n)+rnd(-40,40);a.push([t,f,f*.85,.09,'square',.55]);t+=rnd(.11,.17);}}
+  return a;},
+ // a long, very fast string of different trills, each one note repeated, with buzzes and tinkles between them; new every time
+ pacwren:()=>{const a=[];let t=0;for(let s=0;s<10;s++){const k=Math.random();
+  if(k<.6){const n=5+(Math.random()*6|0),dt=rnd(.032,.05),f=rnd(4000,8000),e=rnd(.85,1.15);for(let i=0;i<n;i++){a.push([t,f,f*e,dt*.6,'sine',.5]);t+=dt;}}
+  else if(k<.8){const f=rnd(3500,6000),d=rnd(.15,.3);a.push([t,f,f*rnd(.9,1.1),d,'sine',.45,rnd(80,120)]);t+=d;}
+  else{for(let i=0;i<4;i++){const f=rnd(4500,8000);a.push([t,f,f*rnd(.8,1.2),.025,'sine',.5]);t+=.04;}}
+  t+=rnd(.02,.05);}return a;},
  chaffinch:()=>{const a=[];let t=0,dt=.13;for(let i=0;i<12;i++){a.push([t,5200-i*130,5000-i*130,.05,'sine',.65]);t+=dt;dt=Math.max(.055,dt*.9);}a.push([t+.08,3200,5200,.12,'sine',.7],[t+.22,5200,2800,.14,'sine',.7]);return a;}};
-const REC={};
-function playCall(id,o){o=o||{};if(!AMB.on)return;startAudio();if(!AMB.ctx)return;const ctx=AMB.ctx,dest=o.world?AMB.L.birds.synth:AMB.fx,t0=ctx.currentTime+.03,vol=o.vol==null?1:o.vol;
+function playCall(id,o){o=o||{};if(!AMB.on)return;startAudio();if(!AMB.ctx)return;const ctx=AMB.ctx,dest=o.world?AMB.L.birds.gain:AMB.fx,t0=ctx.currentTime+.03,vol=o.vol==null?1:o.vol;
  const out=ctx.createGain();out.gain.value=vol*(o.world?.35:.55);let node=out;if(ctx.createStereoPanner){const p=ctx.createStereoPanner();p.pan.value=clamp(o.pan||0,-1,1);out.connect(p);node=p;}node.connect(dest);
- if(REC[id]&&REC[id].buf){const s=ctx.createBufferSource();s.buffer=REC[id].buf;s.connect(out);s.start(t0);return;}
- if(!REC[id]){REC[id]={};fetch('audio/birds/'+id+'.mp3').then(r=>r.ok?r.arrayBuffer():Promise.reject()).then(b=>ctx.decodeAudioData(b)).then(buf=>{REC[id].buf=buf;}).catch(()=>{});}
- const lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=o.world?7000:12000;lp.connect(out);
- for(const[t,f0,f1,d,w,v,am]of(CALLS[id]||CALLS.cardinal)()){const g=ctx.createGain();g.gain.setValueAtTime(0,t0+t);g.gain.linearRampToValueAtTime(v*.5,t0+t+Math.min(.012,d*.3));g.gain.setValueAtTime(v*.5,t0+t+d*.7);g.gain.exponentialRampToValueAtTime(.0001,t0+t+d);
-  if(w==='noise'){const s=ctx.createBufferSource();s.buffer=AMB.click2||(AMB.click2=amb_noise(ctx,1));const bp=ctx.createBiquadFilter();bp.type='bandpass';bp.Q.value=6;bp.frequency.setValueAtTime(f0,t0+t);bp.frequency.exponentialRampToValueAtTime(f1,t0+t+d);s.connect(bp).connect(g);s.start(t0+t);s.stop(t0+t+d+.05);}
-  else{const os=ctx.createOscillator();os.type=w;os.frequency.setValueAtTime(f0,t0+t);os.frequency.exponentialRampToValueAtTime(f1,t0+t+d);
-   if(am){const lfo=ctx.createOscillator(),lg=ctx.createGain();lfo.frequency.value=am;lg.gain.value=.5;const amg=ctx.createGain();amg.gain.value=.5;lfo.connect(lg).connect(amg.gain);os.connect(amg).connect(g);lfo.start(t0+t);lfo.stop(t0+t+d+.05);}else os.connect(g);
-   os.start(t0+t);os.stop(t0+t+d+.05);}
-  g.connect(lp);}}
+ const lp=ctx.createBiquadFilter();lp.type='lowpass';lp.frequency.value=o.world?7000-(o.far||0)*3000:12000;lp.connect(out);
+ // no two songs alike: each one is a little higher or lower and faster or slower, and every note wavers slightly
+ const P=1+(Math.random()-.5)*.1,K=1+(Math.random()-.5)*.14;
+ for(let[t,f0,f1,d,w,v,am,q]of(CALLS[id]||CALLS.cardinal)()){const j=P*(1+(Math.random()-.5)*.03);t=t0+t*K;d*=1+(K-1)*.5;f0*=j;f1*=j;v*=.85+Math.random()*.3;
+  const g=ctx.createGain();g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(v*.5,t+Math.min(.012,d*.3));g.gain.setValueAtTime(v*.5,t+d*.7);g.gain.exponentialRampToValueAtTime(.0001,t+d);
+  let src,n;if(w==='noise'){src=ctx.createBufferSource();src.buffer=AMB.click2||(AMB.click2=amb_noise(ctx,1));src.loop=true;n=ctx.createBiquadFilter();n.type='bandpass';n.Q.value=q||6;n.frequency.setValueAtTime(f0,t);n.frequency.exponentialRampToValueAtTime(f1,t+d);src.connect(n);}
+  else{src=n=ctx.createOscillator();src.type=w;src.frequency.setValueAtTime(f0,t);src.frequency.exponentialRampToValueAtTime(f1,t+d);}
+  if(am){const lfo=ctx.createOscillator(),lg=ctx.createGain(),amg=ctx.createGain();lfo.frequency.value=am;lg.gain.value=.5;amg.gain.value=.5;lfo.connect(lg).connect(amg.gain);n=n.connect(amg);lfo.start(t);lfo.stop(t+d+.05);}
+  n.connect(g).connect(lp);src.start(t);src.stop(t+d+.05);}}
 function worldBirdCall(){if(!W)return false;let best=[];for(const T of W.trees.values())for(const b of T.birds||[]){const dx=b.x-cam.x;if(Math.abs(dx)<800)best.push(b);}if(!best.length)return false;
  const b=best[(Math.random()*best.length)|0],d=Math.hypot(b.x-cam.x,b.y-cam.y);playCall(b.sp,{world:1,pan:(b.x-cam.x)/600,vol:clamp(1.2-d/700,.15,1)});return true;}
 
