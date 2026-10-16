@@ -4,7 +4,7 @@ This is how the five current forests were researched and modelled. Follow the sa
 
 A forest is a list of real species plus a few colours. All the species art, calls and placement come from data, so adding a forest means **researching** the species, **writing their data**, then **checking it**. No new drawing code is needed unless a species has a shape the renderers can't draw yet.
 
-What each card **says** (names, scientific names, ranges, facts and field marks) lives in `data/*.js`, with a source for every claim. How each species **looks and sounds** (art, coats, calls) and which forest it lives in are code: bird artwork is in `art/birds.js`, flower, nut and cone artwork in `art/plants.js`, and everything else in `index.html`. Search for the names in the headings below. The two are joined by the species id, and `node tools/check_facts.mjs` checks that they line up.
+What each card **says** (names, scientific names, ranges, facts and field marks) lives in `data/*.js`, with a source for every claim. How each species **looks and sounds** (art, coats, calls) and which forest it lives in are code: bird artwork is in `art/birds.js`, flower, nut and cone artwork in `art/plants.js`, squirrel artwork and coats in `art/squirrel.js`, and everything else in `index.html`. Search for the names in the headings below. The two are joined by the species id, and `node tools/check_facts.mjs` checks that they line up.
 
 ---
 
@@ -199,7 +199,7 @@ cardinal: () => rep(4, .24, t => [[t, 3900, 1800, .17, 'sine', .9]]),
 
 Every time a call plays, the whole thing is shifted a little in pitch and speed, so you don't need to add that yourself. For birds whose song is different every time (the robin, the Pacific wren), build the phrase with `rnd` so each call is new. The forest's background birds are drawn from its `birds` list, so they come for free.
 
-### 2.5 Squirrels: facts in `data/squirrels.js`, art in `COATS` and `SQUIRRELS`
+### 2.5 Squirrels: facts in `data/squirrels.js`, art in `COATS` and `SQUIRRELS` (`art/squirrel.js`)
 
 ```js
 abert: {back:'#73767a', back2:'#55585c', wash:'#8a7a6c', belly:'#f4f2ec', tail:'#7a7d80', tailEdge:'#efeee9',
