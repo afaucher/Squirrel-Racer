@@ -1,6 +1,6 @@
 # Adding a forest
 
-This is how the six current forests were researched and modelled. Follow the same steps to add a new one. The Pacific Northwest Forest was the first one built from this guide, so it makes a good worked example.
+This is how the real forests were researched and modelled. Follow the same steps to add a new one. The Pacific Northwest Forest was the first one built from this guide, so it makes a good worked example.
 
 A forest is a list of real species plus a few colours. All the species art, calls and placement come from data, so adding a forest means **researching** the species, **writing their data**, then **checking it**. No new drawing code is needed unless a species has a shape the renderers can't draw yet.
 
