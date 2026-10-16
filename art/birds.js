@@ -89,6 +89,22 @@ const BIRDS=[
  {id:'pacwren',zone:'pnw',pose:'horiz',size:.55,bw:.95,bh:1.12,
   up:'#7a4e30',low:'#b08860',head:'#7a4e30',wing:'#6a4430',tail:{c:'#5a3f2c',len:6,p:[['bars','#3a2a1e']]},bill:{t:'thin',c:'#2a2420',len:3.4,d:1.4},leg:'#8a6a58',
   hp:[['brow','#b8926e']],bp:[['backbars','#3e2c20'],['scallop','#5a3e2c']],wp:[['bars','#3a2a1e']]},
+
+ {id:'varitit',zone:'jp',pose:'perch',size:.66,bh:1.04,hs:1.1,
+  up:'#a8552a',low:'#b9602c',head:'#f2e6c8',wing:'#6a7a8a',tail:{c:'#5c6b7a',len:14},bill:{t:'short',c:'#1a1a1a',len:2.6,d:2.2},leg:'#4a4f55',
+  hp:[['cap','#1a1a1a',-.6],['napespot','#efe2bf'],['bib','#161616',1.15]]},
+ {id:'eunut',zone:'jp',pose:'headdown',size:.74,
+  up:'#6d8299',low:'#f7f5ef',head:'#f4f3ee',wing:'#647890',tail:{c:'#5f7186',len:8,p:[['tip','#1d1d1d']]},bill:{t:'thin',c:'#3a3f46',len:6,d:1.8},leg:'#8c7b6a',
+  hp:[['cap','#6d8299',-1.6],['brow','#ffffff'],['eyeline','#141414']],bp:[['flank','#c8703a'],['vent','#9a4a2a']]},
+ {id:'jgreenwp',zone:'jp',sex:1,pose:'cling',size:1.25,bh:.95,
+  up:'#7f9a3a',low:'#ece9dc',head:'#a3a8a5',wing:'#6f8a34',tail:{c:'#4b5a2c',len:15},bill:{t:'chisel',c:'#d8c25a',len:7,d:2.4},leg:'#8d9294',
+  hp:[['crown','#c62828'],['nape','#c62828'],['moustache','#1b1b1b'],['moustache','#c62828'],['iris','#b3261e']],bp:[['breast','#a3a8a5',.75],['spots','#222222'],['rump','#a9b84a']],wp:[['bars','#5f7330']]},
+ {id:'narcfly',zone:'jp',sex:1,pose:'perch',size:.62,
+  up:'#121212',low:'#ffc53d',head:'#121212',wing:'#141414',tail:{c:'#121212',len:13},bill:{t:'thin',c:'#1a1a1a',len:3.2,d:1.8},leg:'#3d3d3d',
+  hp:[['brow','#ffc21a'],['chin','#ff8a1a']],bp:[['breast','#ff9a24',.8],['belly','#f8f6ee'],['rump','#ffd21f']],wp:[['patch','#ffffff']]},
+ {id:'jrobin',zone:'jp',sex:1,pose:'ground',size:.7,bw:.95,bh:1.1,
+  up:'#7a5638',low:'#f2f1ec',head:'#7a5638',wing:'#6e4e34',tail:{c:'#b5562a',len:12},bill:{t:'thin',c:'#151515',len:3.4,d:1.8},leg:'#d9a08f',
+  hp:[['face','#e0662a']],bp:[['flank','#8e9399'],['breast','#e0662a'],['breastedge','#3a3534']]},
 ];
 
 /* ---------- renderer: canonical frame, bird faces +x, belly toward +y ---------- */

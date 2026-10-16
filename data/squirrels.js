@@ -114,5 +114,26 @@
   "sci": {"text":"Sciurus vulgaris","src":["https://animaldiversity.org/accounts/Sciurus_vulgaris/"],"checked":"2026-10","sig":"1a90684a"},
   "range": {"text":"Across its range, most often in mountain and northern forests of mainland Europe and Asia","src":["https://en.wikipedia.org/wiki/Red_squirrel"],"checked":"2026-10","sig":"384fe27d"},
   "fact": {"text":"Red squirrels range from fiery orange to nearly black.","src":["https://animaldiversity.org/accounts/Sciurus_vulgaris/","https://en.wikipedia.org/wiki/Red_squirrel"],"checked":"2026-10","sig":"5bc441c4"}
+ },
+ "jsquirrel": {
+  "name": {"text":"Japanese squirrel","src":["https://animaldiversity.org/accounts/Sciurus_lis/","https://en.wikipedia.org/wiki/Japanese_squirrel"],"checked":"2026-10","sig":"e5893930"},
+  "sci": {"text":"Sciurus lis","src":["https://kankyojoho.pref.aichi.jp/rdb/pdf/animals/species/honyu/%E3%83%8B%E3%83%9B%E3%83%B3%E3%83%AA%E3%82%B9.pdf","https://animaldiversity.org/accounts/Sciurus_lis/"],"checked":"2026-10","sig":"58f75967","note":"Once treated as a subspecies of the Eurasian red squirrel (Sciurus vulgaris); now a separate species endemic to Japan. Japanese name: ニホンリス (also ホンドリス)."},
+  "wiki": "Japanese_squirrel",
+  "range": {"text":"Honshu and Shikoku, Japan","src":["https://kankyojoho.pref.aichi.jp/rdb/pdf/animals/species/honyu/%E3%83%8B%E3%83%9B%E3%83%B3%E3%83%AA%E3%82%B9.pdf","https://www.env.go.jp/guide/info/ecojin/quiz/20210818.html"],"checked":"2026-10","sig":"dd3d4848"},
+  "fact": {"text":"It splits hard walnuts neatly into two halves, and buries spare nuts in the ground to eat in winter.","src":["https://www.pref.kanagawa.jp/docs/f4y/02yama/kanagawaparkranger/tokubetukikaku/tabeta.html","https://www.env.go.jp/guide/info/ecojin/quiz/20210818.html","https://animaldiversity.org/accounts/Sciurus_lis/"],"checked":"2026-10","sig":"05c3035d"}
+ },
+ "jgiantfly": {
+  "name": {"text":"Japanese giant flying squirrel","src":["https://animaldiversity.org/accounts/Petaurista_leucogenys/","https://en.wikipedia.org/wiki/Japanese_giant_flying_squirrel"],"checked":"2026-10","sig":"02101ad5"},
+  "sci": {"text":"Petaurista leucogenys","src":["https://www.pref.kyoto.jp/kankyo/rdb/bio/db/man0018.html","https://animaldiversity.org/accounts/Petaurista_leucogenys/"],"checked":"2026-10","sig":"74514c5a","note":"ADW's range text also mentions mainland Asia (older broad taxonomy); Kyoto Prefecture and Wikipedia treat it as a Japanese species found everywhere except Hokkaido and Okinawa. Japanese name: ムササビ (local name バンドリ in Tadami/Aizu)."},
+  "wiki": "Japanese_giant_flying_squirrel",
+  "range": {"text":"Honshu, Shikoku and Kyushu, Japan","src":["https://www.pref.kyoto.jp/kankyo/rdb/bio/db/man0018.html","https://en.wikipedia.org/wiki/Japanese_giant_flying_squirrel"],"checked":"2026-10","sig":"74914a4d"},
+  "fact": {"text":"At night it glides between trees, once 160 metres in one go, to munch buds, leaves and seeds.","src":["https://animaldiversity.org/accounts/Petaurista_leucogenys/","https://en.wikipedia.org/wiki/Japanese_giant_flying_squirrel","https://www.pref.kyoto.jp/kankyo/rdb/bio/db/man0018.html"],"checked":"2026-10","sig":"b8147062"}
+ },
+ "jdwarffly": {
+  "name": {"text":"Japanese dwarf flying squirrel","src":["https://en.wikipedia.org/wiki/Japanese_dwarf_flying_squirrel"],"checked":"2026-10","sig":"d549ca55","note":"ADW calls it 'Japanese flying squirrel'; 'Japanese dwarf flying squirrel' is the usual English name and avoids confusion with the giant flying squirrel. Japanese name: ニホンモモンガ (ホンドモモンガ)."},
+  "sci": {"text":"Pteromys momonga","src":["https://www.pref.kyoto.jp/kisyosyu/1218610259502.html","https://animaldiversity.org/accounts/Pteromys_momonga/"],"checked":"2026-10","sig":"0497a968"},
+  "wiki": "Japanese_dwarf_flying_squirrel",
+  "range": {"text":"Honshu, Shikoku and Kyushu, Japan","src":["https://www.pref.kyoto.jp/kisyosyu/1218610259502.html","https://en.wikipedia.org/wiki/Japanese_dwarf_flying_squirrel"],"checked":"2026-10","sig":"74914a4d","note":"ADW lists only Honshu and Kyushu; Kyoto Prefecture and Wikipedia include Shikoku."},
+  "fact": {"text":"This little night glider has huge eyes and snoozes all day in a tree hole lined with soft moss.","src":["https://www.pref.kyoto.jp/kisyosyu/1218610259502.html","https://en.wikipedia.org/wiki/Japanese_dwarf_flying_squirrel","https://animaldiversity.org/accounts/Pteromys_momonga/"],"checked":"2026-10","sig":"04acb05b"}
  }
 };

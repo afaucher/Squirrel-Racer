@@ -264,5 +264,66 @@
   "name": {"text":"Vanilla leaf","src":["https://www.wildflower.org/plants/result.php?id_plant=ACTR","https://burkeherbarium.org/imagecollection/taxon.php?Taxon=Achlys%20triphylla"],"checked":"2026-10","sig":"d596c5d0"},
   "sci": {"text":"Achlys triphylla","src":["https://www.wildflower.org/plants/result.php?id_plant=ACTR","https://burkeherbarium.org/imagecollection/taxon.php?Taxon=Achlys%20triphylla"],"checked":"2026-10","sig":"b24c633c"},
   "range": {"text":"Coast Ranges and Cascades from British Columbia to northern California","src":["https://www.wildflower.org/plants/result.php?id_plant=ACTR"],"checked":"2026-10","sig":"7cdc4741"}
+ },
+ "katakuri": {
+  "name": {"text":"Japanese fawn lily","src":["https://en.wikipedia.org/wiki/Erythronium_japonicum"],"checked":"2026-10","sig":"1f36cc29","note":"Hokkaido University's plant pages call it Japanese dog-tooth violet; Japanese name katakuri."},
+  "sci": {"text":"Erythronium japonicum","src":["https://hosho.ees.hokudai.ac.jp/tsuyu/top/plt/lily/erythronium/jap.html","https://api.gbif.org/v1/species/2752866"],"checked":"2026-10","sig":"5bd32b58"},
+  "wiki": "Erythronium_japonicum",
+  "range": {"text":"Japan, Korea, northeast China and the Russian Far East","src":["https://hosho.ees.hokudai.ac.jp/tsuyu/top/plt/lily/erythronium/jap.html","https://en.wikipedia.org/wiki/Erythronium_japonicum"],"checked":"2026-10","sig":"e73d6691"}
+ },
+ "nirinso": {
+  "name": {"text":"Soft windflower","src":["https://hosho.ees.hokudai.ac.jp/tsuyu/top/plt/buttercup/anemone/fla.html","https://en.wikipedia.org/wiki/Anemonastrum_flaccidum"],"checked":"2026-10","sig":"0576ec1e","note":"Also called flaccid anemone; Japanese name nirinso ('two-flower plant')."},
+  "sci": {"text":"Anemonastrum flaccidum","src":["https://api.gbif.org/v1/species/10305703","https://en.wikipedia.org/wiki/Anemonastrum_flaccidum"],"checked":"2026-10","sig":"d7927930","note":"Moved from Anemone to Anemonastrum by Mosyakin (published 2018); many Japanese sources, incl. Hokkaido Univ. and the Forestry Agency, still use Anemone flaccida."},
+  "formerly": "Anemone flaccida",
+  "wiki": "Anemonastrum_flaccidum",
+  "range": {"text":"Japan, Korea, Sakhalin and northern and eastern China","src":["https://hosho.ees.hokudai.ac.jp/tsuyu/top/plt/buttercup/anemone/fla.html","https://en.wikipedia.org/wiki/Anemonastrum_flaccidum"],"checked":"2026-10","sig":"00095f4f"}
+ },
+ "shiraneaoi": {
+  "name": {"text":"Japanese wood poppy","src":["https://hosho.ees.hokudai.ac.jp/tsuyu/top/plt/buttercup/glaucidium/pal.html","https://en.wikipedia.org/wiki/Glaucidium_palmatum"],"checked":"2026-10","sig":"319365fe","note":"Japanese name shirane-aoi. Not a true poppy."},
+  "sci": {"text":"Glaucidium palmatum","src":["https://hosho.ees.hokudai.ac.jp/tsuyu/top/plt/buttercup/glaucidium/pal.html","https://api.gbif.org/v1/species/5579436"],"checked":"2026-10","sig":"57364c77","note":"Only species in its genus; placed in Ranunculaceae (APG), though some Japanese sources keep a separate family Glaucidiaceae."},
+  "wiki": "Glaucidium_palmatum",
+  "range": {"text":"Mountains of Hokkaido and northern Honshu, Japan","src":["https://hosho.ees.hokudai.ac.jp/tsuyu/top/plt/buttercup/glaucidium/pal.html","https://www.rinya.maff.go.jp/tohoku/syo/huzisato/zukan/siraneaoi.html"],"checked":"2026-10","sig":"622c91ab"}
+ },
+ "mizubasho": {
+  "name": {"text":"Asian skunk cabbage","src":["https://hosho.ees.hokudai.ac.jp/tsuyu/top/plt/arum/lysichiton/cam.html","https://en.wikipedia.org/wiki/Lysichiton_camtschatcensis"],"checked":"2026-10","sig":"9a59ee47","note":"Also white skunk cabbage; Japanese name mizubasho."},
+  "sci": {"text":"Lysichiton camtschatcensis","src":["https://hosho.ees.hokudai.ac.jp/tsuyu/top/plt/arum/lysichiton/cam.html","https://api.gbif.org/v1/species/2869301"],"checked":"2026-10","sig":"5ca722ae","note":"Sometimes spelled camtschatcense (e.g. Forestry Agency Asahi-Shonai list)."},
+  "wiki": "Lysichiton_camtschatcensis",
+  "range": {"text":"Northern Japan to Kamchatka and eastern Siberia","src":["https://hosho.ees.hokudai.ac.jp/tsuyu/top/plt/arum/lysichiton/cam.html","https://en.wikipedia.org/wiki/Lysichiton_camtschatcensis"],"checked":"2026-10","sig":"041a823b"}
+ },
+ "cobralily": {
+  "name": {"text":"Japanese cobra lily","src":["https://hosho.ees.hokudai.ac.jp/tsuyu/top/plt/arum/arisaema/ser.html"],"checked":"2026-10","sig":"e49f6e96","note":"A Japanese jack-in-the-pulpit; Japanese name mamushigusa ('viper plant'). Wikipedia calls it Fuji cobra lily."},
+  "sci": {"text":"Arisaema serratum","src":["https://hosho.ees.hokudai.ac.jp/tsuyu/top/plt/arum/arisaema/ser.html","https://api.gbif.org/v1/species/2866950"],"checked":"2026-10","sig":"c8d24cac","note":"Japanese Arisaema taxonomy is messy: some Japanese lists treat mamushigusa under Arisaema japonicum (also accepted by GBIF as a separate species). The Forestry Agency Shirakami page gives only the genus."},
+  "wiki": "Arisaema_serratum",
+  "range": {"text":"Japan, Korea, China and the Russian Far East","src":["https://hosho.ees.hokudai.ac.jp/tsuyu/top/plt/arum/arisaema/ser.html","https://en.wikipedia.org/wiki/Arisaema_serratum"],"checked":"2026-10","sig":"0f2a1e3a"}
+ },
+ "goldenlily": {
+  "name": {"text":"Golden-rayed lily","src":["https://hosho.ees.hokudai.ac.jp/tsuyu/top/plt/lily/lilium/aur.html","https://en.wikipedia.org/wiki/Lilium_auratum"],"checked":"2026-10","sig":"330a5733","note":"Also goldband lily or mountain lily; Japanese name yamayuri."},
+  "sci": {"text":"Lilium auratum","src":["https://hosho.ees.hokudai.ac.jp/tsuyu/top/plt/lily/lilium/aur.html","https://api.gbif.org/v1/species/2753106"],"checked":"2026-10","sig":"e51f4e10"},
+  "wiki": "Lilium_auratum",
+  "range": {"text":"Honshu, Japan, from the Kinki region north to Tohoku","src":["https://hosho.ees.hokudai.ac.jp/tsuyu/top/plt/lily/lilium/aur.html","https://www.rinya.maff.go.jp/tohoku/syo/huzisato/zukan/yamayuri.html"],"checked":"2026-10","sig":"04eb7e99"}
+ },
+ "sankayou": {
+  "name": {"text":"Skeleton flower","src":["https://en.wikipedia.org/wiki/Diphylleia_grayi"],"checked":"2026-10","sig":"cfe465cc","note":"So called because its white petals turn see-through when wet. Hokkaido University's pages call it umbrella leaf; Japanese name sankayo."},
+  "sci": {"text":"Diphylleia grayi","src":["https://hosho.ees.hokudai.ac.jp/tsuyu/top/plt/barberry/diphylleia/gra.html","https://api.gbif.org/v1/species/5634432"],"checked":"2026-10","sig":"4c7d81a0"},
+  "wiki": "Diphylleia_grayi",
+  "range": {"text":"Hokkaido and northern and central Honshu, Japan, and Sakhalin","src":["https://hosho.ees.hokudai.ac.jp/tsuyu/top/plt/barberry/diphylleia/gra.html","https://www.rinya.maff.go.jp/tohoku/syo/huzisato/zukan/sankayou.html"],"checked":"2026-10","sig":"9a8501e4"}
+ },
+ "yamaajisai": {
+  "name": {"text":"Mountain hydrangea","src":["https://hosho.ees.hokudai.ac.jp/tsuyu/top/plt/saxifrage/hydrangea/ser.html","https://en.wikipedia.org/wiki/Hydrangea_serrata"],"checked":"2026-10","sig":"b0cc27c0","note":"Japanese name yama-ajisai; the beech-forest form on the Sea of Japan side is ezo-ajisai."},
+  "sci": {"text":"Hydrangea serrata","src":["https://hosho.ees.hokudai.ac.jp/tsuyu/top/plt/saxifrage/hydrangea/ser.html","https://api.gbif.org/v1/species/7319016"],"checked":"2026-10","sig":"12e97e88","note":"The Shirakami plant is var. yesoensis (ezo-ajisai), accepted by GBIF (https://api.gbif.org/v1/species/3645548); also published as subspecies yezoensis."},
+  "wiki": "Hydrangea_serrata",
+  "range": {"text":"Mountains of Japan and Korea","src":["https://en.wikipedia.org/wiki/Hydrangea_serrata","https://www.rinya.maff.go.jp/tohoku/syo/huzisato/zukan/ezoajisai.html"],"checked":"2026-10","sig":"4e09c746"}
+ },
+ "toadlily": {
+  "name": {"text":"Toad lily","src":["https://en.wikipedia.org/wiki/Tricyrtis_latifolia"],"checked":"2026-10","sig":"1fac44ea","note":"Yellow-flowered toad lily; Japanese name tamagawa-hototogisu. Weak-ish: only Wikipedia gives an English name for this exact species."},
+  "sci": {"text":"Tricyrtis latifolia","src":["https://www.pref.kyoto.jp/kankyo/rdb/bio/db/flo0724.html","https://api.gbif.org/v1/species/2752139"],"checked":"2026-10","sig":"c01685ef"},
+  "wiki": "Tricyrtis_latifolia",
+  "range": {"text":"Hokkaido, Honshu, Shikoku and Kyushu, Japan","src":["https://www.pref.kyoto.jp/kankyo/rdb/bio/db/flo0724.html","https://en.wikipedia.org/wiki/Tricyrtis_latifolia"],"checked":"2026-10","sig":"dd3c31a4"}
+ },
+ "enreiso": {
+  "name": {"text":"Japanese trillium","src":["https://hosho.ees.hokudai.ac.jp/tsuyu/top/plt/lily/trillium/ape.html"],"checked":"2026-10","sig":"c5b5ee7c","note":"Japanese name enreiso."},
+  "sci": {"text":"Trillium apetalon","src":["https://hosho.ees.hokudai.ac.jp/tsuyu/top/plt/lily/trillium/ape.html","https://api.gbif.org/v1/species/2742312"],"checked":"2026-10","sig":"6ff960d5","note":"Older Japanese lists (e.g. Forestry Agency Asahi-Shonai page) use 'Trillium smallii' for enreiso, but that name belongs to a different species (Kojima-enreiso, Sakhalin-Hokkaido)."},
+  "wiki": "Trillium",
+  "range": {"text":"Japan, Sakhalin and the southern Kuril Islands","src":["https://hosho.ees.hokudai.ac.jp/tsuyu/top/plt/lily/trillium/ape.html","https://www.rinya.maff.go.jp/tohoku/syo/huzisato/zukan/enreisou.html"],"checked":"2026-10","sig":"4503d1b3"}
  }
 };

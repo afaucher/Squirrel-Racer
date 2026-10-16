@@ -186,7 +186,7 @@ a{color:var(--accent)}
 <header>
   <div class="eyebrow">A cozy field guide you can climb</div>
   <h1>Squirrel <span>Ranger</span></h1>
-  <p class="lede">Be a real squirrel in five real forests. Run the branches, leap between trees, photograph the birds and wildflowers, and collect the nuts and cones. There's no score and no wrong way to go.</p>
+  <p class="lede">Be a real squirrel in six real forests. Run the branches, leap between trees, photograph the birds and wildflowers, and collect the nuts and cones. There's no score and no wrong way to go.</p>
 </header>
 
 <section class="panel" id="panel-play">
@@ -196,9 +196,9 @@ a{color:var(--accent)}
     <li><b>Leap</b>Right thumb, the arrow keys, or a controller's right stick. Pull back away from where you want to go, then let go. Hold longer to wind up a bigger leap; on keys, the direction is the average of what you've held.</li>
     <li><b>Land anywhere</b>You latch onto whatever you touch: limb, trunk or ground. Thin branch tips bend and weaken your launch, so leap from closer to the trunk.</li>
     <li><b>Photo</b>Hold the camera (top right), Space, or a controller's A button to look through the lens. It opens under your finger or mouse pointer and follows it as you slide (on a keyboard or controller, the arrows or right stick aim it). Let go to take the photo. Only what's inside the circle counts, and what your mission is looking for is chosen first. Nuts and cones within reach are collected.</li>
-    <li><b>Menu</b>The acorn (top left), M or Start. Play any of five forests as one of its squirrels, take a mission (each is dealt its own forest and squirrel), or browse your collection.</li>
+    <li><b>Menu</b>The acorn (top left), M or Start. Play any of six forests as one of its squirrels, take a mission (each is dealt its own forest and squirrel), or browse your collection.</li>
     <li><b>Missions</b>Photograph three different birds, collect three different nuts or cones, or photograph three different wildflowers. Each mission shows its three in outline on the right, and each one fills in when you find it; tap a frame to see it again (and hear the call, for birds). Finish a mission and the squirrel you played joins your collection.</li>
-    <li><b>Flying squirrels glide</b>Play as a southern, northern or Humboldt's flying squirrel and, once a leap starts to fall, it spreads its gliding membrane and sails much farther.</li>
+    <li><b>Flying squirrels glide</b>Play as a southern, northern, Humboldt's or Japanese flying squirrel and, once a leap starts to fall, it spreads its gliding membrane and sails much farther.</li>
     <li><b>Big leaps</b>Long flights turn your tail into a rainbow. Land a long leap on a branch and you get stars, fireflies and falling leaves.</li>
     <li><b>Full screen</b>Tap the button at the bottom of the play area, or press F. Esc exits.</li>
   </ul>
@@ -738,6 +738,15 @@ const TREE_INFO={};for(const[id,r]of Object.entries(SPECIES_DATA.trees)){const t
  redalder:mk('birch',{bark:'#b9b8ae',barkHi:'#dcdbd2',barkLo:'#8e8d84',mark:'#e9e7dc',leaf:['#4f7a34','#5c8a3c','#44702c'],droop:.12,wavy:0,bloom:null,trunk:14}),
  beakedhazel:mk('maple',{bark:'#7a6050',barkHi:'#9a806e',barkLo:'#54402f',leaf:['#6a8a35','#7a9a3e','#5a7a2e'],trunk:10,H:.6,bloom:null})});})();
 
+// Japanese beech forest trees
+(function(){const mk=(base,o)=>Object.assign({},SPECIES[base],o);Object.assign(SPECIES,{
+ buna:mk('maple',{bark:'#c8c6be',barkHi:'#e4e2da',barkLo:'#8e8d86',mark:'#9aa58c',leaf:['#5e8c31','#74a03a','#9cc45a','#4f7a2a'],spread:.62,trunk:21,H:1.1,bloom:null}),
+ mizunara:mk('oak',{bark:'#7d7064',barkHi:'#9a8e80',barkLo:'#554b42',leaf:['#4f7a2c','#5f8a34','#3f6a26','#6f9a3e'],trunk:21,bloom:null}),
+ jwalnut:mk('maple',{bark:'#6d6258',barkHi:'#9a958c',barkLo:'#4a423b',leaf:['#8db04a','#7a9e3e','#a0c058'],trunk:16,spread:.7,droop:.12,H:.8,bloom:null}),
+ tochi:mk('maple',{bark:'#7a6e62',barkHi:'#a39888',barkLo:'#54493f',leaf:['#4e7f2e','#5e8f36','#3f6e28'],leafR:14,trunk:22,spread:.58,bloom:null}),
+ itaya:mk('maple',{bark:'#8a8a84',barkHi:'#a8a8a2',barkLo:'#62625d',leaf:['#5f9138','#6fa040','#4f8030','#7fb048'],trunk:17,H:.85,bloom:null}),
+ hoonoki:mk('maple',{bark:'#8e9290',barkHi:'#b0b4b2',barkLo:'#626664',leaf:['#4f8a34','#5f9a3c','#3f7a2c','#c9d2c0'],leafR:16,trunk:16,H:.9,bloom:null})});})();
+
 /* ---- nuts and cones: art in art/plants.js (NUTS), facts merged in from data/trees.js ---- */
 for(const[id,r]of Object.entries(SPECIES_DATA.nuts))Object.assign(NUTS[id],facts(r));
 for(const[id,n]of Object.entries(NUTS)){const ti=TREE_INFO[n.tree];n.id=id;n.sci=ti[1];n.range=ti[2];n.treeName=ti[0];}
@@ -769,8 +778,12 @@ const ZN={
  cal:{name:'Caledonian Pinewood',where:'Scottish Highlands and northern Europe',sky:['#a7bcc6','#e4e8df'],hills:'#aebfb8',far:'#91a5a8',farLeaf:['#98aca6','#a3b6b0'],
   trees:[['scotspine',6],['silverbirch',3],['hazel',2],['pedoak',2],['eubeech',2],['rowan',1]],squirrels:['eured','eudark'],
   birds:['eujay','crestit','gspot','coaltit','robin','chaffinch'],nuts:['scotscone','hazelnut','eubeechnut','pedacorn'],
-  flowers:['bluebell','woodanemone','primrose','celandine','twinflower','foxglove','woodsorrel','heather','redcampion','harebell','wintergreen']}};
-const ZONE_IDS=['east','boreal','sw','pnw','cal'];
+  flowers:['bluebell','woodanemone','primrose','celandine','twinflower','foxglove','woodsorrel','heather','redcampion','harebell','wintergreen']},
+ jp:{name:'Japanese Beech Forest',where:'Mountains of northern Honshu, Japan',sky:['#b4c6d0','#e6eae6'],hills:'#a9bcb2',far:'#8ea39c',farLeaf:['#93a993','#9fb49d'],
+  trees:[['buna',7],['mizunara',2],['itaya',2],['hoonoki',2],['tochi',1],['jwalnut',1]],squirrels:['jsquirrel','jgiantfly','jdwarffly'],
+  birds:['eujay','varitit','eunut','jgreenwp','narcfly','jrobin'],nuts:['bunanut','mizunaraacorn','jwalnutnut','tochinut'],
+  flowers:['katakuri','nirinso','shiraneaoi','mizubasho','enreiso','cobralily','goldenlily','sankayou','yamaajisai','toadlily','marshmarigold']}};
+const ZONE_IDS=['east','boreal','sw','pnw','cal','jp'];
 function zone(){return ZN[PLAY.zone||'east'];}
 function itemInfo(kind,id){if(kind==='s'){const q=SQUIRRELS[id];return{kind,id,name:q.name,sci:q.sci,range:q.range,fact:q.fact};}
  if(kind==='b'){const b=BIRD_SP[id];return{kind,id,name:b.name,sci:b.sci,range:b.range,fact:b.fact,pl:b.pl};}
@@ -845,6 +858,22 @@ const CALLS={
   else if(k<.8){const f=rnd(3500,6000),d=rnd(.15,.3);a.push([t,f,f*rnd(.9,1.1),d,'sine',.45,rnd(80,120)]);t+=d;}
   else{for(let i=0;i<4;i++){const f=rnd(4500,8000);a.push([t,f,f*rnd(.8,1.2),.025,'sine',.5]);t+=.04;}}
   t+=rnd(.02,.05);}return a;},
+ // a slow, drawling "tsu-tsu-pee": two thin even notes, then a lower, longer, buzzier one
+ varitit:()=>{const a=[],f=rnd(3800,4600),n=2+(Math.random()*2|0);let t=0;for(let p=0;p<n;p++){a.push([t,f,f*.98,.12,'sine',.6],[t+.2,f,f*.98,.12,'sine',.6],[t+.42,f*.72,f*.7,.3,'sine',.55,38]);t+=rnd(1,1.2);}return a;},
+ // loud, clear whistled "fii-fii-fii", or a fast ringing "pipipipi" trill
+ eunut:()=>{if(Math.random()<.5){const f=rnd(2200,3000);return rep(3+(Math.random()*4|0),rnd(.22,.3),t=>[[t,f*.85,f*1.08,.14,'sine',.75]]);}const f=rnd(2800,3600);return rep(8+(Math.random()*8|0),.07,t=>[[t,f,f*.9,.045,'sine',.65]]);},
+ // a far-carrying whistled "pyo-pyo-pyo", sharp "kyo kyo" calls, or a fast drum roll
+ jgreenwp:()=>{const k=Math.random();if(k<.45){const f=rnd(1700,2200);return rep(4+(Math.random()*4|0),rnd(.3,.38),t=>[[t,f*1.1,f*.85,.2,'sine',.75]]);}
+  if(k<.75)return rep(2+(Math.random()*2|0),.4,t=>[[t,2600,2100,.07,'square',.35]]);
+  const a=[];let t=0;for(let i=0;i<26;i++){a.push([t,700,580,.025,'noise',4*(i<18?1:1-(i-18)/10),0,2]);t+=.045;}return a;},
+ // fluty, bouncy phrases like "pikkororo, pyoi, chii-tsuku-tsuku", new every time
+ narcfly:()=>{const a=[];let t=0;for(let m=0;m<3;m++){const k=Math.random();
+  if(k<.33){let f=rnd(4000,5000);for(let i=0;i<5;i++){a.push([t,f,f*.95,.05,'sine',.55]);f*=.93;t+=.06;}}
+  else if(k<.66){const f=rnd(2600,3400);a.push([t,f,f*1.5,.12,'sine',.65]);t+=.16;a.push([t,f*1.8,f*1.7,.18,'sine',.6]);t+=.22;}
+  else{const f=rnd(3000,4200);for(let i=0;i<2;i++){a.push([t,f,f*1.2,.06,'sine',.6],[t+.08,f*1.2,f*.9,.07,'sine',.6]);t+=.2;}}
+  t+=rnd(.08,.16);}return a;},
+ // "hin-karararara": one sharp ringing note, then a fast rattling trill that fades, like a horse whinnying
+ jrobin:()=>{const f=rnd(4200,5200),g=rnd(3200,4000),dt=rnd(.045,.06),n=10+(Math.random()*6|0),a=[[0,f,f*1.05,.22,'sine',.8]];let t=.3;for(let i=0;i<n;i++){a.push([t,g,g*.85,dt*.6,'sine',.7*(1-i/n*.7)]);t+=dt;}return a;},
  chaffinch:()=>{const a=[];let t=0,dt=.13;for(let i=0;i<12;i++){a.push([t,5200-i*130,5000-i*130,.05,'sine',.65]);t+=dt;dt=Math.max(.055,dt*.9);}a.push([t+.08,3200,5200,.12,'sine',.7],[t+.22,5200,2800,.14,'sine',.7]);return a;}};
 function playCall(id,o){o=o||{};if(!AMB.on)return;startAudio();if(!AMB.ctx)return;const ctx=AMB.ctx,dest=o.world?AMB.L.birds.gain:AMB.fx,t0=ctx.currentTime+.03,vol=o.vol==null?1:o.vol;
  const out=ctx.createGain();out.gain.value=vol*(o.world?.35:.55);let node=out;if(ctx.createStereoPanner){const p=ctx.createStereoPanner();p.pan.value=clamp(o.pan||0,-1,1);out.connect(p);node=p;}node.connect(dest);

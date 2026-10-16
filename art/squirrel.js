@@ -52,6 +52,7 @@ function headB(ctx,h,C,P){ctx.save();ctx.translate(h.x,h.y);ctx.rotate(h.ang);
  ctx.fillStyle=C.earOut||C.back2;ctx.save();ctx.translate(-4.5,-5.5);ctx.rotate(-.55-(P.ear||0)*.4);ctx.beginPath();ctx.ellipse(0,-3,2.4,4.6,0,0,TAU);ctx.fill();ctx.restore();
  ctx.fillStyle=C.back;ctx.beginPath();ctx.ellipse(0,0,8.5,7,0,0,TAU);ctx.fill();ctx.fillStyle=C.muzzle||C.back;ctx.beginPath();ctx.ellipse(6,1.6,5.6,4.5,.15,0,TAU);ctx.fill();
  ctx.fillStyle=C.belly;ctx.beginPath();ctx.ellipse(3.5,4.2,5.4,2.5,.2,0,TAU);ctx.fill();
+ if(C.cheek){ctx.strokeStyle=C.cheek;ctx.lineWidth=2.1;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-5.8,-3);ctx.quadraticCurveTo(-5.4,2,-2.4,5.2);ctx.stroke();}
  ctx.fillStyle=C.ear;ctx.save();ctx.translate(-2,-6);ctx.rotate(-.3-(P.ear||0)*.4);ctx.beginPath();ctx.ellipse(0,-3.4,2.7,5,0,0,TAU);ctx.fill();ctx.fillStyle=C.earIn||C.back;ctx.beginPath();ctx.ellipse(.3,-2.4,1.3,3,0,0,TAU);ctx.fill();if(C.tuft){ctx.fillStyle=C.tuftC||C.back2;for(const o of[-1,0,1]){ctx.beginPath();ctx.moveTo(-1.6+o*.5,-6.6);ctx.quadraticCurveTo(o*.8,-8-C.tuft*.6,o*1.4+.4,-8.4-C.tuft);ctx.quadraticCurveTo(o*.4+1,-8,1.6+o*.5,-6.6);ctx.fill();}}ctx.restore();
  {const e=C.eye||1;ctx.fillStyle=C.ring;ctx.beginPath();ctx.ellipse(2.6,-1.4,3.1*e,2.7*e,0,0,TAU);ctx.fill();
  ctx.fillStyle='#120f0d';ctx.beginPath();ctx.ellipse(2.9,-1.4,2.2*e,2.1*e,0,0,TAU);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(2.9+.7*e,-1.4-.8*e,.75*e,0,TAU);ctx.fill();}
@@ -126,6 +127,9 @@ Object.assign(COATS,{
  abert:{back:'#73767a',back2:'#55585c',wash:'#8a7a6c',belly:'#f4f2ec',tail:'#7a7d80',tailEdge:'#efeee9',paw:'#4a4c50',ring:'#f2f0ea',ear:'#55585c',nose:'#2a2a2c',tuft:9,tuftC:'#3a3c3f',stripe:'#9a5a32'},
  kaibab:{back:'#5a5654',back2:'#3e3b3a',wash:'#6a5a50',belly:'#262220',tail:'#f2f0ea',tailEdge:'#ffffff',paw:'#2a2624',ring:'#e8e4dc',ear:'#3e3b3a',nose:'#141414',tuft:9,tuftC:'#2a2826',stripe:'#7a5034'},
  eured:{back:'#b35a2a',back2:'#8e4320',wash:'#c06a35',belly:'#f3ead9',tail:'#a8501f',tailEdge:'#c96a35',paw:'#6a3216',ring:'#f4e6d4',ear:'#b35a2a',nose:'#2a1408',tuft:7,tuftC:'#8e4320'},
+ jsquirrel:{back:'#9a5a32',back2:'#6e3e22',wash:'#c9803f',belly:'#f8f6f1',tail:'#8e5230',tailEdge:'#c9a27a',paw:'#b06a36',ring:'#f3efe6',ear:'#8e5230',nose:'#2a1a10'},
+ jgiantfly:{back:'#7a5236',back2:'#4f3322',wash:'#8c7a66',belly:'#efe6d4',tail:'#7a5236',tailEdge:'#9a8670',paw:'#3e2a1d',ring:'#2a1f18',ear:'#6b4630',nose:'#20160f',cheek:'#f4f1ea',eye:1.3,glide:1,tailR:1},
+ jdwarffly:{back:'#8a7d6e',back2:'#6b6054',wash:'#a9a094',belly:'#f4f1ea',tail:'#85786a',tailEdge:'#5e544a',paw:'#b9a79a',ring:'#3a322b',ear:'#7a6e61',nose:'#2a221c',eye:1.5,glide:1,tailR:.7},
  eudark:{back:'#4a3428',back2:'#33231a',wash:'#5a3f2f',belly:'#efe6d6',tail:'#3e2b20',tailEdge:'#6a4a36',paw:'#2a1d16',ring:'#d8ccbc',ear:'#4a3428',nose:'#120c08',tuft:7,tuftC:'#2a1d16'}});
 const SQUIRRELS={
  egray:{coat:'gray'},
@@ -144,4 +148,7 @@ const SQUIRRELS={
  douglas:{coat:'douglas'},
  westerngray:{coat:'westerngray'},
  humboldt:{coat:'humboldt'},
- eudark:{coat:'eudark'}};
+ eudark:{coat:'eudark'},
+ jsquirrel:{coat:'jsquirrel'},
+ jgiantfly:{coat:'jgiantfly'},
+ jdwarffly:{coat:'jdwarffly'}};

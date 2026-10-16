@@ -1,6 +1,6 @@
 # Adding a forest
 
-This is how the five current forests were researched and modelled. Follow the same steps to add a new one. The Pacific Northwest Forest was the first one built from this guide, so it makes a good worked example.
+This is how the six current forests were researched and modelled. Follow the same steps to add a new one. The Pacific Northwest Forest was the first one built from this guide, so it makes a good worked example.
 
 A forest is a list of real species plus a few colours. All the species art, calls and placement come from data, so adding a forest means **researching** the species, **writing their data**, then **checking it**. No new drawing code is needed unless a species has a shape the renderers can't draw yet.
 
@@ -28,6 +28,8 @@ Each forest has the same shape:
 
 **Check habitat, not just range.** A species can live in the right region but in the wrong place, like a meadow, prairie or dry oak woodland. For the Pacific Northwest, common camas and broadleaf lupine were swapped for Oregon fawn lily and vanilla leaf, and tall Oregon grape for the dwarf Oregon grape of the forest floor. When you keep a weaker fit on purpose (the western gray squirrel prefers drier oak and Douglas-fir woods), say so in its range.
 
+**Reuse species that are already in the game.** Search `data/*.js` for the scientific name first. If a species is already there and its range already covers the new forest, add its existing id to the forest instead of writing a new card (the Japanese Beech Forest reuses the Eurasian jay and marsh marigold). New ids must not clash with existing ones: `trillium`, `beech` and `robin` are taken, for example.
+
 Missions pick 3 of each kind, so a forest needs **at least 3** birds, nuts or cones, and wildflowers. More gives variety.
 
 **Bird poses.** A good mix is:
@@ -54,7 +56,11 @@ For every species, write down:
   | Trees, nuts, cones | [FEIS](https://research.fs.usda.gov/feis), [The Gymnosperm Database](https://www.conifers.org), [Woodland Trust](https://www.woodlandtrust.org.uk), [EUFORGEN](https://www.euforgen.org) |
   | Wildflowers | [Lady Bird Johnson Wildflower Center](https://www.wildflower.org), [Burke Herbarium](https://burkeherbarium.org), [Woodland Trust](https://www.woodlandtrust.org.uk), [Plantlife](https://www.plantlife.org.uk) |
 
-  Some sites (All About Birds, Kew's Plants of the World Online) block automated fetches, so agents may need the alternatives.
+  Some sites (All About Birds, Kew's Plants of the World Online, the IUCN Red List) block automated fetches, so agents may need the alternatives.
+
+  Outside North America and Britain, use the region's own authorities. For the Japanese Beech Forest these were the Ministry of the Environment (env.go.jp, biodic.go.jp), the Forestry Agency's regional pages (rinya.maff.go.jp), prefectural Red Data Books, Hokkaido University's plant pages, Kotobank's encyclopedia entries, and the [IOC World Bird List](https://www.worldbirdnames.org) for bird names. RHS, GBIF and World Flora Online stand in for Kew. Where sources disagree on a scientific name, use the current accepted one and record the other in the claim's `note`.
+
+  **Splitting the research.** Four agents can research in parallel: birds; the forest itself plus trees and nuts; squirrels; and wildflowers. Give them one shared brief with the rules above. Ask each to return JSON in the `data/*.js` shape, with `src` lists they actually opened, plus free-text drawing notes (colours, shapes, the call). Then review the results yourself: shorten the text to card length, swap any species whose habitat evidence is weak, and check for id clashes before merging.
 
 For **birds**, also note the field marks from a field guide: colours of the back, belly, head, wings and tail, plus caps, masks, bars and crests. Note the bill shape and length, and draw the male where the sexes differ. When they differ, say so in the field marks too ("Male: … Female is browner."), since the card text should match the picture without being wrong about the other sex. Also note the call's rhythm and pitch as field guides describe it, like the cardinal's slurred "cheer cheer cheer" whistles.
 
@@ -132,7 +138,7 @@ whitespruce: mk('pine', {bark:'#5b4a3e', leaf:['#3d5f55','#4c6e63','#2f4a42'], w
 douglascone: {art:{t:'cone', len:10.5, wid:4.6, col:'#9a6e44', hi:'#b88c5c', bract:'#c9b48a'}},
 ```
 
-The nut's `name`, `tree` and `fact` go under `nuts` in `data/trees.js`. `tree` must be a tree id from the same file; the scientific name and range are filled in from that tree.
+The nut's `name`, `tree` and `fact` go under `nuts` in `data/trees.js`. `tree` is a claim like any other (`{"text": "<tree id>", "src": [...]}`), so it needs a source showing the tree bears this nut. It must be a tree id from the same file; the scientific name and range are filled in from that tree.
 
 | `art.t` | Parameters |
 |---|---|
@@ -141,6 +147,8 @@ The nut's `name`, `tree` and `fact` go under `nuts` in `data/trees.js`. `tree` m
 | `hickory` | No parameters: a split husk |
 | `beech` | `col`: a spiny husk with three-sided nuts |
 | `hazel` | A nut in a frilled husk. `beak: 1` gives the long bristly husk of the beaked hazel. |
+| `walnut` | `col` (shell), `husk`: a pointed, wrinkled walnut between the two halves of its split green husk |
+| `conker` | `col` (seed), `hilum` (the pale scar), `husk` and `inner`: a glossy horse chestnut in its three-part husk |
 
 Hanging nuts are placed under their own tree's limbs (upright cones on top), and 1–2 lie fallen nearby.
 
@@ -158,7 +166,7 @@ Hanging nuts are placed under their own tree's limbs (upright cones on top), and
 | `columbine` | Spurred columbine | `c1` (sepals and spurs), `c2` (petals), `nod` |
 | `cluster` | Flat or domed cluster of tiny flowers | `c`, `eye`, `dome` |
 | `hearts` | Hearts hanging from an arching stem (bleeding heart) | `c`, `tip`, `n` |
-| `spathe` | Big leaves around a hooded spathe (skunk cabbage) | None |
+| `spathe` | Big leaves around a hooded spathe (skunk cabbage) | `c`, `c2` (spathe outside and inside, yellow by default), `sp` (spadix) |
 | `mayapple`, `slipper`, `iris` | One-off shapes | None |
 
 If a flower needs a shape that doesn't exist, add a new `art.k` branch in `drawFlowerSp` (in `art/plants.js`) and keep it to simple filled shapes.
@@ -214,6 +222,7 @@ abert: {back:'#73767a', back2:'#55585c', wash:'#8a7a6c', belly:'#f4f2ec', tail:'
 | `tuft`, `tuftC` | Ear tufts: length (0 for none, 7–9 for tufted) and colour |
 | `stripe` | An optional coloured band along the back (Abert's) |
 | `side` | A dark line along the flank (Douglas squirrel) |
+| `cheek` | A pale stripe from the ear down the cheek (Japanese giant flying squirrel) |
 | `muzzle`, `earOut`, `earIn` | Colours for the muzzle and the outer and inner ear, when they differ from the coat (the white nose and ears of the southeastern fox squirrel, the pink ears of the white gray squirrel) |
 | `eye` | Eye size (1 is normal; 1.4 for the big night eyes of flying squirrels) |
 | `tailR` | Tail fluffiness (0.75 for a flying squirrel's flat tail, 1.15 for the western gray's huge one) |
@@ -251,7 +260,23 @@ sw: {name:'Southwest Ponderosa Pine', where:'Arizona, New Mexico and Colorado',
 
    Compare each one with a photo. Check that the key field marks read at small size, and that the silhouettes are still recognisable (they become the mission outlines).
 2. **Walk the forest.** Play it on a phone-sized and a desktop window. Check that the trees look right together, birds sit on limbs and trunks properly, cones hang (or stand) correctly, and nothing blocks the controls.
-3. **Play each mission type** to the success screen, and check that the squirrel joins the collection.
+3. **Play each mission type** to the success screen, and check that the squirrel joins the collection. You can play by hand, or drive the real game from the console. A hidden browser pane or background tab slows `requestAnimationFrame` to a crawl, so the first line moves the game loop onto a timer that keeps full speed. Walking uses the same key events as the keyboard, and photos use the real lens. Remember that the lens follows the mouse once the pointer has been over the play area.
+
+   ```js
+   (() => { const mc = new MessageChannel(); let q = []; mc.port1.onmessage = () => { const now = performance.now(), due = q.filter(x => x.at <= now); q = q.filter(x => x.at > now); due.forEach(x => x.cb(now)); if (q.length) mc.port2.postMessage(0); };
+     window.requestAnimationFrame = cb => { q.push({cb, at: performance.now() + 16}); mc.port2.postMessage(0); return 1; }; })();
+   const sleep = ms => new Promise(r => setTimeout(r, ms));
+   const walk = (code, ms) => { dispatchEvent(new KeyboardEvent('keydown', {code})); return sleep(ms).then(() => dispatchEvent(new KeyboardEvent('keyup', {code}))); };
+   const targets = () => { const c = document.getElementById('play'), w = c.clientWidth, h = c.clientHeight, M = PLAY.mission, o = [];
+     for (const T of W.trees.values()) { for (const b of T.birds) { const [x, y] = birdPos(b); o.push(['b', b.sp, x, y - 8]); } for (const n of T.nuts) { const [x, y] = nutPos(n); o.push(['n', n.sp, x, y + 5]); } for (const f of T.flowers) o.push(['f', f.sp, f.x, f.y - f.h]); }
+     return o.filter(([k, id]) => wanted(M, k, id)).map(([k, id, x, y]) => { const [sx, sy] = toScreen(x, y, w, h); return {id, sx, sy}; }).filter(q => q.sx > 0 && q.sx < w && q.sy > 0 && q.sy < h); };
+   const shoot = async ({sx, sy}) => { Object.assign(MOUSE, {x: sx, y: sy, t: performance.now()}); lensStart('key'); await sleep(700); lensEnd(); await sleep(300); };
+   // a bird or flower mission: walk right, photographing each target that comes on screen
+   startGame({zone: 'sw', squirrel: 'abert', mission: {zone: 'sw', squirrel: 'abert', type: 'b', targets: ZN.sw.birds.slice(0, 3), need: 3, got: []}});
+   for (let i = 0; i < 40 && !PLAY.mission.done; i++) { const t = targets()[0]; if (t) await shoot(t); else await walk('KeyD', 1500); }
+   ```
+
+   Nuts must also be within reach: walk to a fallen one (`n.ground`) before you shoot, or climb to a hanging one.
 4. **Check the facts.** Read every claim against its sources, and check the plurals in mission titles. Then run:
 
    ```sh

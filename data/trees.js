@@ -138,6 +138,42 @@
   "name": {"text":"Beaked hazel","src":["https://www.fs.usda.gov/database/feis/plants/shrub/corcor/all.html"],"checked":"2026-10","sig":"4c8f07d2"},
   "sci": {"text":"Corylus cornuta","src":["https://www.fs.usda.gov/database/feis/plants/shrub/corcor/all.html"],"checked":"2026-10","sig":"646b3f55"},
   "range": {"text":"Across much of North America; the western variety is called California hazelnut","src":["https://www.fs.usda.gov/database/feis/plants/shrub/corcor/all.html"],"checked":"2026-10","sig":"7bb6f1ff"}
+ },
+ "buna": {
+  "name": {"text":"Siebold's beech","src":["https://whc.unesco.org/en/list/663/","https://www.env.go.jp/nature/isan/worldheritage/en/shirakami/uiversal/index.html"],"checked":"2026-10","sig":"1bc2fe0f","note":"Also called Japanese beech; Japanese name buna."},
+  "sci": {"text":"Fagus crenata","src":["https://www.worldfloraonline.org/taxon/wfo-0000966414","https://whc.unesco.org/en/list/663/"],"checked":"2026-10","sig":"b0f05b44"},
+  "wiki": "Fagus_crenata",
+  "range": {"text":"Southwest Hokkaido, Honshu, Shikoku and Kyushu, Japan","src":["https://www.rinya.maff.go.jp/tohoku/sidou/jumoku/shubetu/buna.html"],"checked":"2026-10","sig":"1cd977c6"}
+ },
+ "mizunara": {
+  "name": {"text":"Japanese oak","src":["https://en.wikipedia.org/wiki/Quercus_crispula","https://www.rinya.maff.go.jp/tohoku/sidou/jumoku/shubetu/mizunara.html"],"checked":"2026-10","sig":"8bfd6c84","note":"Also called Mongolian oak; Japanese name mizunara (water oak), famous for whisky casks."},
+  "sci": {"text":"Quercus mongolica subsp. crispula","src":["https://www.worldfloraonline.org/taxon/wfo-0000290363","https://en.wikipedia.org/wiki/Quercus_crispula"],"checked":"2026-10","sig":"46901c19","note":"Sources disagree. WFO (WCSP data, Dec 2025) treats Quercus crispula Blume as a synonym of Q. mongolica subsp. crispula; GBIF and most Japanese sources (Hirosaki Univ., Forestry Agency gallery) still use Quercus crispula, and the Tohoku Forest Office page says Quercus mongolica. 'Quercus crispula' is widely used and acceptable if a simpler label is wanted."},
+  "wiki": "Quercus_crispula",
+  "range": {"text":"Japan, Sakhalin, Korea and northeast China","src":["https://www.rinya.maff.go.jp/tohoku/sidou/jumoku/shubetu/mizunara.html","https://en.wikipedia.org/wiki/Quercus_crispula"],"checked":"2026-10","sig":"1a021b78"}
+ },
+ "jwalnut": {
+  "name": {"text":"Japanese walnut","src":["https://en.wikipedia.org/wiki/Juglans_ailantifolia"],"checked":"2026-10","sig":"c576befb","note":"Japanese name oni-gurumi ('ogre walnut')."},
+  "sci": {"text":"Juglans mandshurica var. sachalinensis","src":["https://www.worldfloraonline.org/taxon/wfo-0001067474","https://ja.wikipedia.org/wiki/%E3%82%AA%E3%83%8B%E3%82%B0%E3%83%AB%E3%83%9F"],"checked":"2026-10","sig":"5fe67f5d","note":"Sources disagree. WFO (Tropicos data) and Japanese Wikipedia treat it as Juglans mandshurica var. sachalinensis; GBIF, English Wikipedia and the Tohoku Forest Office page use Juglans ailantifolia (often spelled ailanthifolia). Juglans ailantifolia is the more familiar label."},
+  "wiki": "Juglans_ailantifolia",
+  "range": {"text":"Japan and Sakhalin","src":["https://www.rinya.maff.go.jp/tohoku/sidou/jumoku/shubetu/onigurumi.html","https://en.wikipedia.org/wiki/Juglans_ailantifolia"],"checked":"2026-10","sig":"17d97a28"}
+ },
+ "tochi": {
+  "name": {"text":"Japanese horse chestnut","src":["https://en.wikipedia.org/wiki/Aesculus_turbinata"],"checked":"2026-10","sig":"9a8e320a","note":"Japanese name tochinoki or tochi."},
+  "sci": {"text":"Aesculus turbinata","src":["https://www.worldfloraonline.org/taxon/wfo-0000522367"],"checked":"2026-10","sig":"a31fc0d8"},
+  "wiki": "Aesculus_turbinata",
+  "range": {"text":"Southwest Hokkaido, Honshu, Shikoku and Kyushu, Japan","src":["https://www.rinya.maff.go.jp/tohoku/sidou/jumoku/shubetu/totinoki.html"],"checked":"2026-10","sig":"1cd977c6"}
+ },
+ "itaya": {
+  "name": {"text":"Painted maple","src":["https://www.rinya.maff.go.jp/tohoku/sidou/jumoku/shubetu/itaya.html","https://en.wikipedia.org/wiki/Acer_pictum"],"checked":"2026-10","sig":"88062488","note":"Japanese name itaya-kaede. English names vary: painted maple, mono maple, yellow-paint maple."},
+  "sci": {"text":"Acer pictum","src":["https://www.worldfloraonline.org/taxon/wfo-0000514846","https://en.wikipedia.org/wiki/Acer_pictum"],"checked":"2026-10","sig":"b3419f0b","note":"Acer mono (still used by the Tohoku Forest Office page) is a synonym."},
+  "wiki": "Acer_pictum",
+  "range": {"text":"Japan, Korea, China and the Russian Far East","src":["https://www.rinya.maff.go.jp/tohoku/sidou/jumoku/shubetu/itaya.html","https://en.wikipedia.org/wiki/Acer_pictum"],"checked":"2026-10","sig":"0f2a1e3a"}
+ },
+ "hoonoki": {
+  "name": {"text":"Japanese bigleaf magnolia","src":["https://www.rhs.org.uk/plants/23120/wd/details","https://en.wikipedia.org/wiki/Magnolia_obovata"],"checked":"2026-10","sig":"cb21ffdc","note":"Japanese name hoonoki; about 9% of tall stems in the Forestry Agency's Shirakami core-zone plot (shirakamimonitarinngu-13.pdf)."},
+  "sci": {"text":"Magnolia obovata","src":["https://www.rhs.org.uk/plants/23120/wd/details","https://en.wikipedia.org/wiki/Magnolia_obovata"],"checked":"2026-10","sig":"458d7036","note":"The Tohoku Forest Office page still uses the synonym Magnolia hypoleuca."},
+  "wiki": "Magnolia_obovata",
+  "range": {"text":"Japan and the southern Kuril Islands","src":["https://www.rhs.org.uk/plants/23120/wd/details","https://www.rinya.maff.go.jp/tohoku/sidou/jumoku/shubetu/hoonoki.html"],"checked":"2026-10","sig":"7420ebd7"}
  }
 };
 
@@ -236,5 +272,25 @@
   "name": "Beaked hazelnut",
   "tree": {"text":"beakedhazel","src":["https://www.fs.usda.gov/database/feis/plants/shrub/corcor/all.html"],"checked":"2026-10","sig":"7ab4dde3"},
   "fact": {"text":"The bristly husk around each nut stretches into a tube, the \"beak\" in its name.","src":["https://www.fs.usda.gov/database/feis/plants/shrub/corcor/all.html"],"checked":"2026-10","sig":"75a2b006"}
+ },
+ "bunanut": {
+  "name": "Siebold's beechnut",
+  "tree": {"text":"buna","src":["https://www.rinya.maff.go.jp/tohoku/sidou/buna.html"],"checked":"2026-10","sig":"56849f01"},
+  "fact": {"text":"Beech trees drop big nut crops only some years. Wood mice choose beechnuts over other forest nuts.","src":["https://www.rinya.maff.go.jp/tohoku/sidou/buna.html","https://eprints.lib.hokudai.ac.jp/repo/huscap/all/50928/PB145-4_798-801.pdf"],"checked":"2026-10","sig":"ac433bbd"}
+ },
+ "mizunaraacorn": {
+  "name": "Japanese oak acorn",
+  "tree": {"text":"mizunara","src":["https://www.rinya.maff.go.jp/tohoku/sidou/jumoku/shubetu/mizunara.html"],"checked":"2026-10","sig":"eae6a56d"},
+  "fact": {"text":"Jays and squirrels bury mizunara acorns to eat later; forgotten ones sprout far from the parent tree.","src":["https://msc.tsukuba.ac.jp/wp/wp-content/uploads/2021/03/worksheet_level2ans._20210116.pdf","https://global.canon/ja/bird-branch/photo-gallery/kakesu/index.html"],"checked":"2026-10","sig":"7f93df99"}
+ },
+ "jwalnutnut": {
+  "name": "Japanese walnut",
+  "tree": {"text":"jwalnut","src":["https://www.rinya.maff.go.jp/tohoku/sidou/jumoku/shubetu/onigurumi.html"],"checked":"2026-10","sig":"a838ba27"},
+  "fact": {"text":"Japanese squirrels and wood mice bury walnuts along forest streams; forgotten ones can sprout into new walnut trees.","src":["https://www.jstage.jst.go.jp/article/jjfs1953/84/1/84_1_1/_article"],"checked":"2026-10","sig":"6f4e9e4a"}
+ },
+ "tochinut": {
+  "name": "Tochi nut",
+  "tree": {"text":"tochi","src":["https://www.rinya.maff.go.jp/tohoku/sidou/jumoku/shubetu/totinoki.html","https://www.pref.yamagata.jp/documents/40694/syunndayori_202501_tochimoti.pdf"],"checked":"2026-10","sig":"21c17002"},
+  "fact": {"text":"Tochi nuts are bitter, but wood mice still bury them. People take about 20 days to wash out the bitterness for tochi-mochi.","src":["https://eprints.lib.hokudai.ac.jp/repo/huscap/all/50928/PB145-4_798-801.pdf","https://www.pref.yamagata.jp/documents/40694/syunndayori_202501_tochimoti.pdf"],"checked":"2026-10","sig":"fe779aee"}
  }
 };
