@@ -40,10 +40,9 @@ Holding the photo button opens a round lens (a quarter of the screen across) and
 
 Each forest also has 11 native wildflowers and 4 nuts or cones. To add a forest, see [docs/ADDING-A-FOREST.md](docs/ADDING-A-FOREST.md): how the species are researched, how each one is described as data, and how to check the result. Birds are synthesized from the rhythm and pitch of their real calls, a little different every time, and the birds you hear in the distance are always ones that live in that forest.
 
-## Motion models (A/B toggle in the page)
+## How the squirrel moves
 
-- **B · Nimble (default).** A two-ended body: the shoulders lead and the hips trail, so the spine follows the path it actually takes. Each end grips its own surface and you can move while either end is within reach, so the squirrel climbs across gaps (front paws reach the next branch while the hind paws still hold the last) instead of jumping. Roll comes from what both ends are holding, so it twists through a back view (or a belly view behind thick branches) rather than flipping. The spine's swing rate is capped, reversing plays a short turn, and standing still settles the body back onto the branch.
-- **A · Surface.** The squirrel runs along one surface at a time. Push into the branch to swing to its other side; overlapping branches from neighbouring trees can be crossed by pushing toward them.
+A two-ended body: the shoulders lead and the hips trail, so the spine follows the path it actually takes. Each end grips its own surface and you can move while either end is within reach, so the squirrel climbs across gaps (front paws reach the next branch while the hind paws still hold the last) instead of jumping. Roll comes from what both ends are holding, so it twists through a back view (or a belly view behind thick branches) rather than flipping. The spine's swing rate is capped, reversing plays a short turn, and standing still settles the body back onto the branch.
 
 ## What's in it
 

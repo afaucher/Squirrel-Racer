@@ -192,7 +192,7 @@ a{color:var(--accent)}
 <section class="panel" id="panel-play">
   <div class="stage" id="stage"><canvas id="play" aria-label="Squirrel Ranger"></canvas><button class="fsbtn" id="fs-btn" type="button" aria-label="Enter full screen"></button></div>
   <ul class="howto">
-    <li><b>Move</b>Left thumb, W A S D, or a controller's left stick. In Nimble motion (B), steer anywhere within reach of a branch: the body glides in straight lines while the feet keep hold, so slipping between nearby branches, going under, or around a trunk just happens. In Surface motion (A), run along the branch and push into it to swing to the other side.</li>
+    <li><b>Move</b>Left thumb, W A S D, or a controller's left stick. Steer anywhere within reach of a branch: the body glides in straight lines while the feet keep hold, so slipping between nearby branches, going under, or around a trunk just happens.</li>
     <li><b>Leap</b>Right thumb, the arrow keys, or a controller's right stick. Pull back away from where you want to go, then let go. Hold longer to wind up a bigger leap; on keys, the direction is the average of what you've held.</li>
     <li><b>Land anywhere</b>You latch onto whatever you touch: limb, trunk or ground. Thin branch tips bend and weaken your launch, so leap from closer to the trunk.</li>
     <li><b>Photo</b>Hold the camera (top right), Space, or a controller's A button to look through the lens. It opens under your finger or mouse pointer and follows it as you slide (on a keyboard or controller, the arrows or right stick aim it). Let go to take the photo. Only what's inside the circle counts, and what your mission is looking for is chosen first. Nuts and cones within reach are collected.</li>
@@ -205,8 +205,6 @@ a{color:var(--accent)}
   <div class="bar">
     <div class="ctl"><span class="label">Forest sound</span>
       <div class="chips" id="play-sound"><button data-v="on" aria-pressed="true">On</button><button data-v="off" aria-pressed="false">Off</button></div></div>
-    <div class="ctl"><span class="label">Motion · A/B</span>
-      <div class="chips" id="play-motion"><button data-v="nimble" aria-pressed="true">B · Nimble</button><button data-v="surface" aria-pressed="false">A · Surface</button></div></div>
     <div class="ctl"><span class="label">World</span>
       <div class="chips"><button class="act" id="play-reset">Back to the ground</button><button class="act" id="play-new">New forest</button></div></div>
     <div class="ctl"><span class="label">Game controller</span><span id="pad-status" class="padstat">No controller yet. Pair one, then press any button.</span></div>
@@ -621,7 +619,7 @@ function drawTreeBase(ctx,T){const sp=T.sp,w=T.trunk.w0,x=T.trunk.pts[0][0],r=rn
   ctx.strokeStyle=front?sp.bark:sp.barkHi;ctx.globalAlpha=.45;ctx.lineWidth=Math.max(1,w*.05);ctx.beginPath();ctx.moveTo(bx-side*1,top+2);ctx.quadraticCurveTo(bx+side*w*.1,ey-w*.15,ex-side*3,ey-1);ctx.stroke();ctx.globalAlpha=1;}
 }
 
-/* ================= NIMBLE MOTION (B) =================
+/* ================= NIMBLE MOTION =================
    The body moves freely in straight lines anywhere within reach of a surface; each foot grabs the nearest surface.
    Which side of a branch the squirrel is on comes from where the body is, not from a flip control. */
 const NIM={R:22,stand:16};
@@ -686,11 +684,7 @@ function makeIK(bx,by,ta,fx,fy,ph,moving){const c=Math.cos(ta),s=Math.sin(ta),sx
    if(moving){const st=Math.sin(ph*TAU+off)*6*fx;T=[T[0]+Math.cos(ns.ang)*st,T[1]+Math.sin(ns.ang)*st];}
    let Tl=toL(T);const hind=k[0]==='h';if(hind)Tl=[Tl[0]-6,Tl[1]-3];if(Math.hypot(Tl[0]-o[0],Tl[1]-o[1])>(a+b)*1.85)continue;
    const[j,e]=ik2(o,Tl,a,b,pref);sk[k]=hind?[o,j,e,[e[0]+6,e[1]+3]]:[o,j,e];}};}
-function setMotion(m){if(PLAY.motion===m)return;
- if(!S.flying){if(m==='nimble'){const p=surfacePos();S.x=p.x+p.nx*NIM.stand;S.y=Math.min(p.y+p.ny*NIM.stand,-NIM.stand);S.ta=p.ang+(S.dir<0?Math.PI:0);S.nfx=1;S.nfy=(S.side===-1?1:-1)*(S.dir<0?-1:1);S.fxA=1;S.fyA=S.nfy;S.rollSg=S.fyA;S.hip=null;S.held=S.path;}
-  else{const ns=nearestSurf(S.x,S.y);if(ns){S.path=ns.P;S.s=ns.s;S.side=ns.P.noFlip?-1:(ns.P.kind==='ground'?-1:pathProject(ns.P,S.x,S.y).side);S.dir=S.nfx||1;}}}
- PLAY.motion=m;}
-function squirrelDepth(){if(S.flying)return 9;if(PLAY.motion==='nimble'&&S.prim&&S.prim.P.kind!=='ground'&&S.prim.hw>6.5&&Math.abs(S.rollU)<.8)return(S.prim.P.depth||0)-.5;const P=PLAY.motion==='nimble'?(S.held||S.path):S.path;return(P.depth||0)+.5;}
+function squirrelDepth(){if(S.flying)return 9;if(S.prim&&S.prim.P.kind!=='ground'&&S.prim.hw>6.5&&Math.abs(S.rollU)<.8)return(S.prim.P.depth||0)-.5;const P=S.held||S.path;return(P.depth||0)+.5;}
 
 /* ================= FOREST AUDIO =================
    Layers fade with where you are: canopy wind and birds grow with height, crickets live near the ground,
@@ -1105,7 +1099,7 @@ function openMenu(view,arg){hideCard();let h='';
 function startGame(cfg){PLAY.zone=cfg.zone;PLAY.squirrel=cfg.squirrel;PLAY.mission=cfg.mission||null;PLAY.started=1;newWorld((Math.random()*1e6)|0);buildFrames();closeMenu();input.seen=false;}
 
 /* ================= PLAY SANDBOX ================= */
-const PLAY={coat:'gray',scheme:'dual',motion:'nimble',zone:'east',squirrel:null,mission:null,paused:false,started:0};
+const PLAY={coat:'gray',scheme:'dual',zone:'east',squirrel:null,mission:null,paused:false,started:0};
 const G=980,VMAX=880,RUN=250,SP=470,SQS=.85,OFF=1e5;
 let W,S;
 function pickCoat(){const r=Math.random();PLAY.coat=r<.42?'gray':r<.68?'fox':r<.88?'red':'black';}
@@ -1132,7 +1126,7 @@ function bakePool(){const q=W.pool.queue.shift();if(!q)return;
  if(q.k==='far'){const crown=['round','tall','wide'][q.i%3];const T=genSpaceCol(900+q.i*31,0,0,1,crown,170);const c=document.createElement('canvas');c.width=520;c.height=480;const g=c.getContext('2d');g.translate(260,470);drawSpaceCol(g,T,zone().far,zone().farLeaf,1);fadeBase(g,200);W.pool.far.push(c);}
  else{const zt=zone().trees;const key=zt[q.i%zt.length][0];const T=genRecursive(SPECIES[key],300+q.i*17,0,0,.85);const c=document.createElement('canvas');c.width=520;c.height=480;const g=c.getContext('2d');g.translate(260,470);g.globalAlpha=1;drawSegs(g,T.segs,null,'#6f7c6a');drawLeaves(g,T.leaves,null,.9);g.globalCompositeOperation='source-atop';g.fillStyle='rgba(180,200,207,.7)';g.fillRect(-260,-470,520,480);g.globalCompositeOperation='source-over';fadeBase(g,170);W.pool.mid.push(c);}
 }
-function surfacePos(){if(PLAY.motion==='nimble'&&!S.flying)return{x:S.x,y:S.y+sagAt(S.path,S.s),ang:S.ta||0,nx:0,ny:0,w:0};const a=pathAt(S.path,S.s);const nx=-S.side*Math.sin(a.ang),ny=S.side*Math.cos(a.ang);const sag=sagAt(S.path,S.s);return{x:a.x+nx*a.w/2,y:a.y+ny*a.w/2+sag,ang:a.ang,nx,ny,w:a.w};}
+function surfacePos(){if(!S.flying)return{x:S.x,y:S.y+sagAt(S.path,S.s),ang:S.ta||0,nx:0,ny:0,w:0};const a=pathAt(S.path,S.s);const nx=-S.side*Math.sin(a.ang),ny=S.side*Math.cos(a.ang);const sag=sagAt(S.path,S.s);return{x:a.x+nx*a.w/2,y:a.y+ny*a.w/2+sag,ang:a.ang,nx,ny,w:a.w};}
 function flexAt(P,s){if(P.kind!=='limb')return 1;const w=wAt(P,s);return clamp((w-2.5)/10,0,1);}
 function sagLoad(P){if(S.flying||P.kind!=='limb')return null;if(P===S.path)return{us:Math.max(8,S.s),D:S.sag};const c=S.path&&S.path.lb;if(c&&c.parent===P)return{us:Math.max(8,c.at),D:S.sag*.45};return null;}
 // a limb bends under the squirrel (or under a fork the squirrel is on), and carries everything that grows from it
@@ -1143,26 +1137,13 @@ function sqScreen(w,h){const p=surfacePos();const cx=p.x+p.nx*12*SQS,cy=p.y+p.ny
 function launch(w,h){const sp=sqScreen(w,h);let vx=sp[0]-input.x,vy=sp[1]-input.y;const L=Math.hypot(vx,vy);const pw=clamp(L/130,0,1);if(L<18)return false;const ff=flexAt(S.path,S.s);const m=.55+.45*ff;const v=pw*VMAX*m;const p=surfacePos();S.x=p.x;S.y=p.y;S.vx=vx/L*v;S.vy=vy/L*v;S.flying=true;S.air=0;S.from=S.path;S.lx=p.x;S.ly=p.y;FX.trail.length=0;S.sagV-=60*(1-ff);return true;}
 function aimVel(w,h){const sp=sqScreen(w,h);const vx=sp[0]-input.x,vy=sp[1]-input.y;const L=Math.hypot(vx,vy)||1;const pw=clamp(L/130,0,1);const ff=flexAt(S.path,S.s);const v=pw*VMAX*(.55+.45*ff);return{vx:vx/L*v,vy:vy/L*v,pw,L};}
 function flip(){if(S.path.noFlip||S.flying)return;S.flipFrom=S.side;S.side=-S.side;S.flipT=1;}
-function latch(P,pr){SFX.land();S.path=P;S.s=pr.s;S.side=P.noFlip?-1:pr.side;const a=pathAt(P,pr.s);const d=S.vx*Math.cos(a.ang)+S.vy*Math.sin(a.ang);S.dir=d<0?-1:1;S.flying=false;S.landT=.35;S.speed=0;S.idle=0;if(P.kind==='limb'){S.sag=0;S.sagV=90*(1-flexAt(P,pr.s))+20;}
- const sp=surfacePos();
- if(P.kind==='ground'){if(S.vy>260)celebrate(0,sp.x,sp.y,0,-1);}
- else{const score=Math.abs(S.x-(S.lx||S.x))+Math.max(0,(S.ly||S.y)-S.y)*.7;const tier=score>420?3:score>270?2:score>160?1:0;if(tier)celebrate(tier,sp.x,sp.y,sp.nx,sp.ny,S.side===1,P.sp&&P.sp.leaf);}}
 function updatePlay(dt,w,h){
  updateAudio(dt);pollKeys(dt);if(S.flying)pollPad();
- if(S.flying&&PLAY.motion==='nimble'){S.vy+=G*dt;S.vy=glideVy(S.vy,dt);S.x+=S.vx*dt;S.y+=S.vy*dt;S.air+=dt;if(Math.abs(S.x-S.lx)>270&&S.air>.45)FX.rbHold=Math.max(FX.rbHold,.35);if(FX.rb>.3){const a=Math.atan2(S.vy,S.vx);FX.trail.push({x:S.x-Math.cos(a)*18,y:S.y-Math.sin(a)*8,age:0});}
+ if(S.flying){S.vy+=G*dt;S.vy=glideVy(S.vy,dt);S.x+=S.vx*dt;S.y+=S.vy*dt;S.air+=dt;if(Math.abs(S.x-S.lx)>270&&S.air>.45)FX.rbHold=Math.max(FX.rbHold,.35);if(FX.rb>.3){const a=Math.atan2(S.vy,S.vx);FX.trail.push({x:S.x-Math.cos(a)*18,y:S.y-Math.sin(a)*8,age:0});}
   if(S.air>.12||S.y>-NIM.stand){const ns=nearestSurf(S.x,S.y);if(S.y>=-NIM.stand)landNimble(nearestSurf(S.x,-NIM.stand)||ns);else if(ns&&ns.gap<NIM.stand*.9&&!(ns.P===S.from&&S.air<.3))landNimble(ns);}
   if(S.y>2000||Math.abs(S.x-cam.x)>5000){resetSquirrel();}
- }else if(S.flying){S.vy+=G*dt;S.vy=glideVy(S.vy,dt);S.x+=S.vx*dt;S.y+=S.vy*dt;S.air+=dt;if(Math.abs(S.x-S.lx)>270&&S.air>.45)FX.rbHold=Math.max(FX.rbHold,.35);if(FX.rb>.3){const a=Math.atan2(S.vy,S.vx);FX.trail.push({x:S.x-Math.cos(a)*18,y:S.y-Math.sin(a)*18-10,age:0});}
-  if(S.y>=0){S.vy=Math.max(S.vy,1);latch(W.ground,{s:S.x+OFF,side:-1,d:0});}
-  else if(S.air>.06){for(const P of W.paths){if(P.kind==='ground')continue;if(P===S.from&&S.air<.3)continue;const b=P.bb;if(S.x<b[0]-40||S.x>b[2]+40||S.y<b[1]-40||S.y>b[3]+40)continue;const pr=pathProject(P,S.x,S.y);const half=wAt(P,pr.s)/2;if(pr.d<half+7){latch(P,pr);break;}}}
-  if(S.y>2000||Math.abs(S.x-cam.x)>5000){resetSquirrel();}
  }else{
-  pollPad();const stickUsed=PLAY.motion==='nimble'?(nimbleMove(dt),true):((PLAY.scheme==='dual'||DS.gp.active)?stickMove(dt):false);
-  if(stickUsed){}else if(input.down&&input.mode==='pull'){const P=S.path,fx=input.wx,fy=input.wy;const pr=pathProject(P,fx,fy);let targetS=pr.s,tr=null;
-   for(const j of P.junctions){const pj=pathProject(j.to,fx,fy);if(pj.d<pr.d-6&&(!tr||pj.d<tr.pj.d))tr={j,pj};}
-   if(tr)targetS=tr.j.s;const ds=targetS-S.s;const step=clamp(ds,-RUN*dt,RUN*dt);S.s+=step;S.speed=Math.abs(step)/Math.max(dt,1e-4);if(Math.abs(step)>.3)S.dir=step<0?-1:1;
-   if(tr&&Math.abs(targetS-S.s)<1.5){const j=tr.j;S.path=j.to;S.s=j.s2;S.side=j.to.noFlip?-1:tr.pj.side;S.dir=(tr.pj.s-j.s2)<0?-1:1;S.sag=0;}
-  }else S.speed*=Math.pow(.001,dt);
+  pollPad();nimbleMove(dt);
   S.s=clamp(S.s,0,S.path.len);
   if(S.path.kind==='limb'){const ff=flexAt(S.path,S.s);const ca0=curAim(w,h),aimP=ca0?ca0.pw:0;const tgt=(7+aimP*26)*(1-ff)*clamp(S.s/S.path.len*1.5,0,1);S.sagV+=((tgt-S.sag)*180-S.sagV*9)*dt;S.sag+=S.sagV*dt;}else{S.sag=0;S.sagV=0;}
  }
@@ -1219,8 +1200,8 @@ function drawPlay(t,dt){
  if(FX.aura>0){const p=S.flying?{x:S.x,y:S.y,nx:0,ny:-1}:surfacePos();const a=Math.min(1,FX.aura)*.18;ctx.save();ctx.globalCompositeOperation='lighter';ctx.globalAlpha=a*(.75+.25*Math.sin(t*9));ctx.drawImage(glowSprite('#ffd84a'),p.x+p.nx*14-46,p.y+p.ny*14-46,92,92);ctx.restore();}
  const C=COATS[PLAY.coat],rig=S.rig;ctx.save();
  let ikFn=null;
- if(S.flying){mode=(C.glide&&S.vy>-80)?'glide':'leap';ph=clamp(S.air/.8,0,1);ctx.translate(S.x,S.y);if(S.vx<0)ctx.scale(-1,1);ctx.rotate(Math.atan2(S.vy,Math.abs(S.vx))*.7);ctx.scale(SQS,SQS);if(PLAY.motion==='nimble')ctx.translate(0,19);}
- else if(PLAY.motion==='nimble'){const ta=S.ta||0;S.fxA=S.nfx;{let r=clamp((S.rollU==null?1:S.rollU)*1.35,-1,1);const sg=Math.sign(r||1),tnow=performance.now()/1000;if(S.rollSg&&sg!==S.rollSg){if(tnow-(S.rollT||0)<.35&&Math.abs(r)<.75)r=S.rollSg*.3;else{S.rollSg=sg;S.rollT=tnow;}}else if(!S.rollSg)S.rollSg=sg;const tgt=Math.sign(r||1)*Math.pow(Math.abs(r),.6);S.fyA=S.fyA==null?tgt:S.fyA+clamp(tgt-S.fyA,-4.5*dt,4.5*dt);} const fyDraw=Math.sign(S.fyA||1);
+ if(S.flying){mode=(C.glide&&S.vy>-80)?'glide':'leap';ph=clamp(S.air/.8,0,1);ctx.translate(S.x,S.y);if(S.vx<0)ctx.scale(-1,1);ctx.rotate(Math.atan2(S.vy,Math.abs(S.vx))*.7);ctx.scale(SQS,SQS);ctx.translate(0,19);}
+ else{const ta=S.ta||0;S.fxA=S.nfx;{let r=clamp((S.rollU==null?1:S.rollU)*1.35,-1,1);const sg=Math.sign(r||1),tnow=performance.now()/1000;if(S.rollSg&&sg!==S.rollSg){if(tnow-(S.rollT||0)<.35&&Math.abs(r)<.75)r=S.rollSg*.3;else{S.rollSg=sg;S.rollT=tnow;}}else if(!S.rollSg)S.rollSg=sg;const tgt=Math.sign(r||1)*Math.pow(Math.abs(r),.6);S.fyA=S.fyA==null?tgt:S.fyA+clamp(tgt-S.fyA,-4.5*dt,4.5*dt);} const fyDraw=Math.sign(S.fyA||1);
   // mid-roll: switch to the back (or belly, when passing behind a thick branch) view, with hysteresis
   const af=Math.abs(S.fyA);if(S.dorsal){if(af>.7||S.turnT>0)S.dorsal=false;}else if(af<.55&&!S.turnT&&S.prim&&S.prim.P.kind!=='ground')S.dorsal=true;
   const tm=S.turnT>0?-Math.cos(Math.PI*(1-S.turnT)):1,turnSx=Math.sign(tm||1)*Math.max(.22,Math.abs(tm));
@@ -1235,13 +1216,7 @@ function drawPlay(t,dt){
   if(aiming||Math.abs(S.fyA)<.75||S.turnT>.15)mode='crouch';else if(S.landT>0){mode='land';ph=1-S.landT/.35;}else if(moving)mode='bound';
   else if(S.fyA*Math.cos(ta)>.6&&S.prim&&S.prim.gap<NIM.stand+5){mode=(S.idle%9)>5?'alert':'sit';useIK=false;}else{mode='bound';ph=.75;}
   if(useIK)ikFn=makeIK(bx,by,ta,turnSx,fyDraw,ph,moving);}
- else{const p=surfacePos();ctx.translate(p.x+(S.bx||0),p.y+(S.by||0));let flipScale=S.side===-1?1:-1;if(S.flipT>0){const f=Math.cos(Math.PI*(1-S.flipT));flipScale=(S.side===-1?1:-1)*-f;ctx.translate(-p.nx*p.w*(1-Math.abs(f))*.5,-p.ny*p.w*(1-Math.abs(f))*.5);}
-  ctx.rotate(p.ang);ctx.scale(S.dir*SQS,flipScale*SQS);
-  const steep=Math.abs(Math.sin(p.ang))>.65,down=Math.sin(p.ang)*S.dir>.65;
-  if(aiming)mode='crouch';else if(S.landT>0){mode='land';ph=1-S.landT/.35;}
-  else if(S.speed>12)mode=S.side===1&&!steep?'cling':down?'descend':'bound';
-  else{if(S.side===1&&!steep){mode='cling';ph=.25;}else if(steep){mode=down?'descend':'bound';ph=.75;}else mode=(S.idle%9)>5?'alert':'sit';}}
-  TAILFX.amt=FX.rb;TAILFX.t=t;if(PLAY.motion==='nimble'&&!S.flying&&S.dorsalDraw)drawDorsal(ctx,C,S.dorsalDraw.belly,t,S.dorsalDraw.paws,S.speed>15,S.phase);else drawSquirrel(ctx,rig,mode,ph,t,dt,C,ikFn);TAILFX.amt=0;ctx.restore();};
+  TAILFX.amt=FX.rb;TAILFX.t=t;if(!S.flying&&S.dorsalDraw)drawDorsal(ctx,C,S.dorsalDraw.belly,t,S.dorsalDraw.paws,S.speed>15,S.phase);else drawSquirrel(ctx,rig,mode,ph,t,dt,C,ikFn);TAILFX.amt=0;ctx.restore();};
  // trees back to front (behind limbs, trunks, front limbs), each layer followed by the birds and nuts on it, and the
  // ground after the trunks. The squirrel goes in at its own depth, so whatever is in front of it is simply drawn later.
  // Behind a trunk, the flight path waits until the end so trunks can't hide it.
@@ -1259,7 +1234,7 @@ function drawPlay(t,dt){
 }
 
 
-/* ================= KEYBOARD: WASD move · arrows pull back to jump · space switches sides ================= */
+/* ================= KEYBOARD: WASD move · arrows pull back to jump ================= */
 const KB={down:new Set(),pull:null,t:0,ax:0,ay:0};
 const KMOVE={KeyW:[0,-1],KeyS:[0,1],KeyA:[-1,0],KeyD:[1,0]},KPULL={ArrowUp:[0,-1],ArrowDown:[0,1],ArrowLeft:[-1,0],ArrowRight:[1,0]};
 function kbVec(map){let x=0,y=0;for(const k of KB.down){const v=map[k];if(v){x+=v[0];y+=v[1];}}const m=Math.hypot(x,y);return m?{x:x/m,y:y/m}:null;}
@@ -1277,7 +1252,7 @@ window.addEventListener('blur',()=>{lensEnd(true);KB.down.clear();KB.pull=null;K
 
 /* ================= DUAL STICK + GAMEPAD ================= */
 const DS={L:null,R:null,gp:{active:false,lx:0,ly:0,rs:null,rcur:null,aPrev:false,name:'',blocked:false},toast:null};
-const STICK_R=50,TOLERANCE=Math.cos(70*Math.PI/180);
+const STICK_R=50;
 function aimFrom(ux,uy,pw){const ff=flexAt(S.path,S.s);const v=pw*VMAX*(.55+.45*ff);return{vx:ux*v,vy:uy*v,pw,L:100};}
 function dualAim(){if(S.flying||LENS.on)return null;const R=DS.R;if(R&&PLAY.scheme==='dual'){const dx=R.x-R.sx,dy=R.y-R.sy,L=Math.hypot(dx,dy);if(L>=30&&performance.now()-R.t0>110)return aimFrom(-dx/L,-dy/L,(.5+.5*clamp((L-30)/80,0,1)));}
  if(KB.pull&&KB.t>.1)return aimFrom(-KB.pull.x,-KB.pull.y,kbPower());
@@ -1285,40 +1260,6 @@ function dualAim(){if(S.flying||LENS.on)return null;const R=DS.R;if(R&&PLAY.sche
 function curAim(w,h){if(S.flying)return null;if(input.down&&input.mode==='aim'){const a=aimVel(w,h);return a.L>18?a:null;}return dualAim();}
 function jumpWith(a){if(S.flying||!a||LENS.on)return;S.dorsal=false;S.dorsalDraw=null;SFX.leap(a.pw||.5);const p=surfacePos();S.bx=S.by=0;S.x=p.x;S.y=p.y;S.vx=a.vx;S.vy=a.vy;S.flying=true;S.air=0;S.from=S.path;S.lx=p.x;S.ly=p.y;FX.trail.length=0;S.sagV-=60*(1-flexAt(S.path,S.s));}
 function stickVec(){let x=0,y=0;if(DS.L){x=DS.L.vx;y=DS.L.vy;}const kv=kbVec(KMOVE);if(kv&&!DS.L){x=kv.x;y=kv.y;}const g=DS.gp;if(g.active&&Math.hypot(g.lx,g.ly)>Math.hypot(x,y)){x=g.lx;y=g.ly;}return{x,y,m:Math.min(1,Math.hypot(x,y))};}
-function sideFor(Q,s2,old,uy){if(Q.noFlip)return -1;if(Q.kind==='trunk')return old.x<pathAt(Q,s2).x?-1:1;return uy>.5?1:-1;}
-// Move along the surface only if the stick points roughly along it (within 70°); otherwise stand still.
-// Move along the surface only if the stick points roughly along it (within 70°); otherwise stand still.
-// Nearby branches from any tree act as junctions too: walk across where they touch, or hop to one just out of reach.
-function switchTo(Q,s2,dir,side){const before=surfacePos();S.path=Q;S.s=s2;S.dir=dir;S.side=Q.noFlip?-1:side;S.sag=0;S.sagV=0;const after=surfacePos();S.bx=(S.bx||0)+before.x-after.x;S.by=(S.by||0)+before.y-after.y;}
-function stickMove(dt){const v=stickVec();if(v.m<.2){S.speed*=Math.pow(.001,dt);return false;}
- const ux=v.x/v.m,uy=v.y/v.m,P=S.path;let best={dot:-2};
- const consider=(path,s,sign,jn)=>{const b=pathAt(path,s);const d=(Math.cos(b.ang)*ux+Math.sin(b.ang)*uy)*sign;if(d>best.dot)best={dot:d,path,s,sign,jn};};
- if(S.s<P.len-.5)consider(P,S.s,1,null);if(S.s>.5)consider(P,S.s,-1,null);
- for(const j of P.junctions){if(Math.abs(j.s-S.s)<18){const Q=j.to;if(j.s2<Q.len-.5)consider(Q,j.s2,1,j);if(j.s2>.5)consider(Q,j.s2,-1,j);}}
- // dynamic junctions with overlapping / nearby branches
- const here=pathAt(P,S.s),hwc=here.w/2;let hop=null;S.hopCD=Math.max(0,(S.hopCD||0)-dt);
- for(const Q of W.paths){if(Q===P)continue;const bb=Q.bb,m=70;if(here.x<bb[0]-m||here.x>bb[2]+m||here.y<bb[1]-m||here.y>bb[3]+m)continue;
-  if(P.junctions.some(j=>j.to===Q))continue; // a limb's own parent/forks are handled by real junctions
-  const pr=pathProject(Q,here.x,here.y);const hwq=wAt(Q,pr.s)/2,gap=pr.d-hwc-hwq;
-  if(gap<6){const dj={s:S.s,to:Q,s2:pr.s,dyn:true};if(pr.s<Q.len-.5)consider(Q,pr.s,1,dj);if(pr.s>.5)consider(Q,pr.s,-1,dj);}
-  if(gap<32&&!S.hopCD){const q=pathAt(Q,pr.s);const dx=q.x-here.x,dy=q.y-here.y,dl=Math.hypot(dx,dy)||1;const toward=(ux*dx+uy*dy)/dl;if(toward>.7&&(!hop||toward>hop.toward))hop={Q,s:pr.s,toward,q};}}
- if(hop&&(best.dot<TOLERANCE||hop.toward>best.dot+.2)){const Q=hop.Q,qa=hop.q,tq=Math.cos(qa.ang)*ux+Math.sin(qa.ang)*uy;
-  let side;if(Q.kind==='limb'&&Math.abs(uy)>.3)side=-1;else{const sp0=surfacePos();side=pathProject(Q,sp0.x,sp0.y).side;}
-  switchTo(Q,hop.s,Math.abs(tq)>.15?(tq<0?-1:1):S.dir,side);S.hopCD=.3;S.speed=80;S.pushT=0;return true;}
- // any push that leans mostly into the branch swings you to its other side, even mid-run (unless you're steering onto a fork)
- {const q0=pathAt(P,S.s),onx=-S.side*Math.sin(q0.ang),ony=S.side*Math.cos(q0.ang),into=-(ux*onx+uy*ony);
-  // keyboard: a held key must point mostly into the branch (S on top, D on a trunk's left side...), so running uphill never flips.
-  // sticks: the push must lean more than ~40 degrees into the branch.
-  let want;if(kbVec(KMOVE)&&!DS.L&&!(DS.gp.active&&Math.hypot(DS.gp.lx,DS.gp.ly)>.2)){want=false;for(const k of KB.down){const d=KMOVE[k];if(d&&-(d[0]*onx+d[1]*ony)>.7)want=true;}}else want=into>.64;
-  if(!P.noFlip&&!S.flipT&&(!best.jn||best.jn.dyn||best.dot<TOLERANCE)&&want){S.pushT=(S.pushT||0)+dt;if(S.pushT>.12){flip();S.pushT=0;}}else S.pushT=0;}
- // momentum: once running, keep going as long as the push still leans even slightly forward (e.g. right after a flip)
- if(best.dot<TOLERANCE&&S.speed>20){const q=pathAt(P,S.s),along=(Math.cos(q.ang)*ux+Math.sin(q.ang)*uy)*S.dir;if(along>.1&&(S.dir>0?S.s<P.len-.5:S.s>.5))best={dot:Math.max(along,.45),path:P,s:S.s,sign:S.dir,jn:null};}
- if(best.dot<TOLERANCE){S.speed*=Math.pow(.001,dt);return false;}
- const sp=RUN*(.35+.65*v.m)*(.6+.4*best.dot);
- if(best.jn){const j=best.jn,ds=j.s-S.s,step=clamp(ds,-sp*dt,sp*dt);S.s+=step;S.speed=Math.abs(step)/Math.max(dt,1e-4)+20;
-  if(Math.abs(j.s-S.s)<1.5){const old=pathAt(P,clamp(S.s-(ds>=0?1:-1)*12,0,P.len));switchTo(j.to,j.s2,best.sign,j.dyn?(j.to.kind==='limb'?(uy>.5?1:-1):pathProject(j.to,surfacePos().x,surfacePos().y).side):sideFor(j.to,j.s2,old,uy));}}
- else{const step=best.sign*sp*dt;S.s=clamp(S.s+step,0,P.len);S.speed=sp;S.dir=best.sign;}
- return true;}
 function pollPad(){const g=DS.gp;let pads;try{pads=navigator.getGamepads?navigator.getGamepads():[];}catch(e){g.blocked=true;g.active=false;return;}
  let p=null;for(const q of pads||[])if(q&&q.connected){p=q;break;}
  if(!p){if(g.active){DS.toast={txt:'Controller disconnected',t:2};g.active=false;setPadStatus();}return;}
@@ -1371,7 +1312,7 @@ function drawSticks(ctx,w,h){const dual=PLAY.scheme==='dual';ctx.save();ctx.line
 
 /* ================= UI ================= */
 function chipGroup(id,fn){const el=document.getElementById(id);el.addEventListener('click',e=>{const b=e.target.closest('button[data-v]');if(!b)return;for(const x of el.querySelectorAll('button[data-v]'))x.setAttribute('aria-pressed',x===b?'true':'false');fn(b.dataset.v);});}
-setPadStatus();chipGroup('play-motion',v=>setMotion(v));chipGroup('play-sound',v=>setSound(v==='on'));
+setPadStatus();chipGroup('play-sound',v=>setSound(v==='on'));
 // full screen: the real Fullscreen API where allowed, otherwise an immersive window-filling mode
 const stage=document.getElementById('stage'),fsb=document.getElementById('fs-btn');
 const IC_FULL='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M2 6V2h4M10 2h4v4M14 10v4h-4M6 14H2v-4"/></svg>',IC_EXIT='<svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 2v4H2M14 6h-4V2M10 14v-4h4M2 10h4v4"/></svg>';
