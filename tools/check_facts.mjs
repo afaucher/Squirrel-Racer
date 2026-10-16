@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Checks the species facts in data/*.js against the rules below and against the game in index.html.
+// Checks the species facts in data/*.js against the rules below and against the game's code (index.html and art/*.js).
 //
 //   node tools/check_facts.mjs                       validate (exits 1 on any error)
 //   node tools/check_facts.mjs --links               also fetch every source URL and report dead ones
@@ -15,13 +15,19 @@ import { fileURLToPath } from 'node:url';
 import { CLAIMS, PLAIN, FILES, readData, writeDataFiles, sig } from './species_data.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const HTML = path.join(ROOT, 'index.html');
 const ATTR = path.join(ROOT, 'ATTRIBUTION.md');
 
-// Evaluate a data literal (object or array) that follows `marker` in the game's script.
+// The game's code: the page plus the artwork scripts it loads.
+function gameCode() {
+  const artDir = path.join(ROOT, 'art');
+  const art = fs.existsSync(artDir) ? fs.readdirSync(artDir).filter(f => f.endsWith('.js')).sort().map(f => fs.readFileSync(path.join(artDir, f), 'utf8')) : [];
+  return [fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8'), ...art].join('\n');
+}
+
+// Evaluate a data literal (object or array) that follows `marker` in the game's code.
 function literalText(html, marker) {
   const at = html.indexOf(marker);
-  if (at < 0) throw new Error('index.html: missing ' + marker);
+  if (at < 0) throw new Error('game code (index.html, art/*.js): missing ' + marker);
   let i = at + marker.length;
   while (html[i] !== '{' && html[i] !== '[') i++;
   const start = i; let depth = 0, q = null;
@@ -32,7 +38,7 @@ function literalText(html, marker) {
     if (c === '{' || c === '[') depth++;
     else if (c === '}' || c === ']') { if (!--depth) return html.slice(start, i + 1); }
   }
-  throw new Error('index.html: unbalanced ' + marker);
+  throw new Error('game code: unbalanced ' + marker);
 }
 const literal = (html, marker) => new Function('return (' + literalText(html, marker) + ')')();
 
@@ -80,7 +86,7 @@ async function deadLinks(urls) {
 async function main() {
   const argv = process.argv.slice(2);
   const has = f => argv.includes(f);
-  const html = fs.readFileSync(HTML, 'utf8');
+  const html = gameCode();
   const data = readData(ROOT);
   const errors = [], warns = [], stat = {};
 
@@ -130,8 +136,8 @@ async function main() {
   // 2. the game uses exactly these ids: art tables, bird calls and the forests
   const same = (label, game, mine) => {
     const G = new Set(game), M = new Set(mine);
-    for (const x of G) if (!M.has(x)) errors.push(`${label}: "${x}" is in index.html but has no facts in data/`);
-    for (const x of M) if (!G.has(x)) errors.push(`${label}: "${x}" has facts in data/ but no entry in index.html`);
+    for (const x of G) if (!M.has(x)) errors.push(`${label}: "${x}" is in the game code but has no facts in data/`);
+    for (const x of M) if (!G.has(x)) errors.push(`${label}: "${x}" has facts in data/ but no entry in the game code`);
   };
   same('birds (BirdArt BIRDS)', literal(html, 'const BIRDS=').map(b => b.id), Object.keys(data.birds));
   same('squirrels (SQUIRRELS)', Object.keys(literal(html, 'const SQUIRRELS=')), Object.keys(data.squirrels));

@@ -4,7 +4,7 @@ This is how the five current forests were researched and modelled. Follow the sa
 
 A forest is a list of real species plus a few colours. All the species art, calls and placement come from data, so adding a forest means **researching** the species, **writing their data**, then **checking it**. No new drawing code is needed unless a species has a shape the renderers can't draw yet.
 
-What each card **says** (names, scientific names, ranges, facts and field marks) lives in `data/*.js`, with a source for every claim. How each species **looks and sounds** (art, coats, calls) and which forest it lives in stay in `index.html`; search for the names in the headings below. The two are joined by the species id, and `node tools/check_facts.mjs` checks that they line up.
+What each card **says** (names, scientific names, ranges, facts and field marks) lives in `data/*.js`, with a source for every claim. How each species **looks and sounds** (art, coats, calls) and which forest it lives in are code: bird artwork is in `art/birds.js`, everything else in `index.html`. Search for the names in the headings below. The two are joined by the species id, and `node tools/check_facts.mjs` checks that they line up.
 
 ---
 
@@ -163,7 +163,7 @@ Hanging nuts are placed under their own tree's limbs (upright cones on top), and
 
 If a flower needs a shape that doesn't exist, add a new `art.k` branch in `drawFlowerSp` and keep it to simple filled shapes.
 
-### 2.4 Birds: facts in `data/birds.js`, art in `BIRDS` (inside `BirdArt`)
+### 2.4 Birds: facts in `data/birds.js`, art in `BIRDS` (inside `BirdArt`, in `art/birds.js`)
 
 Each bird is drawn from its field marks on a shared body, facing right:
 
@@ -268,4 +268,4 @@ sw: {name:'Southwest Ponderosa Pine', where:'Arizona, New Mexico and Colorado',
 
 ## Workflow
 
-The game is also published as a Claude artifact for quick review. Update and review the artifact first, then push to GitHub once it's approved. `index.html` is the artifact's page wrapped in a standard `<!doctype html>` skeleton, and the four `data/*.js` files are published alongside it at the same paths.
+The game is also published as a Claude artifact for quick review. Update and review the artifact first, then push to GitHub once it's approved. `index.html` is the artifact's page wrapped in a standard `<!doctype html>` skeleton, and the `data/*.js` and `art/*.js` files are published alongside it at the same paths.

@@ -4,7 +4,7 @@ A cozy treetop game in one HTML5 page, for explorers aged 8 and up. You're a rea
 
 ## Play
 
-Open `index.html` in a browser. It works on phones (touch), with a keyboard, or with a game controller. It needs no server or build: keep the `data/` folder beside it, since that's where the species facts live.
+Open `index.html` in a browser. It works on phones (touch), with a keyboard, or with a game controller. It needs no server or build: keep the `data/` and `art/` folders beside it: `data/` holds the species facts and `art/` some of the drawing code.
 
 ## Controls
 
