@@ -238,7 +238,6 @@ const SPECIES={
  birch:{bark:'#e7e2d6',barkHi:'#ffffff',barkLo:'#b5ad9f',mark:'#2b2622',leaf:['#c9c040','#adb63b','#dfd56a','#9aa832'],trunk:13,len:112,decay:.77,spread:.42,jit:.22,depth:8,split:'mono',droop:.3,gnarl:.12,leafR:8},
  pine:{bark:'#4b3c31',barkHi:'#6a584b',barkLo:'#30261e',leaf:['#2f4a3a','#3b5d47','#25392d'],trunk:17,whorl:true,leafR:9}
 };
-const SPKEYS=['oak','maple','birch','pine'];
 function leafBlob(r,sp,x,y,size,out){const blobs=[];const n=3+Math.floor(r()*4);for(let i=0;i<n;i++)blobs.push({dx:(r()-.5)*size*1.6,dy:(r()-.5)*size*1.2-size*.2,rx:size*(.45+r()*.5),ry:size*(.35+r()*.4),rot:r()*TAU,c:sp.leaf[Math.floor(r()*sp.leaf.length)]});out.push({x,y,blobs});}
 
 function genRecursive(sp,seed,x,y,s){
@@ -394,25 +393,6 @@ function drawPath(ctx,P,sp,sag,outline,opt){
  if(sp.strips&&P.kind==='trunk'){ctx.strokeStyle=sp.strips;ctx.lineWidth=1.6;ctx.globalAlpha=.75;for(const o of[.2,.38,.56,.74]){for(let i0=((o*40)|0)%3;i0<p.length-4;i0+=6){ctx.beginPath();for(let i=i0;i<i0+4;i++){const a=Lp[i],b=Rp[i];const x=lerp(a[0],b[0],o),y=lerp(a[1],b[1],o);i>i0?ctx.lineTo(x,y):ctx.moveTo(x,y);}ctx.stroke();}}ctx.globalAlpha=1;}
  return{Lp,Rp,k0};
 }
-// Branch joint: a soft shadow under the limb, a flared collar that blends into the parent, and a crease in the crotch
-function drawJoint(ctx,lb,par,sp,geo){const P=lb.path,J=pathAt(par,lb.at),w0=P.w0;const pa=J.ang,pt=[Math.cos(pa),Math.sin(pa)];
- const k=Math.min(geo.k0+1,P.pts.length-1);const L=geo.Lp[k],R=geo.Rp[k];
- const up=((L[0]-J.x)*pt[0]+(L[1]-J.y)*pt[1])>((R[0]-J.x)*pt[0]+(R[1]-J.y)*pt[1])?L:R,dn=up===L?R:L;
- const d0=pathAt(P,Math.min(P.len,w0*.8)),d=[d0.x-J.x,d0.y-J.y],dl=Math.hypot(d[0],d[1])||1;d[0]/=dl;d[1]/=dl;
- const reach=Math.max(w0*.95,J.w*.35),A=[J.x+pt[0]*reach,J.y+pt[1]*reach],C=[J.x-pt[0]*reach,J.y-pt[1]*reach];
- const cA=[J.x+d[0]*w0*.75+pt[0]*w0*.35,J.y+d[1]*w0*.75+pt[1]*w0*.35],cC=[J.x+d[0]*w0*.75-pt[0]*w0*.35,J.y+d[1]*w0*.75-pt[1]*w0*.35];
- ctx.fillStyle=sp.bark;ctx.beginPath();ctx.moveTo(A[0],A[1]);ctx.quadraticCurveTo(cA[0],cA[1],up[0],up[1]);ctx.lineTo(dn[0],dn[1]);ctx.quadraticCurveTo(cC[0],cC[1],C[0],C[1]);ctx.lineTo(J.x-d[0]*w0*.08,J.y-d[1]*w0*.08);ctx.closePath();ctx.fill();
- ctx.lineCap='round';
- // crotch crease (branch bark ridge) on the acute side
- ctx.strokeStyle=sp.barkLo;ctx.globalAlpha=.85;ctx.lineWidth=Math.max(1.2,w0*.09);ctx.beginPath();ctx.moveTo(lerp(A[0],J.x,.15)+pt[0]*2,lerp(A[1],J.y,.15)+pt[1]*2);ctx.quadraticCurveTo(cA[0]+pt[0]*1.5,cA[1]+pt[1]*1.5,lerp(cA[0],up[0],.7),lerp(cA[1],up[1],.7));ctx.stroke();
- // soft underside shading where the limb meets the parent
- ctx.globalAlpha=.35;ctx.strokeStyle=sp.barkLo;ctx.lineWidth=Math.max(1.5,w0*.18);ctx.beginPath();ctx.moveTo(C[0],C[1]);ctx.quadraticCurveTo(cC[0],cC[1],dn[0],dn[1]);ctx.stroke();ctx.globalAlpha=1;
- // outline continues the limb's edges into the parent so the silhouette stays crisp
- ctx.strokeStyle='rgba(28,20,14,.45)';ctx.lineWidth=1.4;ctx.beginPath();ctx.moveTo(A[0],A[1]);ctx.quadraticCurveTo(cA[0],cA[1],up[0],up[1]);ctx.moveTo(C[0],C[1]);ctx.quadraticCurveTo(cC[0],cC[1],dn[0],dn[1]);ctx.stroke();
-}
-function clipTo(ctx,g){ctx.beginPath();g.Lp.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]));for(let i=g.Rp.length-1;i>=0;i--)ctx.lineTo(g.Rp[i][0],g.Rp[i][1]);ctx.closePath();ctx.clip();}
-function drawLimbShadow(ctx,lb,par,pg){const P=lb.path,J=pathAt(par,lb.at),w0=P.w0,pa=J.ang;const d0=pathAt(P,Math.min(P.len,w0*2));const dx=d0.x-J.x,dy=d0.y-J.y,l=Math.hypot(dx,dy)||1;
- ctx.save();if(pg)clipTo(ctx,pg);ctx.translate(J.x-Math.cos(pa)*w0*.9+dx/l*w0*.4,J.y-Math.sin(pa)*w0*.9+dy/l*w0*.4);ctx.rotate(pa);ctx.fillStyle='rgba(20,14,8,.22)';ctx.beginPath();ctx.ellipse(0,0,w0*.9,w0*.45,0,0,TAU);ctx.fill();ctx.restore();}
 // Joint "foot": the limb's base is closed off by an edge that runs ALONG the parent's axis (inside the parent),
 // with curved fillets from the flared limb edges down onto it, so both corners always overlap the parent.
 function limbEdges(P,s,fl,c0){const a=pathAt(P,s);const w=wAt(P,s)/2*(1+.85*Math.exp(-(s-c0)/fl));const nx=-Math.sin(a.ang),ny=Math.cos(a.ang);return[[a.x+nx*w,a.y+ny*w],[a.x-nx*w,a.y-ny*w],a];}
@@ -429,13 +409,6 @@ function drawTreeLayer(ctx,T,z,sagFor,sag){
  for(const lb of T.limbs){if((lb.behind?-1:1)!==z)continue;const sg=(sagLoad(lb.path)||(lb.parent&&sagAt(lb.path,0)))?(c=>sagAt(lb.path,c)):null;
   if(lb.behind){const g=drawPath(ctx,lb.path,T.sp,sg,true);ctx.save();ctx.globalAlpha=.16;ctx.fillStyle='#120c06';ctx.beginPath();g.Lp.forEach((q,i)=>i?ctx.lineTo(q[0],q[1]):ctx.moveTo(q[0],q[1]));for(let i=g.Rp.length-1;i>=0;i--)ctx.lineTo(g.Rp[i][0],g.Rp[i][1]);ctx.closePath();ctx.fill();ctx.restore();}
   else{const par=lb.parent||T.trunk,fy=lb.parent?sagAt(lb.path,0):0;if(fy){ctx.save();ctx.translate(0,fy);}drawFoot(ctx,lb,par,T.sp);if(fy)ctx.restore();drawPath(ctx,lb.path,T.sp,sg,true,{flare:lb.path.w0*1.3,parent:par});}}}
-function drawTreeBody(ctx,T,sagFor,sag){for(const z of[-1,0,1])drawTreeLayer(ctx,T,z,sagFor,sag);}
-function drawSplineTree(ctx,T,opt){
- opt=opt||{};drawLeaves(ctx,T.leaves,null,opt.leafAlpha==null?.92:opt.leafAlpha);
- drawSegs(ctx,T.twigs,T.sp);
- for(const b of T.blooms)drawBloomSprite(ctx,b.v,b.x,b.y,opt.bloomR||6,b.rot);
- drawTreeBody(ctx,T,opt.sagFor,opt.sag);
-}
 
 /* ---- scenery flowers, flower shapes and the sprite cache: art/plants.js ---- */
 
@@ -754,8 +727,7 @@ const TREE_INFO={};for(const[id,r]of Object.entries(SPECIES_DATA.trees)){const t
   pedoak:mk('oak',{bloom:null}),
   eubeech:mk('maple',{bark:'#9aa0a2',barkHi:'#c3c8c9',barkLo:'#6e7375',leaf:['#5f8a2c','#78a038','#4f7a26'],spread:.62,trunk:21,bloom:null}),
   rowan:mk('maple',{bark:'#7d7a74',barkHi:'#9e9a93',barkLo:'#57544f',leaf:['#6a8a35','#7b9a3c','#c8402a'],trunk:13,bloom:null})});
- for(const k of['oak','maple','birch','pine'])if(SPECIES[k].bloom===undefined)SPECIES[k].bloom=k==='birch'?'cherry':k==='oak'?'dogwood':null;
- SPECIES.birch.wavy=SPECIES.paperbirch.wavy=SPECIES.aspen.wavy=SPECIES.silverbirch.wavy=1;})();
+ SPECIES.paperbirch.wavy=SPECIES.aspen.wavy=SPECIES.silverbirch.wavy=1;})();
 
 // Pacific Northwest trees
 (function(){const mk=(base,o)=>Object.assign({},SPECIES[base],o);Object.assign(SPECIES,{
@@ -804,7 +776,6 @@ function itemInfo(kind,id){if(kind==='s'){const q=SQUIRRELS[id];return{kind,id,n
  if(kind==='b'){const b=BIRD_SP[id];return{kind,id,name:b.name,sci:b.sci,range:b.range,fact:b.fact,pl:b.pl};}
  if(kind==='n'){const n=NUTS[id];return{kind,id,name:n.name,sci:n.sci,range:n.range,fact:n.fact,tree:n.treeName};}
  const f=FLW[id];return{kind,id,name:f.name,sci:f.sci,range:f.range};}
-function plural(i){if(i.pl)return i.pl;const n=i.name;if(/(ch|sh)$/.test(n))return n+'es';if(/nut$/.test(n)||/cone$/.test(n)||/acorn$/.test(n))return n+'s';if(/grouse$/.test(n))return n;return n+'s';}
 
 /* ---- nut, cone and wildflower drawing: art/plants.js ---- */
 
@@ -936,7 +907,6 @@ function slotId(M,k){return M.targets[k];}
 function slotFilled(M,k){return M.got.includes(M.targets[k]);}
 
 /* ---- photo: pick what's on screen, prefer what you're looking for ---- */
-function onScreen(x,y,w,h){const z=cam.zoom*(1+FX.punch),sx=(x-cam.x)*z+w/2,sy=(y-cam.y)*z+h/2;return sx>-6&&sx<w+6&&sy>-6&&sy<h+6;}
 /* ---- camera lens: hold to look through a circle, drag to aim, release to shoot ---- */
 const LENS={on:false,src:null,follow:false,f:{x:0,y:0},t0:0,cx:0,cy:0,bx:0,by:0,px:0,py:0,ax:0,ay:0,pick:null};
 const LENS_READY=.3;
